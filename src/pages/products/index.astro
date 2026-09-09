@@ -1,0 +1,197 @@
+---
+import Layout from "@/layouts/main.astro"
+
+const products = [
+  {
+    slug: "t-shirts",
+    title: "T-Shirts",
+    badge: "Bestseller",
+    description: "Custom printed cotton, poly-blend, and oversized t-shirts with vibrant, long-lasting DTF and screen prints.",
+    features: ["100% Combed Cotton", "High-Def DTF Printing", "Fade-Resistant Washable"],
+    startingPrice: "₹299",
+    turnaround: "24-48 hrs"
+  },
+  {
+    slug: "mobile-case",
+    title: "Mobile Cases",
+    badge: "Popular",
+    description: "Durable hard plastic, tempered glass, and shockproof silicone cases customized for 500+ phone models.",
+    features: ["Edge-to-Edge 3D Print", "Impact Resistant", "Glossy & Matte Finish"],
+    startingPrice: "₹199",
+    turnaround: "24 hrs"
+  },
+  {
+    slug: "key-chain",
+    title: "Key Chains",
+    badge: "Gifting",
+    description: "Laser-cut acrylic, engraved metal, and wooden keychains personalized with photos, names, or logos.",
+    features: ["Custom Die-Cut Shapes", "Double-Sided Prints", "Durable Hardware"],
+    startingPrice: "₹49",
+    turnaround: "24 hrs"
+  },
+  {
+    slug: "photo-frame",
+    title: "Photo Frames",
+    badge: "Trending",
+    description: "Turn your cherished memories into museum-grade acrylic and wooden wall and desk photo frames.",
+    features: ["Ultra-Clear Acrylic", "Matte & Gloss Lamination", "Ready to Mount/Desk Stand"],
+    startingPrice: "₹349",
+    turnaround: "2-3 days"
+  },
+  {
+    slug: "photo-frame-clock",
+    title: "Photo Frame Clocks",
+    badge: "Unique",
+    description: "2-in-1 personalized wall clocks featuring customized photo collages and silent sweep quartz movements.",
+    features: ["Silent Quartz Clock", "High-Resolution Collage", "Battery Included"],
+    startingPrice: "₹599",
+    turnaround: "2-3 days"
+  },
+  {
+    slug: "cushion-cover",
+    title: "Cushion Covers",
+    badge: "Home Decor",
+    description: "Super-soft velvet, satin, and canvas customized cushions with vibrant photo and typography prints.",
+    features: ["Concealed Zipper", "Colorfast Printing", "Includes Plush Filler Option"],
+    startingPrice: "₹249",
+    turnaround: "24-48 hrs"
+  },
+  {
+    slug: "table-mat",
+    title: "Table Mats",
+    badge: "Custom",
+    description: "Waterproof, non-slip, and heat-resistant custom dining and desk mats with edge-stitched durability.",
+    features: ["Waterproof PVC/Fabric", "Anti-Slip Rubber Base", "Wipe-Clean Surface"],
+    startingPrice: "₹149",
+    turnaround: "24-48 hrs"
+  },
+  {
+    slug: "water-bottle",
+    title: "Water Bottles",
+    badge: "Eco Friendly",
+    description: "Double-walled stainless steel insulated flasks and lightweight aluminum sippers personalized with UV prints.",
+    features: ["Hot & Cold 12+ Hours", "BPA-Free Stainless Steel", "UV Laser / Full Wrap"],
+    startingPrice: "₹399",
+    turnaround: "24-48 hrs"
+  },
+  {
+    slug: "cap",
+    title: "Caps",
+    badge: "Apparel",
+    description: "High-grade structured cotton baseball caps and snapbacks with premium embroidery or heat-pressed prints.",
+    features: ["Adjustable Strap", "Breathable Fabric", "Embroidery or Print"],
+    startingPrice: "₹199",
+    turnaround: "2-3 days"
+  },
+  {
+    slug: "pens",
+    title: "Pens",
+    badge: "Corporate",
+    description: "Precision laser-engraved metallic pens and colorful printed promotional ballpoint pens for corporate branding.",
+    features: ["Smooth Flow German Ink", "Permanent Laser Etch", "Gift Box Available"],
+    startingPrice: "₹29",
+    turnaround: "24-48 hrs"
+  },
+  {
+    slug: "banner",
+    title: "Banners",
+    badge: "Promotional",
+    description: "Heavy-duty outdoor flex banners, pull-up roll-up standees, and vinyl backdrops in any custom dimension.",
+    features: ["Weatherproof Vinyl", "Metal Eyelets & Hems", "Vivid Solvent Inks"],
+    startingPrice: "₹15/sq.ft",
+    turnaround: "Same Day"
+  }
+]
+---
+
+<Layout 
+  title="Products & Services - RS Prints"
+  description="Explore our full collection of custom personalized printing services: t-shirts, phone cases, key chains, photo frames, banners, and promotional merchandise."
+  canonicalUrl="/products"
+  currentActive="products"
+>
+  <div class="container mx-auto px-4 py-12 max-w-7xl">
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto space-y-4 mb-14">
+      <div class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+        ✦ Premium Custom Printing
+      </div>
+      <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground">
+        Custom Merchandise & Print Solutions
+      </h1>
+      <p class="text-base md:text-lg text-muted-foreground leading-relaxed">
+        From personalized individual keepsakes to bulk corporate branded supplies, we produce sharp, vibrant prints with fast turnaround times.
+      </p>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {products.map((item) => (
+        <div class="group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                {item.badge}
+              </span>
+              <span class="text-xs text-muted-foreground font-mono">
+                From <span class="font-semibold text-foreground">{item.startingPrice}</span>
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                <a href={`/products/${item.slug}`} class="after:absolute after:inset-0">
+                  {item.title}
+                </a>
+              </h2>
+              <p class="mt-2 text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+
+            <!-- Features -->
+            <ul class="space-y-1.5 pt-2">
+              {item.features.map((feature) => (
+                <li class="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span class="text-primary font-bold">✓</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+            <span>Ready in: <strong class="text-foreground">{item.turnaround}</strong></span>
+            <span class="font-medium text-primary group-hover:translate-x-1 transition-transform flex items-center gap-1">
+              Customize & Order &rarr;
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom CTA Banner -->
+    <div class="mt-16 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-8 md:p-12 text-center max-w-4xl mx-auto space-y-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+        Have a Custom Requirement or Bulk Order?
+      </h2>
+      <p class="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+        We offer tiered wholesale pricing for corporate gifting, team apparel, event merchandise, and custom bulk printing orders.
+      </p>
+      <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
+        <a 
+          href="/contact" 
+          class="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
+        >
+          Request a Bulk Quote
+        </a>
+        <a 
+          href="tel:+919876543210" 
+          class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+        >
+          Call Our Print Studio
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

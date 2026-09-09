@@ -1,0 +1,46 @@
+{
+  "brand": {
+    "name": "RS Prints",
+    "legalName": "RS Prints Custom Studio LLP",
+    "tagline": "Custom Print Studio & Merchandise",
+    "description": "Crafting high-definition custom apparel, personalized photo gifts, and corporate merchandise with precision printing delivered across India.",
+    "siteUrl": "https://rsprints.in"
+  },
+  "contact": {
+    "phone": {
+      "display": "+91 98765 43210",
+      "raw": "+919876543210"
+    },
+    "whatsapp": {
+      "display": "+91 98765 43210",
+      "number": "919876543210",
+      "url": "https://wa.me/919876543210",
+      "defaultMessage": "Hi RS Prints, I would like to inquire about custom printing."
+    },
+    "email": {
+      "support": "support@rsprints.in",
+      "bulk": "bulk@rsprints.in",
+      "orders": "orders@rsprints.in",
+      "legal": "legal@rsprints.in"
+    },
+    "hours": {
+      "display": "Monday – Saturday: 9:30 AM – 7:30 PM IST",
+      "short": "Mon - Sat: 9:30 AM - 7:30 PM IST",
+      "closed": "Sundays & National Holidays",
+      "responseTime": "Within 2 business hours"
+    },
+    "address": {
+      "line1": "Plot No. 42, Industrial Area, Phase II",
+      "line2": "Okhla Industrial Area",
+      "city": "New Delhi",
+      "state": "Delhi",
+      "postalCode": "110020",
+      "country": "India"
+    }
+  },
+  "socials": {
+    "instagram": "https://instagram.com/rsprints",
+    "facebook": "https://facebook.com/rsprints",
+    "twitter": "https://twitter.com/rsprints"
+  }
+}

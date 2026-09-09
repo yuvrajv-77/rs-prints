@@ -1,0 +1,138 @@
+---
+import "@/styles/global.css"
+import Navbar from "@/components/navbar"
+import BrandLogo from "@/components/BrandLogo"
+import Footer from "@/components/footer"
+import { Button } from "@/components/ui/button"
+
+interface Props {
+  title?: string
+  description?: string
+  canonicalUrl?: string
+  ogType?: string
+  currentActive?:
+    | "home"
+    | "products"
+    | "about"
+    | "contact"
+    | "t-shirts"
+    | "mobile-case"
+    | "key-chain"
+    | "photo-frame"
+    | "photo-frame-clock"
+    | "cushion-cover"
+    | "table-mat"
+    | "water-bottle"
+    | "cap"
+    | "pens"
+    | "banner"
+    | (string & {})
+  schemaMarkup?: Record<string, any> | Record<string, any>[]
+}
+
+const {
+  title = "RS Prints",
+  description = "An offline-first, private-by-design developer utility suite. Format, beautify, validate, minify, and inspect JSON in an interactive tree view. No data ever leaves your computer.",
+  canonicalUrl,
+  ogType = "website",
+  currentActive = "home",
+  schemaMarkup,
+} = Astro.props
+
+// Build absolute canonical URL
+const siteUrl = "https://devjsonsandbox.pages.dev" // Placeholders replaced with clean static production domain
+const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={finalCanonical} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={finalCanonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={finalCanonical} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={`${siteUrl}/og-image.png`} />
+
+    {
+      schemaMarkup && (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(schemaMarkup)}
+        />
+      )
+    }
+  </head>
+  <body
+    class="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20"
+  >
+    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container mx-auto flex h-20 items-center justify-between px-4">
+       <BrandLogo/>
+        <Navbar client:load />
+        <Button size={'lg'}>
+          Sign Up
+        </Button>
+      </div>
+    </header>
+
+
+
+    
+    <!-- Main Content -->
+    <main class="flex flex-1 flex-col">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <Footer client:load />
+
+    <!-- Script to toggle light/dark theme dynamically -->
+    <script>
+      const themeToggleBtn = document.getElementById("theme-toggle")
+      const lightIcon = document.getElementById("theme-toggle-light-icon")
+      const darkIcon = document.getElementById("theme-toggle-dark-icon")
+
+      function updateIcons() {
+        const isDark = document.documentElement.classList.contains("dark")
+        if (isDark) {
+          lightIcon?.classList.remove("hidden")
+          darkIcon?.classList.add("hidden")
+        } else {
+          lightIcon?.classList.add("hidden")
+          darkIcon?.classList.remove("hidden")
+        }
+      }
+
+      // Initial icon alignment
+      updateIcons()
+
+      themeToggleBtn?.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.toggle("dark")
+        localStorage.setItem("theme", isDark ? "dark" : "light")
+        updateIcons()
+      })
+
+      // Font size selectors management handled by FontSizeSelector React component
+    </script>
+  </body>
+</html>
