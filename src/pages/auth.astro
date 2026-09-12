@@ -1,0 +1,18 @@
+---
+import Layout from "@/layouts/auth.astro"
+import AuthTabs from "@/components/auth/AuthTabs"
+
+// Determine initial tab from URL during SSR
+const tabParam =
+  Astro.url.searchParams.get("tab") ||
+  Astro.url.searchParams.get("mode") ||
+  "signin"
+---
+
+<Layout
+  title="Sign In / Sign Up - RS Prints"
+  description="Sign in or create your RS Prints account to manage your orders, custom prints, and account details."
+  canonicalUrl="/auth"
+>
+  <AuthTabs client:load initialTab={tabParam} />
+</Layout>

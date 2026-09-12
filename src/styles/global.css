@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/outfit";
+@import "@fontsource/overlock";
+@import "@fontsource/overlock/700.css";
+@import "@fontsource/overlock/900.css";
 @import "@fontsource/righteous";
 
 @custom-variant dark (&:is(.dark *));
@@ -38,10 +40,10 @@
   --sidebar-accent-foreground: rgb(15, 23, 42);
   --sidebar-border: rgb(241, 245, 249);
   --sidebar-ring: rgb(241, 244, 62);
-  --font-sans: "Outfit Variable", "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Overlock", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Righteous", cursive, sans-serif;
   --font-righteous: "Righteous", cursive, sans-serif;
-  --font-mono: "Outfit Variable", "Outfit", sans-serif;
+  --font-mono: "Overlock", sans-serif;
   --radius: 1.15rem;
   --shadow-x: 0px;
   --shadow-y: 8px;
@@ -94,12 +96,12 @@
   --sidebar-accent-foreground: rgb(248, 250, 252);
   --sidebar-border: rgb(30, 41, 59);
   --sidebar-ring: rgb(175, 243, 62);
-  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Overlock", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Righteous", cursive, sans-serif;
   --font-righteous: "Righteous", cursive, sans-serif;
   --font-geist: "Geist Variable", sans-serif;
   --font-serif: Playfair Display, ui-serif, serif;
-  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", monospace;
+  --font-mono: "Overlock", monospace;
   --radius: 1.15rem;
   --shadow-x: 0px;
   --shadow-y: 10px;

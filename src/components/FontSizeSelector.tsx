@@ -18,7 +18,8 @@ export const FontSizeSelector: React.FC = () => {
     setSize(savedSize);
   }, []);
 
-  const handleSizeChange = (newSize: string) => {
+  const handleSizeChange = (newSize: string | null) => {
+    if (!newSize) return;
     setSize(newSize);
 
     const classes = ["ui-fs-sm", "ui-fs-md", "ui-fs-lg"];

@@ -1,0 +1,96 @@
+---
+import "@/styles/global.css"
+
+interface Props {
+  title?: string
+  description?: string
+  canonicalUrl?: string
+}
+
+const {
+  title = "Authentication - RS Prints",
+  description = "Sign in or create your RS Prints account to manage your orders, custom prints, and preferences.",
+  canonicalUrl = "/auth",
+} = Astro.props
+
+const siteUrl = "https://devjsonsandbox.pages.dev"
+const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={finalCanonical} />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={finalCanonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}/og-image.png`} />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={finalCanonical} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+  </head>
+  <body
+    class="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20"
+  >
+    <!-- Minimal Auth Header -->
+    <header class="w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
+      <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
+        <a
+          href="/"
+          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-4 transition-transform group-hover:-translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Store</span>
+        </a>
+
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+      <slot />
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="w-full border-t border-border/40 py-4 text-center text-xs text-muted-foreground">
+      <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 px-4">
+        <p>&copy; {new Date().getFullYear()} RS Prints. All rights reserved.</p>
+        <div class="flex items-center gap-4">
+          <a href="/privacy-policy" class="hover:underline hover:text-foreground transition-colors">Privacy Policy</a>
+          <a href="/terms-and-conditions" class="hover:underline hover:text-foreground transition-colors">Terms of Service</a>
+          <a href="/contact" class="hover:underline hover:text-foreground transition-colors">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Ensure pure light mode -->
+    <script is:inline>
+      document.documentElement.classList.remove("dark")
+      try {
+        localStorage.removeItem("theme")
+      } catch (e) {}
+    </script>
+  </body>
+</html>

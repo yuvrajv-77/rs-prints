@@ -187,13 +187,7 @@ export default function Navbar() {
                     />
                 </NavigationMenuItem>
 
-                {/* 3. Key Chains */}
-                <NavigationMenuItem>
-                    <NavigationMenuLink
-                        className={navItemClassName}
-                        render={<a href="/products/key-chain">Key Chains</a>}
-                    />
-                </NavigationMenuItem>
+               
 
                 {/* 4. Photo Frames Dropdown (2-column layout with tall card on right) */}
                 <NavigationMenuItem>
@@ -293,14 +287,6 @@ export default function Navbar() {
                     />
                 </NavigationMenuItem>
 
-                {/* 6. Table Mats */}
-                <NavigationMenuItem>
-                    <NavigationMenuLink
-                        className={navItemClassName}
-                        render={<a href="/products/table-mat">Table Mats</a>}
-                    />
-                </NavigationMenuItem>
-
                 {/* 7. Water Bottles */}
                 <NavigationMenuItem>
                     <NavigationMenuLink
@@ -317,12 +303,44 @@ export default function Navbar() {
                     />
                 </NavigationMenuItem>
 
-                {/* 9. Pens */}
+                {/* 9. Accessories */}
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        className={navItemClassName}
-                        render={<a href="/products/pens">Pens</a>}
-                    />
+                    <NavigationMenuTrigger className={navItemClassName}>
+                        Accessories
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                        <div className="w-[320px]  p-2">
+                            <ul className="grid grid-cols-1 gap-1">
+                                <li>
+                                    <NavigationMenuLink
+                                        render={
+                                            <a href="/products/pens" className="block select-none rounded-lg p-2.5 text-sm font-medium leading-none no-underline outline-none transition-colors hover:bg-muted focus:bg-muted">
+                                                Pens
+                                            </a>
+                                        }
+                                    />
+                                </li>
+                                <li>
+                                    <NavigationMenuLink
+                                        render={
+                                            <a href="/products/keychains" className="block select-none rounded-lg p-2.5 text-sm font-medium leading-none no-underline outline-none transition-colors hover:bg-muted focus:bg-muted">
+                                                Keychains
+                                            </a>
+                                        }
+                                    />
+                                </li>
+                                <li>
+                                    <NavigationMenuLink
+                                        render={
+                                            <a href="/products/desk-mats" className="block select-none rounded-lg p-2.5 text-sm font-medium leading-none no-underline outline-none transition-colors hover:bg-muted focus:bg-muted">
+                                                Desk Mats
+                                            </a>
+                                        }
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                    </NavigationMenuContent>
                 </NavigationMenuItem>
 
                 {/* 10. Banners */}
