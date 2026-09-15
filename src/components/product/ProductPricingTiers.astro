@@ -1,0 +1,58 @@
+---
+import type { PricingTier } from "@/types/product"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { LayersIcon, CheckIcon } from "lucide-react"
+
+interface Props {
+  tiers?: PricingTier[]
+}
+
+const { tiers = [] } = Astro.props
+---
+
+{tiers.length > 0 && (
+  <div class="mt-12 space-y-4">
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider">
+          <LayersIcon className="size-3.5" />
+          <span>Volume Savings</span>
+        </div>
+        <h2 class="text-xl md:text-2xl font-bold tracking-tight text-foreground mt-1">
+          Wholesale & Bulk Pricing Tiers
+        </h2>
+      </div>
+      <Badge variant="outline">
+        Discounts auto-applied in cart & quotes
+      </Badge>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {tiers.map((tier) => (
+        <Card>
+          <CardHeader>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-muted-foreground">
+                {tier.quantityRange}
+              </span>
+              {tier.discountPercent && tier.discountPercent !== "Standard" && (
+                <Badge variant="default">
+                  {tier.discountPercent}
+                </Badge>
+              )}
+            </div>
+            <CardTitle className="text-xl font-extrabold text-foreground mt-1">
+              {tier.price}
+              <span class="text-xs font-normal text-muted-foreground block">/ piece</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs text-muted-foreground flex items-center gap-1">
+            <CheckIcon className="size-3 text-primary shrink-0" />
+            <span>{tier.savingsLabel || "Bulk discount included"}</span>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  </div>
+)}

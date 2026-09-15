@@ -1,0 +1,116 @@
+---
+import type { ProductSpecGroup } from "@/types/product"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { CpuIcon, LayersIcon, CheckCircleIcon } from "lucide-react"
+
+interface Props {
+  materials: string[]
+  printMethods: string[]
+  options: string[]
+  specifications?: ProductSpecGroup[]
+}
+
+const { materials, printMethods, options, specifications = [] } = Astro.props
+---
+
+<div class="mt-14 space-y-6">
+  <div>
+    <h2 class="text-xl font-bold tracking-tight text-foreground md:text-2xl">
+      Technical Specifications & Options
+    </h2>
+    <p class="mt-1 text-sm text-muted-foreground">
+      Comprehensive breakdown of materials, technology, and configuration
+      choices.
+    </p>
+  </div>
+
+  {
+    specifications.length > 0 ? (
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {specifications.map((group) => (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CpuIcon className="size-4 text-primary" />
+                {group.groupName}
+              </CardTitle>
+            </CardHeader>
+            <Separator />
+            <CardContent className="space-y-3 pt-4">
+              {group.items.map((item) => (
+                <div class="text-xs">
+                  <span class="block text-[11px] font-medium text-muted-foreground">
+                    {item.label}
+                  </span>
+                  <span class="font-semibold text-foreground">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    ) : (
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Materials */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LayersIcon className="size-4 text-primary" />
+              Available Materials
+            </CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent className="space-y-2 pt-4">
+            {materials.map((m) => (
+              <div class="flex items-center gap-2 text-xs text-foreground">
+                <CheckCircleIcon className="size-3.5 text-primary shrink-0" />
+                <span>{m}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Print Technologies */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CpuIcon className="size-4 text-primary" />
+              Print Technologies
+            </CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent className="space-y-2 pt-4">
+            {printMethods.map((p) => (
+              <div class="flex items-center gap-2 text-xs text-foreground">
+                <CheckCircleIcon className="size-3.5 text-primary shrink-0" />
+                <span>{p}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Options / Variations */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LayersIcon className="size-4 text-primary" />
+              Styles & Sizes
+            </CardTitle>
+          </CardHeader>
+          <Separator />
+          <CardContent className="space-y-2 pt-4">
+            {options.map((o) => (
+              <div class="flex items-center gap-2 text-xs text-foreground">
+                <CheckCircleIcon className="size-3.5 text-primary shrink-0" />
+                <span>{o}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+</div>

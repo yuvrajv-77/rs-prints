@@ -13,3 +13,4 @@ export default defineConfig({
   },
   integrations: [react(), sitemap()],
 })
+// Vite cache refresh

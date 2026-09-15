@@ -1,0 +1,252 @@
+---
+import Layout from "@/layouts/main.astro"
+import BulkOrderForm from "@/components/bulk-order/BulkOrderForm"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
+import {
+  CheckCircle2,
+  PhoneCall,
+  Mail,
+  Layers,
+} from "lucide-react"
+import brandConfig from "@/data/brandConfig.json"
+
+const title = "Bulk Orders & Corporate Custom Printing - RS Prints"
+const description =
+  "Order custom printed apparel, drinkware, photo frames, and corporate merchandise in volume. Enjoy up to 45% tiered discounts, digital mockups, and priority dispatch."
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalUrl="/bulk-order"
+  currentActive="bulk-order"
+>
+  <div class="container mx-auto space-y-8 px-4 py-6 md:py-10">
+    <!-- Breadcrumb Navigation -->
+    <Breadcrumb>
+      <BreadcrumbList className="text-xs">
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/products">Products</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Bulk Orders</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+
+    <!-- Bulk Order Banner -->
+    <div class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+      <img
+        src="/bulk-order-banner.png"
+        alt="RS Prints Bulk Custom Printing & Corporate Solutions"
+        class="w-full h-auto object-cover"
+        width="2170"
+        height="409"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+
+    <!-- Main Two-Column Layout -->
+    <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
+      <!-- ================= LEFT COLUMN: FORM ISLAND ================= -->
+      <div class="space-y-6 lg:col-span-8">
+        <div class="space-y-1">
+          <h2
+            class="font-heading text-2xl font-bold tracking-tight text-foreground"
+          >
+            Request a Bulk Order Quote
+          </h2>
+          <p class="text-xs text-muted-foreground sm:text-sm">
+            Fill out the form below (minimum 40 units). Your inquiry will be
+            formatted instantly and sent to our team via WhatsApp for direct
+            quote confirmation.
+          </p>
+        </div>
+
+        <!-- React Island: TanStack Form -->
+        <BulkOrderForm client:load />
+      </div>
+
+      <!-- ================= RIGHT COLUMN: TIERS, BENEFITS & FAQ ================= -->
+      <aside class="space-y-6 lg:sticky lg:top-24 lg:col-span-4">
+        <!-- 1. Volume Discount Tiers -->
+        <Card className="space-y-4 border-border/80 p-5 sm:p-6">
+          <div
+            class="flex items-center justify-between border-b border-border/50 pb-3"
+          >
+            <h3
+              class="flex items-center gap-2 font-heading text-base font-bold text-foreground"
+            >
+              <Layers className="size-4 text-primary" />
+              <span>Volume Discount Tiers</span>
+            </h3>
+            <Badge variant="secondary" className="font-mono text-[10px]"
+              >Min 40 units</Badge
+            >
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div
+              class="flex items-center justify-between rounded-xl border border-border/50 bg-muted/40 p-2.5"
+            >
+              <div class="space-y-0.5">
+                <span class="font-semibold text-foreground">40 – 99 Units</span>
+                <p class="text-[11px] text-muted-foreground">
+                  Standard corporate batch
+                </p>
+              </div>
+              <span
+                class="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono font-bold text-amber-600"
+              >
+                15% OFF
+              </span>
+            </div>
+
+            <div
+              class="flex items-center justify-between rounded-xl border border-border/50 bg-muted/40 p-2.5"
+            >
+              <div class="space-y-0.5">
+                <span class="font-semibold text-foreground"
+                  >100 – 249 Units</span
+                >
+                <p class="text-[11px] text-muted-foreground">
+                  College events &amp; clubs
+                </p>
+              </div>
+              <span
+                class="rounded-md border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 font-mono font-bold text-blue-600"
+              >
+                25% OFF
+              </span>
+            </div>
+
+            <div
+              class="flex items-center justify-between rounded-xl border border-border/50 bg-muted/40 p-2.5"
+            >
+              <div class="space-y-0.5">
+                <span class="font-semibold text-foreground"
+                  >250 – 499 Units</span
+                >
+                <p class="text-[11px] text-muted-foreground">
+                  Exhibitions &amp; conferences
+                </p>
+              </div>
+              <span
+                class="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono font-bold text-primary"
+              >
+                35% OFF
+              </span>
+            </div>
+
+            <div
+              class="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/10 p-2.5"
+            >
+              <div class="space-y-0.5">
+                <span class="font-semibold text-foreground">500+ Units</span>
+                <p class="text-[11px] text-muted-foreground">
+                  Mega bulk / Annual supply
+                </p>
+              </div>
+              <span
+                class="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono font-bold text-emerald-600"
+              >
+                45% OFF
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        <!-- 2. What's Included in Every Bulk Order -->
+        <Card className="space-y-3.5 border-border/80 p-5 sm:p-6">
+          <h3 class="font-heading text-base font-bold text-foreground">
+            What You Get With RS Prints
+          </h3>
+
+          <ul class="space-y-2.5 text-xs text-muted-foreground">
+            <li class="flex items-start gap-2">
+              <CheckCircle2
+                className="mt-0.5 size-4 shrink-0 text-emerald-500"
+              />
+              <span
+                ><strong class="text-foreground">Free 3D/Digital Mockup</strong> before
+                production begins so you can approve logo scale and colors.</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle2
+                className="mt-0.5 size-4 shrink-0 text-emerald-500"
+              />
+              <span
+                ><strong class="text-foreground"
+                  >GST Invoicing &amp; Compliance</strong
+                > with proper HSN codes for hassle-free business expense claims.</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle2
+                className="mt-0.5 size-4 shrink-0 text-emerald-500"
+              />
+              <span
+                ><strong class="text-foreground"
+                  >Single or Multi-Location Delivery</strong
+                > options across India with insured transit.</span
+              >
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle2
+                className="mt-0.5 size-4 shrink-0 text-emerald-500"
+              />
+              <span
+                ><strong class="text-foreground">Dedicated Account Lead</strong> assigned
+                to track your order from printing to dispatch.</span
+              >
+            </li>
+          </ul>
+        </Card>
+
+        <!-- 3. Direct Contact Assistance -->
+        <Card className="space-y-3 border-border/80 bg-muted/20 p-5 sm:p-6">
+          <h3 class="font-heading text-sm font-bold text-foreground">
+            Need Immediate Assistance?
+          </h3>
+          <p class="text-xs leading-relaxed text-muted-foreground">
+            Our corporate sales team is available Monday through Saturday to
+            discuss urgent requirements or custom requests.
+          </p>
+
+          <div class="space-y-2 pt-1 text-xs">
+            <a
+              href={`tel:${brandConfig.contact.phone.raw}`}
+              class="flex items-center gap-2 font-medium text-foreground transition-colors hover:text-primary"
+            >
+              <PhoneCall className="size-3.5 text-primary" />
+              <span>{brandConfig.contact.phone.display}</span>
+            </a>
+            <a
+              href={`mailto:${brandConfig.contact.email.bulk}`}
+              class="flex items-center gap-2 font-medium text-foreground transition-colors hover:text-primary"
+            >
+              <Mail className="size-3.5 text-primary" />
+              <span>{brandConfig.contact.email.bulk}</span>
+            </a>
+          </div>
+        </Card>
+      </aside>
+    </div>
+  </div>
+</Layout>

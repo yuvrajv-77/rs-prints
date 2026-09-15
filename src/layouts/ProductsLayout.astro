@@ -1,0 +1,465 @@
+---
+import Layout from "@/layouts/main.astro"
+import { getCategorizedProducts } from "@/data/products"
+import brandConfig from "@/data/brandConfig.json"
+import { Card } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
+import {
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  ShieldCheck,
+  Zap,
+  PhoneCall,
+  X,
+} from "lucide-react"
+
+import CategoryNav from "@/components/product/CategoryNav"
+
+interface Props {
+  title?: string
+  description?: string
+  canonicalUrl?: string
+  currentActive?: string
+}
+
+const {
+  title = "All Products & Printing Services - RS Prints",
+  description = "Explore our full collection of custom printing services: personalized apparel, home decor, custom gifts, and corporate business essentials.",
+  canonicalUrl = "/products",
+  currentActive = "products",
+} = Astro.props
+
+const groupedSections = getCategorizedProducts()
+const totalProductsCount = groupedSections.reduce(
+  (acc, g) => acc + g.products.length,
+  0
+)
+
+const categoriesForNav = groupedSections.map((parent) => ({
+  id: parent.id,
+  title: parent.title,
+  description: parent.description,
+  totalCount: parent.totalCount,
+  subcategories: parent.subcategories.map((sub) => ({
+    id: sub.id,
+    title: sub.title,
+    description: sub.description,
+    count: sub.products.length,
+  })),
+}))
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  currentActive={currentActive}
+>
+  <!-- Top Banner Section (Default or Slot) -->
+  <slot name="banner">
+    <section
+      class="border-b border-border/60 bg-linear-to-b from-primary/10 via-background to-background pt-6 pb-10 md:pt-10 md:pb-14"
+    >
+      <div class="container mx-auto px-4">
+        <!-- Breadcrumbs -->
+        <div class="mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>All Products</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
+        <!-- Banner Container -->
+        <div
+          class="overflow-hidden rounded-2xl border border-border/70 bg-card "
+        >
+          <img
+            src="/products-banner.png"
+            alt="RS Prints Bulk Custom Printing & Corporate Solutions"
+            class="h-auto w-full object-cover"
+            width="2170"
+            height="409"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid Area -->
+    <section class="container mx-auto px-4 py-10 md:py-14">
+      <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+        <!-- ================= ASIDE: CATEGORIES WITH TOOLTIPS ================= -->
+        <slot name="aside">
+          <aside class="z-30 lg:sticky lg:top-24 lg:col-span-3 lg:self-start">
+            <div class="max-h-[calc(100vh-7rem)] overflow-y-auto pr-1">
+              <Card className="p-4 sm:p-5">
+                <div class="space-y-3">
+                  <div
+                    class="flex items-center justify-between border-b border-border/50 px-2 pt-1 pb-2"
+                  >
+                    <h3
+                      class="text-base font-bold tracking-tight text-foreground"
+                    >
+                      Categories
+                    </h3>
+                    <span class="font-mono text-xs text-muted-foreground"
+                      >{categoriesForNav.length} categories</span
+                    >
+                  </div>
+                  <CategoryNav
+                    client:load
+                    categories={categoriesForNav}
+                    totalProductsCount={totalProductsCount}
+                  />
+                </div>
+              </Card>
+            </div>
+          </aside>
+        </slot>
+
+        <!-- ================= RIGHT SECTION: FILTERABLE CARDS CONTAINER ================= -->
+        <section id="products-content-area" class="space-y-8 lg:col-span-9">
+          <!-- Dynamic Filter Feedback Toolbar -->
+          <div
+            id="filter-status-toolbar"
+            class="hidden items-center justify-between rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs sm:text-sm"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-muted-foreground">Showing:</span>
+              <span
+                id="filter-status-label"
+                class="font-semibold text-foreground"></span>
+              <span
+                id="filter-status-count"
+                class="rounded-md border border-border/60 bg-background px-2 py-0.5 font-mono text-xs text-foreground"
+              ></span>
+            </div>
+            <button
+              id="clear-filter-btn"
+              type="button"
+              class="inline-flex cursor-pointer items-center gap-1 font-medium text-primary hover:underline"
+            >
+              <span>Show all products</span>
+              <X className="size-3.5" />
+            </button>
+          </div>
+
+          <!-- No Products Found State -->
+          <div
+            id="no-products-state"
+            class="hidden space-y-3 rounded-2xl border border-dashed border-border p-12 text-center"
+          >
+            <p class="text-base font-semibold text-foreground">
+              No matching products found
+            </p>
+            <p class="text-xs text-muted-foreground">
+              Try clearing your selection to view all products.
+            </p>
+            <button
+              id="reset-filter-btn"
+              type="button"
+              class="inline-flex cursor-pointer items-center justify-center rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
+            >
+              View All Products
+            </button>
+          </div>
+
+          <!-- Injected Cards Slot -->
+          <div id="products-slot-container">
+            <slot />
+          </div>
+
+          <!-- Bottom CTA Slot -->
+          <slot name="footer">
+            <div
+              class="mt-12 rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/15 via-card to-background p-6 shadow-sm sm:p-8 md:p-10"
+            >
+              <div class="max-w-2xl space-y-3">
+                <div
+                  class="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/20 px-3 py-0.5 text-xs font-semibold text-foreground"
+                >
+                  <Zap className="size-3.5" />
+                  <span>Bulk & Corporate Advantage</span>
+                </div>
+                <h3
+                  class="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl md:text-3xl"
+                >
+                  Have a Custom Requirement or Bulk Order?
+                </h3>
+                <p
+                  class="text-xs leading-relaxed text-muted-foreground sm:text-sm md:text-base"
+                >
+                  We offer tiered wholesale pricing, dedicated graphic design
+                  assistance, custom packaging, and doorstep dispatch for orders
+                  of any scale.
+                </p>
+                <div class="flex flex-wrap items-center gap-3 pt-3">
+                  <a
+                    href="/contact"
+                    class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 sm:text-sm"
+                  >
+                    Request a Bulk Quote
+                  </a>
+                  <a
+                    href={brandConfig.contact.whatsapp.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-5 py-2.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted sm:text-sm"
+                  >
+                    <PhoneCall className="size-3.5" />
+                    <span>WhatsApp Studio</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </slot>
+        </section>
+      </div>
+    </section>
+  </slot>
+
+  <!-- Client-side Fast URL Parameter Synchronization & Instant Filtering Script -->
+  <script is:inline>
+    ;(function () {
+      function applyFilter(filterSlug, updateHistory) {
+        const activeFilter = filterSlug
+          ? filterSlug.trim().toLowerCase()
+          : "all"
+
+        // 1. Update URL search params cleanly without reload
+        if (updateHistory) {
+          const url = new URL(window.location.href)
+          if (activeFilter === "all" || !activeFilter) {
+            url.searchParams.delete("category")
+          } else {
+            url.searchParams.set("category", activeFilter)
+          }
+          window.history.pushState(
+            { category: activeFilter },
+            "",
+            url.toString()
+          )
+        }
+
+        // 2. Highlight active link in aside
+        const asideLinks = document.querySelectorAll(".aside-filter-link")
+        asideLinks.forEach((link) => {
+          const linkSlug = (
+            link.getAttribute("data-filter-slug") || ""
+          ).toLowerCase()
+          const parentSlug = (
+            link.getAttribute("data-parent-slug") || ""
+          ).toLowerCase()
+          const isSelf =
+            linkSlug === activeFilter ||
+            (activeFilter === "all" && linkSlug === "all")
+
+          if (isSelf) {
+            link.classList.add(
+              "bg-primary/15",
+              "text-primary",
+              "font-bold",
+              "border-primary/40"
+            )
+            link.classList.remove("text-foreground/85", "text-foreground/75")
+          } else {
+            link.classList.remove(
+              "bg-primary/15",
+              "text-primary",
+              "font-bold",
+              "border-primary/40"
+            )
+            if (link.getAttribute("data-parent-slug")) {
+              link.classList.add("text-foreground/75")
+            } else {
+              link.classList.add("text-foreground/85")
+            }
+          }
+        })
+
+        // 3. Filter cards & category sections in the right area
+        const productCards = document.querySelectorAll("[data-product-slug]")
+        const categorySections = document.querySelectorAll(
+          "[data-category-section]"
+        )
+        let visibleCount = 0
+        let activeLabel = ""
+
+        productCards.forEach((card) => {
+          const pSlug = (
+            card.getAttribute("data-product-slug") || ""
+          ).toLowerCase()
+          const subSlug = (
+            card.getAttribute("data-subcategory") ||
+            card.getAttribute("data-category-slug") ||
+            ""
+          ).toLowerCase()
+          const parentSlug = (
+            card.getAttribute("data-parent-category") || ""
+          ).toLowerCase()
+          const pTitle = card.getAttribute("data-product-title") || pSlug
+
+          const isMatch =
+            activeFilter === "all" ||
+            activeFilter === pSlug ||
+            activeFilter === subSlug ||
+            activeFilter === parentSlug
+
+          if (isMatch) {
+            card.classList.remove("hidden")
+            visibleCount++
+            if (activeFilter === pSlug) {
+              activeLabel = pTitle
+            }
+          } else {
+            card.classList.add("hidden")
+          }
+        })
+
+        // 4. Show/hide subcategory sections & parent category section headings
+        const subcategorySections = document.querySelectorAll(
+          "[data-subcategory-section]"
+        )
+        subcategorySections.forEach((subSection) => {
+          const visibleSubCards = subSection.querySelectorAll(
+            "[data-product-slug]:not(.hidden)"
+          )
+          if (visibleSubCards.length > 0) {
+            subSection.classList.remove("hidden")
+          } else {
+            subSection.classList.add("hidden")
+          }
+        })
+
+        categorySections.forEach((section) => {
+          const cSlug = (
+            section.getAttribute("data-category-section") || ""
+          ).toLowerCase()
+          const cTitle = section.getAttribute("data-category-title") || cSlug
+          const visibleChildCards = section.querySelectorAll(
+            "[data-product-slug]:not(.hidden)"
+          )
+
+          if (visibleChildCards.length > 0) {
+            section.classList.remove("hidden")
+            if (activeFilter === cSlug) {
+              activeLabel = cTitle
+            }
+          } else {
+            section.classList.add("hidden")
+          }
+        })
+
+        // Detect subcategory title if activeFilter matched a subcategory
+        if (!activeLabel && activeFilter !== "all") {
+          const activeSubLink = document.querySelector(
+            `.aside-filter-link[data-filter-slug="${activeFilter}"]`
+          )
+          if (activeSubLink) {
+            const subText =
+              activeSubLink.querySelector("span:first-child")?.textContent
+            if (subText) activeLabel = subText.trim()
+          }
+        }
+
+        // 5. Update filter toolbar
+        const toolbar = document.getElementById("filter-status-toolbar")
+        const labelEl = document.getElementById("filter-status-label")
+        const countEl = document.getElementById("filter-status-count")
+        const noProductsEl = document.getElementById("no-products-state")
+
+        if (activeFilter !== "all" && activeFilter !== "") {
+          if (toolbar) toolbar.classList.remove("hidden")
+          if (toolbar) toolbar.classList.add("flex")
+          if (labelEl) labelEl.textContent = activeLabel || activeFilter
+          if (countEl)
+            countEl.textContent = `${visibleCount} ${visibleCount === 1 ? "item" : "items"}`
+        } else {
+          if (toolbar) toolbar.classList.add("hidden")
+          if (toolbar) toolbar.classList.remove("flex")
+        }
+
+        // 6. Handle zero match state
+        if (noProductsEl) {
+          if (visibleCount === 0) {
+            noProductsEl.classList.remove("hidden")
+          } else {
+            noProductsEl.classList.add("hidden")
+          }
+        }
+      }
+
+      // Initialize from URL on page load
+      function init() {
+        const urlParams = new URLSearchParams(window.location.search)
+        const initialCategory = urlParams.get("category") || "all"
+        applyFilter(initialCategory, false)
+
+        // Intercept clicks on aside filter links for instant transitions
+        document.addEventListener("click", function (e) {
+          const target = e.target.closest(".aside-filter-link")
+          if (target) {
+            const currentPath =
+              window.location.pathname.replace(/\/$/, "") || "/"
+            if (currentPath === "/products") {
+              e.preventDefault()
+              const slug = target.getAttribute("data-filter-slug") || "all"
+              applyFilter(slug, true)
+
+              // Smooth scroll to top of products content area if scrolled past
+              const contentArea = document.getElementById(
+                "products-content-area"
+              )
+              if (contentArea && window.scrollY > contentArea.offsetTop) {
+                contentArea.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+            }
+          }
+        })
+
+        // Reset / Clear filter buttons
+        const clearBtn = document.getElementById("clear-filter-btn")
+        const resetBtn = document.getElementById("reset-filter-btn")
+        ;[clearBtn, resetBtn].forEach((btn) => {
+          if (btn) {
+            btn.addEventListener("click", function () {
+              applyFilter("all", true)
+            })
+          }
+        })
+
+        // Listen for browser Back/Forward navigation
+        window.addEventListener("popstate", function () {
+          const params = new URLSearchParams(window.location.search)
+          applyFilter(params.get("category") || "all", false)
+        })
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init)
+      } else {
+        init()
+      }
+    })()
+  </script>
+</Layout>

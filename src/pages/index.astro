@@ -1,10 +1,43 @@
 ---
 import Layout from "@/layouts/main.astro"
+import { vendureClient } from "@/lib/vendure/client"
+import { GET_PRODUCTS } from "@/lib/vendure/queries/queries"
+
+let productsData = null
+let queryError = null
+
+try {
+  productsData = await vendureClient.request(GET_PRODUCTS)
+} catch (err: any) {
+  queryError = err?.message ?? String(err)
+}
 ---
 
 <Layout title="Home - RS Prints" currentActive="home">
-  <div class="container mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold tracking-tight">RS Prints</h1>
-    <p class="mt-2 text-muted-foreground">Welcome to RS Prints.</p>
+  <script define:vars={{ productsData, queryError }}>
+    console.log("%c[Vendure] Query Result:", "color: #10b981; font-weight: bold; font-size: 13px;")
+    if (queryError) {
+      console.error("[Vendure] Query Error:", queryError)
+    } else {
+      console.log(productsData)
+    }
+  </script>
+  <div class="mx-auto">
+    <a
+      href="/products"
+      class="block overflow-hidden transition-opacity hover:opacity-95 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label="Shop all products"
+    >
+      <img
+        src="/shop-all-banner2.png"
+        alt="RS Prints Bulk Custom Printing & Corporate Solutions"
+        class="h-auto w-full object-cover select-none"
+        draggable="false"
+        width="2170"
+        height="409"
+        loading="eager"
+        decoding="async"
+      />
+    </a>
   </div>
 </Layout>

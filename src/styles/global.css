@@ -1,9 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource/overlock";
-@import "@fontsource/overlock/700.css";
-@import "@fontsource/overlock/900.css";
+@import "@fontsource/readex-pro";
+@import "@fontsource/readex-pro/500.css";
+@import "@fontsource/readex-pro/600.css";
+@import "@fontsource/readex-pro/700.css";
 @import "@fontsource/righteous";
 
 @custom-variant dark (&:is(.dark *));
@@ -40,10 +41,10 @@
   --sidebar-accent-foreground: rgb(15, 23, 42);
   --sidebar-border: rgb(241, 245, 249);
   --sidebar-ring: rgb(241, 244, 62);
-  --font-sans: "Overlock", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Readex Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Righteous", cursive, sans-serif;
   --font-righteous: "Righteous", cursive, sans-serif;
-  --font-mono: "Overlock", sans-serif;
+  --font-mono: "Readex Pro", sans-serif;
   --radius: 1.15rem;
   --shadow-x: 0px;
   --shadow-y: 8px;
@@ -96,12 +97,12 @@
   --sidebar-accent-foreground: rgb(248, 250, 252);
   --sidebar-border: rgb(30, 41, 59);
   --sidebar-ring: rgb(175, 243, 62);
-  --font-sans: "Overlock", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Readex Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Righteous", cursive, sans-serif;
   --font-righteous: "Righteous", cursive, sans-serif;
   --font-geist: "Geist Variable", sans-serif;
   --font-serif: Playfair Display, ui-serif, serif;
-  --font-mono: "Overlock", monospace;
+  --font-mono: "Readex Pro", monospace;
   --radius: 1.15rem;
   --shadow-x: 0px;
   --shadow-y: 10px;
@@ -178,6 +179,24 @@
   --tracking-wide: calc(var(--tracking-normal) + 0.025em);
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 @layer base {
