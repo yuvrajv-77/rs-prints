@@ -1,27 +1,18 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { vendureClient } from "@/lib/vendure/client"
-import { GET_PRODUCTS } from "@/lib/vendure/queries/queries"
+import { vendureClient } from "@/lib/vendure/client";
+import { GET_PRODUCTS } from "@/lib/vendure/queries/queries";
 
-let productsData = null
-let queryError = null
+const productsData = await vendureClient.request(GET_PRODUCTS);
 
-try {
-  productsData = await vendureClient.request(GET_PRODUCTS)
-} catch (err: any) {
-  queryError = err?.message ?? String(err)
-}
+console.log(productsData);
+console.log(productsData.products);
+console.log(productsData.products.items);
+
 ---
 
 <Layout title="Home - RS Prints" currentActive="home">
-  <script define:vars={{ productsData, queryError }}>
-    console.log("%c[Vendure] Query Result:", "color: #10b981; font-weight: bold; font-size: 13px;")
-    if (queryError) {
-      console.error("[Vendure] Query Error:", queryError)
-    } else {
-      console.log(productsData)
-    }
-  </script>
+  <pre>{JSON.stringify(productsData, null, 2)}</pre>
   <div class="mx-auto">
     <a
       href="/products"
