@@ -1,0 +1,63 @@
+---
+import AccountLayout from "@/layouts/AccountLayout.astro"
+import ProfileView from "@/components/account/ProfileView"
+import OrdersView from "@/components/account/OrdersView"
+import SavedCreationsView from "@/components/account/SavedCreationsView"
+import SavedCouponsView from "@/components/account/SavedCouponsView"
+import ConnectedAccountsView from "@/components/account/ConnectedAccountsView"
+import ChangePasswordView from "@/components/account/ChangePasswordView"
+import AddressesView from "@/components/account/AddressesView"
+import RewardHistoryView from "@/components/account/RewardHistoryView"
+
+export function getStaticPaths() {
+  return [
+    { params: { section: "profile" } },
+    { params: { section: "orders" } },
+    { params: { section: "order-history" } },
+    { params: { section: "creations" } },
+    { params: { section: "saved-creation" } },
+    { params: { section: "coupons" } },
+    { params: { section: "saved-coupon" } },
+    { params: { section: "connected-accounts" } },
+    { params: { section: "change-password" } },
+    { params: { section: "password" } },
+    { params: { section: "addresses" } },
+    { params: { section: "address-book" } },
+    { params: { section: "rewards" } },
+    { params: { section: "reward-history" } },
+  ]
+}
+
+const { section = "profile" } = Astro.params
+
+// Titles map
+const titles: Record<string, string> = {
+  profile: "Profile | My Account | RS Prints",
+  orders: "Order History | My Account | RS Prints",
+  "order-history": "Order History | My Account | RS Prints",
+  creations: "Saved Creation | My Account | RS Prints",
+  "saved-creation": "Saved Creation | My Account | RS Prints",
+  coupons: "Saved Coupon | My Account | RS Prints",
+  "saved-coupon": "Saved Coupon | My Account | RS Prints",
+  "connected-accounts": "Connected Accounts | My Account | RS Prints",
+  "change-password": "Change Password | My Account | RS Prints",
+  password: "Change Password | My Account | RS Prints",
+  addresses: "Address Book | My Account | RS Prints",
+  "address-book": "Address Book | My Account | RS Prints",
+  rewards: "Reward History | My Account | RS Prints",
+  "reward-history": "Reward History | My Account | RS Prints",
+}
+
+const pageTitle = titles[section] || "My Account | RS Prints"
+---
+
+<AccountLayout currentSection={section} title={pageTitle}>
+  {section === "profile" && <ProfileView client:load />}
+  {(section === "orders" || section === "order-history") && <OrdersView client:load />}
+  {(section === "creations" || section === "saved-creation") && <SavedCreationsView client:load />}
+  {(section === "coupons" || section === "saved-coupon") && <SavedCouponsView client:load />}
+  {section === "connected-accounts" && <ConnectedAccountsView client:load />}
+  {(section === "change-password" || section === "password") && <ChangePasswordView client:load />}
+  {(section === "addresses" || section === "address-book") && <AddressesView client:load />}
+  {(section === "rewards" || section === "reward-history") && <RewardHistoryView client:load />}
+</AccountLayout>

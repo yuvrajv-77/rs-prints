@@ -1,24 +1,61 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useStore } from "@nanostores/react"
+import { activeVariantImageStore } from "@/stores/product"
 import { Badge } from "@/components/ui/badge"
 import { SparklesIcon, ShieldCheckIcon } from "lucide-react"
 
 interface ProductGalleryProps {
+  /** Array of product images, including primary, variant-specific, and secondary gallery shots */
   images: {
     url: string
     alt: string
     isPrimary?: boolean
   }[]
+  /** Promotional badge text (e.g. "Best Seller", "Custom Printed") */
   badge?: string
+  /** Turnaround speed badge text (e.g. "24-48 Hours") */
   turnaround?: string
 }
 
+/**
+ * ProductGallery Component
+ *
+ * Renders the main product image viewport and a row of selectable thumbnails.
+ *
+ * Synchronization:
+ * - Subscribes to `activeVariantImageStore` (Nanostores).
+ * - When the customer changes a variant option (like Color) in `ProductConfigurator`,
+ *   the store updates and this gallery automatically highlights and displays that variant's photo.
+ * - When a customer clicks any thumbnail directly, it updates the store to notify the configurator.
+ */
 export default function ProductGallery({
   images,
   badge = "Custom Printed",
   turnaround = "Fast Dispatch"
 }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const activeVariantImage = useStore(activeVariantImageStore)
+
+  // When active variant image changes in the configurator, sync local selected thumbnail index
+  useEffect(() => {
+    if (activeVariantImage) {
+      const matchIndex = images.findIndex((img) => img.url === activeVariantImage)
+      if (matchIndex !== -1) {
+        setSelectedIndex(matchIndex)
+      }
+    }
+  }, [activeVariantImage, images])
+
+  // Handles clicking a thumbnail image
+  const handleSelectThumbnail = (idx: number) => {
+    setSelectedIndex(idx)
+    if (images[idx]?.url) {
+      activeVariantImageStore.set(images[idx].url)
+    }
+  }
+
   const currentImage = images[selectedIndex] || images[0]
+  const displayImageUrl = currentImage?.url || activeVariantImage
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,10 +76,10 @@ export default function ProductGallery({
         </div>
 
         {/* Primary Preview */}
-        {currentImage?.url ? (
+        {displayImageUrl ? (
           <img
-            src={currentImage.url}
-            alt={currentImage.alt || "Product image"}
+            src={displayImageUrl}
+            alt={currentImage?.alt || "Product image"}
             className="w-full h-full object-cover object-center transition-transform duration-300"
             loading="eager"
           />
@@ -64,7 +101,7 @@ export default function ProductGallery({
               <button
                 key={idx}
                 type="button"
-                onClick={() => setSelectedIndex(idx)}
+                onClick={() => handleSelectThumbnail(idx)}
                 className={`relative shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                   isSelected
                     ? "border-primary"

@@ -11,18 +11,19 @@
 name: 'try-third-next'
 
 services:
-    postgres_db:
-        image: postgres:16-alpine
-        volumes:
-            - postgres_db_data:/var/lib/postgresql/data
-        ports:
-            - "6543:5432"
-        environment:
-            POSTGRES_DB: vendure
-            POSTGRES_USER: vendure
-            POSTGRES_PASSWORD: v89gt6XIAlDX6P7vwKCrgg
-        labels:
-            - "io.vendure.create.name=try-third-next"
+    # Postgres is now hosted on Neon DB (configured via DATABASE_URL in .env)
+    # postgres_db:
+    #     image: postgres:16-alpine
+    #     volumes:
+    #         - postgres_db_data:/var/lib/postgresql/data
+    #     ports:
+    #         - "6543:5432"
+    #     environment:
+    #         POSTGRES_DB: vendure
+    #         POSTGRES_USER: vendure
+    #         POSTGRES_PASSWORD: v89gt6XIAlDX6P7vwKCrgg
+    #     labels:
+    #         - "io.vendure.create.name=try-third-next"
 
     mysql_db:
         image: mysql:8

@@ -1,11 +1,13 @@
-import { useState, useMemo } from "react"
-import type { Product } from "@/types/product"
+import { useState, useMemo, useEffect } from "react"
+import { useStore } from "@nanostores/react"
+import type { Product, ProductVariant } from "@/types/product"
+import { activeVariantImageStore } from "@/stores/product"
+import { getColorHex } from "@/lib/vendure/mappers"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Select,
   SelectTrigger,
@@ -14,67 +16,207 @@ import {
   SelectItem
 } from "@/components/ui/select"
 import {
-  Field,
-  FieldContent,
-  FieldLabel,
-  FieldTitle
-} from "@/components/ui/field"
-import {
   SendIcon,
-  PercentIcon,
   ClockIcon,
-  UploadIcon
+  UploadIcon,
+  CheckIcon
 } from "lucide-react"
 
 interface ProductConfiguratorProps {
   product: Product
 }
 
-const QUANTITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+// Preset standard quantities for custom print orders with tiered bulk savings
+const QUANTITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 50, 100]
 
+/**
+ * ProductConfigurator Component
+ *
+ * Interactive configuration panel for custom-printed merchandise.
+ *
+ * Key Capabilities:
+ * - Option Filtering: Prunes options to only those that actually exist in active variants.
+ * - Variant Resolution: Matches current user option choices (e.g. Size=M, Color=Red)
+ *   against Vendure variants to compute exact price, SKU, and stock status.
+ * - Bi-directional Image Sync: Coordinates with `ProductGallery` via `activeVariantImageStore`.
+ *   Selecting an option changes the gallery photo; clicking a gallery thumbnail switches options.
+ * - WhatsApp Lead Generation: Formats an order summary and opens WhatsApp with pre-filled message.
+ */
 export default function ProductConfigurator({ product }: ProductConfiguratorProps) {
-  // State for option selection
-  const [selectedColor, setSelectedColor] = useState<string>(product.colors?.[0]?.name || "")
-  const [selectedMaterial, setSelectedMaterial] = useState<string>(product.materials[0] || "")
-  const [selectedOption, setSelectedOption] = useState<string>(product.options[0] || "")
-  const [selectedMethod, setSelectedMethod] = useState<string>(product.printMethods[0] || "")
+  const variants = product.variants || []
+
+  // 1. Process option groups:
+  // Vendure option groups may define options not used in current variants (e.g., 3XL defined
+  // in group but this product only has S, M, L). Here we filter out non-existent options
+  // so customers cannot select impossible variant combinations.
+  const optionGroups = useMemo(() => {
+    if (!product.optionGroups || product.optionGroups.length === 0) {
+      return []
+    }
+
+    return product.optionGroups.map((group) => {
+      const rawOptions =
+        group.options ||
+        group.values?.map((v) => ({ code: v, name: v })) ||
+        []
+
+      // Find all option names that actually appear in variants for this group
+      const availableOptionNames = new Set(
+        variants.flatMap((v) =>
+          v.options
+            .filter((opt) => {
+              const optGroupName = (opt.group?.name || opt.group?.code || "").toLowerCase()
+              const targetGroup = group.name.toLowerCase()
+              const targetCode = (group.code || "").toLowerCase()
+
+              return (
+                optGroupName === targetGroup ||
+                optGroupName === targetCode ||
+                optGroupName.includes(targetGroup) ||
+                targetGroup.includes(optGroupName)
+              )
+            })
+            .map((opt) => opt.name.toLowerCase())
+        )
+      )
+
+      // Only keep options that exist in active variants (e.g. only White & Black for T-Shirt)
+      const validOptions =
+        availableOptionNames.size > 0
+          ? rawOptions.filter((opt) =>
+              availableOptionNames.has(opt.name.toLowerCase())
+            )
+          : rawOptions
+
+      return {
+        ...group,
+        options: validOptions,
+      }
+    }).filter((g) => g.options.length > 0)
+  }, [product.optionGroups, variants])
+
+  // 2. Selection state per option group
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {}
+    for (const og of optionGroups) {
+      const firstOpt = og.options[0]?.name || ""
+      if (firstOpt) {
+        initial[og.name] = firstOpt
+      }
+    }
+    return initial
+  })
+
+  // Optional Material & Print Method selections (only shown if configured on product)
+  const [selectedMaterial, setSelectedMaterial] = useState<string>(
+    product.materials?.[0] || ""
+  )
+  const [selectedMethod, setSelectedMethod] = useState<string>(
+    product.printMethods?.[0] || ""
+  )
   const [quantity, setQuantity] = useState<number>(1)
 
-  // Calculate active pricing tier
-  const activeTier = useMemo(() => {
-    if (!product.pricingTiers || product.pricingTiers.length === 0) {
-      return null
-    }
-    const sorted = [...product.pricingTiers].sort((a, b) => b.minQty - a.minQty)
-    return sorted.find((tier) => quantity >= tier.minQty) || sorted[sorted.length - 1]
-  }, [product.pricingTiers, quantity])
+  // 3. Resolve active variant based on user option selections
+  const currentVariant = useMemo<ProductVariant | null>(() => {
+    if (variants.length === 0) return null
 
-  // Extract base numerical unit price
-  const unitPrice = useMemo(() => {
-    if (activeTier?.price) {
-      const parsed = parseInt(activeTier.price.replace(/[^\d]/g, ""), 10)
-      if (!isNaN(parsed) && parsed > 0) return parsed
+    const matched = variants.find((variant) => {
+      return Object.entries(selectedOptions).every(([groupName, selectedVal]) => {
+        return variant.options.some((opt) => {
+          const groupCode = opt.group?.code?.toLowerCase() || ""
+          const groupLabel = opt.group?.name?.toLowerCase() || ""
+          const targetGroup = groupName.toLowerCase()
+
+          const isGroupMatch =
+            groupCode === targetGroup ||
+            groupLabel === targetGroup ||
+            groupLabel.includes(targetGroup) ||
+            targetGroup.includes(groupLabel)
+
+          const isValMatch = opt.name.toLowerCase() === selectedVal.toLowerCase()
+          return isGroupMatch && isValMatch
+        })
+      })
+    })
+
+    return matched || variants[0]
+  }, [variants, selectedOptions])
+
+  const activeImage = useStore(activeVariantImageStore)
+
+  // 4. Active image resolves to variant asset first, then falls back to product asset
+  const displayImage =
+    currentVariant?.featuredAsset?.preview || product.featuredAsset?.preview
+
+  useEffect(() => {
+    if (displayImage) {
+      activeVariantImageStore.set(displayImage)
     }
-    return product.startingPriceNumber || 299
-  }, [activeTier, product.startingPriceNumber])
+  }, [displayImage])
+
+  // When a thumbnail is clicked in ProductGallery, sync options if matching a variant image
+  useEffect(() => {
+    if (activeImage) {
+      const matchVariant = variants.find(
+        (v) => v.featuredAsset?.preview === activeImage
+      )
+      if (matchVariant) {
+        setSelectedOptions((prev) => {
+          const next = { ...prev }
+          let changed = false
+          for (const opt of matchVariant.options) {
+            const groupName = opt.group?.name || opt.group?.code
+            if (groupName && next[groupName] !== opt.name) {
+              next[groupName] = opt.name
+              changed = true
+            }
+          }
+          return changed ? next : prev
+        })
+      }
+    }
+  }, [activeImage, variants])
+
+  // 5. Calculate price based on the resolved variant
+  const unitPrice = useMemo(() => {
+    if (currentVariant?.priceWithTax) {
+      return Math.round(currentVariant.priceWithTax)
+    }
+    if (currentVariant?.price) {
+      return Math.round(currentVariant.price / 100)
+    }
+    return Math.round(product.startingPriceNumber || 199)
+  }, [currentVariant, product.startingPriceNumber])
 
   const subtotal = unitPrice * quantity
 
-  // Formatted WhatsApp order link
+  // 6. Formatted WhatsApp inquiry message with clean variant details
   const whatsappUrl = useMemo(() => {
+    const optionsSummary = Object.entries(selectedOptions)
+      .map(([group, val]) => `${group}: ${val}`)
+      .join("\n")
+
     const text = encodeURIComponent(
-      `Hi RS Prints, I'd like to order:\n` +
+      `Hi RS Prints, I'd like to place an order:\n` +
       `Product: ${product.title}\n` +
+      (currentVariant ? `Variant: ${currentVariant.name}\n` : "") +
+      (optionsSummary ? `${optionsSummary}\n` : "") +
+      (selectedMaterial ? `Material: ${selectedMaterial}\n` : "") +
+      (selectedMethod ? `Print Method: ${selectedMethod}\n` : "") +
       `Quantity: ${quantity}\n` +
-      (selectedColor ? `Color: ${selectedColor}\n` : "") +
-      `Material: ${selectedMaterial || "Standard"}\n` +
-      `Option/Size: ${selectedOption || "Default"}\n` +
-      `Print Method: ${selectedMethod || "Standard"}\n` +
-      `Total: ₹${subtotal.toLocaleString("en-IN")}\n` +
-      `Please provide mockup approval details.`
+      `Unit Price: ₹${unitPrice}\n` +
+      `Total: ₹${subtotal.toLocaleString("en-IN")}\n\n` +
+      `Please confirm proof approval & dispatch timelines.`
     )
     return `https://wa.me/919876543210?text=${text}`
-  }, [product.title, quantity, selectedColor, selectedMaterial, selectedOption, selectedMethod, subtotal])
+  }, [product.title, currentVariant, selectedOptions, selectedMaterial, selectedMethod, quantity, unitPrice, subtotal])
+
+  const handleOptionChange = (groupName: string, value: string) => {
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [groupName]: value,
+    }))
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -95,116 +237,151 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
           </div>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
           {product.title}
         </h1>
-        <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-          {product.description || product.tagline}
-        </p>
 
-        {/* Specs in description style directly below description */}
-        {((product.features && product.features.length > 0) || (product.specifications && product.specifications.length > 0)) && (
-          <ul className="list-disc pl-4 space-y-1 text-xs md:text-sm text-foreground pt-1">
-            {(product.features || product.specifications?.flatMap((g) => g.items).slice(0, 5).map((i) => `${i.label}: ${i.value}`) || []).map((feat, idx) => (
-              <li key={idx} className="leading-relaxed">
-                {feat}
-              </li>
-            ))}
-          </ul>
+        {product.description && (
+          <div
+            className="text-sm md:text-base text-muted-foreground leading-relaxed prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
         )}
       </div>
 
       <Separator />
 
-      {/* Material Selection using RadioGroup Choice Cards */}
-      {product.materials.length > 0 && (
-        <div className="space-y-3">
+      {/* Dynamic Option Groups (Rendered cleanly per group from Vendure) */}
+      {optionGroups.map((group) => {
+        const groupOptions = group.options
+        if (groupOptions.length === 0) return null
+
+        const groupNameLower = group.name.toLowerCase()
+        const isColorGroup = groupNameLower.includes("color")
+        const isSizeGroup = groupNameLower.includes("size")
+        const activeValue = selectedOptions[group.name] || groupOptions[0]?.name
+
+        return (
+          <div key={group.name} className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                {group.name}
+              </Label>
+              <span className="text-xs font-semibold text-foreground">
+                {activeValue}
+              </span>
+            </div>
+
+            {/* COLOR GROUP: Clean color swatches with circle indicator */}
+            {isColorGroup ? (
+              <div className="flex flex-wrap gap-2.5">
+                {groupOptions.map((opt) => {
+                  const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  const hex = getColorHex(opt.name)
+
+                  return (
+                    <button
+                      key={opt.name}
+                      type="button"
+                      onClick={() => handleOptionChange(group.name, opt.name)}
+                      className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs"
+                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      <span
+                        className="size-4 rounded-full border border-black/20 shrink-0 shadow-xs"
+                        style={{ backgroundColor: hex }}
+                      />
+                      <span className="capitalize">{opt.name}</span>
+                      {isSelected && <CheckIcon className="size-3 text-primary ml-0.5" />}
+                    </button>
+                  )
+                })}
+              </div>
+            ) : isSizeGroup ? (
+              /* SIZE GROUP: Clean segmented button row */
+              <div className="flex flex-wrap gap-2">
+                {groupOptions.map((opt) => {
+                  const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  return (
+                    <button
+                      key={opt.name}
+                      type="button"
+                      onClick={() => handleOptionChange(group.name, opt.name)}
+                      className={`min-w-11 px-3.5 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary text-primary-foreground shadow-xs"
+                          : "border-border/80 bg-card text-foreground hover:border-foreground/40"
+                      }`}
+                    >
+                      {opt.name}
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              /* ANY OTHER GROUP (e.g. Model, Finish, Capacity): Distinct chips */
+              <div className="flex flex-wrap gap-2">
+                {groupOptions.map((opt) => {
+                  const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  return (
+                    <button
+                      key={opt.name}
+                      type="button"
+                      onClick={() => handleOptionChange(group.name, opt.name)}
+                      className={`px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs"
+                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      {opt.name}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+
+      {/* Material Selection: ONLY shown if product actually has materials */}
+      {product.materials && product.materials.length > 0 && (
+        <div className="space-y-2.5">
           <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Material / Fabric
           </Label>
-          <RadioGroup
-            value={selectedMaterial}
-            onValueChange={(val) => {
-              if (val) setSelectedMaterial(val as string)
-            }}
-          >
-            {product.materials.map((mat) => (
-              <FieldLabel key={mat} htmlFor={`mat-${mat}`} className="cursor-pointer">
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldTitle className="font-normal text-sm">{mat}</FieldTitle>
-                  </FieldContent>
-                  <RadioGroupItem value={mat} id={`mat-${mat}`} />
-                </Field>
-              </FieldLabel>
-            ))}
-          </RadioGroup>
-        </div>
-      )}
-
-      {/* Color Selection using ToggleGroup UI Component */}
-      {product.colors && product.colors.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Color
-            </Label>
-            <span className="text-xs font-medium text-foreground">
-              {selectedColor}
-            </span>
+          <div className="flex flex-wrap gap-2">
+            {product.materials.map((mat) => {
+              const isSelected = selectedMaterial === mat
+              return (
+                <button
+                  key={mat}
+                  type="button"
+                  onClick={() => setSelectedMaterial(mat)}
+                  className={`px-3.5 py-1.5 rounded-xl border text-xs font-medium transition-all ${
+                    isSelected
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
+                      : "border-border/80 bg-background text-muted-foreground hover:border-foreground/40"
+                  }`}
+                >
+                  {mat}
+                </button>
+              )
+            })}
           </div>
-          <ToggleGroup
-            variant="outline"
-            value={[selectedColor]}
-            onValueChange={(val) => {
-              if (val && val.length > 0 && val[0]) setSelectedColor(val[0])
-            }}
-            className="flex-wrap"
-          >
-            {product.colors.map((c) => (
-              <ToggleGroupItem key={c.name} value={c.name} className="gap-2">
-                <span
-                  className="size-4 rounded-full border border-black/15 shrink-0"
-                  style={{ backgroundColor: c.hex }}
-                />
-                <span>{c.name}</span>
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
         </div>
       )}
 
-      {/* Style / Size using ToggleGroup UI Component */}
-      {product.options.length > 0 && (
-        <div className="space-y-3">
-          <Label className="text-xs font-bold uppercase tracking-wider  text-muted-foreground">
-            Style / Size / Model
-          </Label>
-          <ToggleGroup
-            variant="outline"
-            value={[selectedOption]}
-            onValueChange={(val) => {
-              if (val && val.length > 0 && val[0]) setSelectedOption(val[0])
-            }}
-            className="flex-wrap"
-          >
-            {product.options.map((opt) => (
-              <ToggleGroupItem key={opt} value={opt}>
-                {opt}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-      )}
-
-      {/* Print Methods using RadioGroup UI Component */}
-      {product.printMethods.length > 0 && (
-        <div className="space-y-3">
+      {/* Print Methods: ONLY shown if product actually has print methods */}
+      {product.printMethods && product.printMethods.length > 0 && (
+        <div className="space-y-2.5">
           <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Print Method
           </Label>
           <RadioGroup
-
             value={selectedMethod}
             onValueChange={(val) => {
               if (val) setSelectedMethod(val as string)
@@ -213,7 +390,7 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
             {product.printMethods.map((pm) => (
               <div key={pm} className="flex items-center gap-2">
                 <RadioGroupItem value={pm} id={`pm-${pm}`} />
-                <Label htmlFor={`pm-${pm}`} className="text-sm font-normal cursor-pointer">
+                <Label htmlFor={`pm-${pm}`} className="text-xs font-normal cursor-pointer">
                   {pm}
                 </Label>
               </div>
@@ -226,7 +403,7 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
 
       {/* Quantity & Dynamic Price Side-by-Side */}
       <div className="flex items-end justify-between gap-6 flex-wrap">
-        <div className="space-y-2 flex-1 min-w-[180px] max-w-xs">
+        <div className="space-y-2 flex-1 min-w-[160px] max-w-xs">
           <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Quantity Required
           </Label>
@@ -237,10 +414,10 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
             }}
             itemToStringLabel={(val) => `${val} ${val === "1" ? "Piece" : "Pieces"}`}
           >
-            <SelectTrigger size="sm" className="w-full py-5">
+            <SelectTrigger size="sm" className="w-full py-4.5">
               <SelectValue placeholder="Select quantity" />
             </SelectTrigger>
-            <SelectContent className="p-4">
+            <SelectContent className="p-2">
               {QUANTITY_OPTIONS.map((qty) => (
                 <SelectItem key={qty} value={String(qty)}>
                   {qty} {qty === 1 ? "Piece" : "Pieces"}
@@ -248,12 +425,9 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
               ))}
             </SelectContent>
           </Select>
-          <p className="text-[11px] text-muted-foreground">
-            Bulk volume discounts auto-calculated
-          </p>
         </div>
 
-        {/* Dynamic Price right side of quantity */}
+        {/* Dynamic Price directly resolving to active variant */}
         <div className="flex flex-col items-end shrink-0">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Total Price
@@ -262,15 +436,10 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
             ₹{subtotal.toLocaleString("en-IN")}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {quantity > 1 ? (
-              <span>(₹{unitPrice} / piece)</span>
-            ) : (
-              <span>/ piece</span>
-            )}
-            {activeTier?.discountPercent && activeTier.discountPercent !== "Standard" && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4">
-                <PercentIcon className="size-2.5 mr-0.5" />
-                {activeTier.discountPercent}
+            <span>(₹{unitPrice} / piece)</span>
+            {currentVariant?.stockLevel && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+                {currentVariant.stockLevel}
               </Badge>
             )}
           </div>
@@ -278,23 +447,23 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 pt-2">
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full"
         >
-          <Button size="lg" className="w-full gap-2 h-14">
+          <Button size="lg" className="w-full gap-2 h-13 text-sm font-semibold">
             <UploadIcon className="size-4" />
-            Upload Your Image
+            Upload Artwork & Order via WhatsApp
           </Button>
         </a>
 
         <a href="/contact" className="w-full">
-          <Button variant="outline" size="lg" className="w-full gap-2">
+          <Button variant="outline" size="lg" className="w-full gap-2 text-sm">
             <SendIcon className="size-4" />
-            Send Inquiry / Custom Artwork
+            Request Bulk Quote / Pantone Matching
           </Button>
         </a>
       </div>

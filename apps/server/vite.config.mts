@@ -27,7 +27,37 @@ export default defineConfig({
             // These types can be used in your dashboard extensions to provide
             // type safety when writing queries and mutations.
             gqlOutputPath: './src/gql',
+            // Dashboard UI theming & branding in Vendure v3
+            theme: {
+                light: {
+                    primary: '#ffd747',
+                    'primary-foreground': '#000000',
+                    'sidebar-primary': '#ffd747',
+                    'sidebar-primary-foreground': '#000000',
+                    ring: '#ffd747',
+                    brand: '#ffd747',
+                    'brand-lighter': '#ffeaa0',
+                    'brand-darker': '#e5b800',
+                },
+                dark: {
+                    primary: '#aff33e',
+                    'primary-foreground': '#000000',
+                    'sidebar-primary': '#aff33e',
+                    'sidebar-primary-foreground': '#000000',
+                    ring: '#aff33e',
+                    brand: '#aff33e',
+                    'brand-lighter': '#cbf97a',
+                    'brand-darker': '#88cc1e',
+                },
+                additionalStylesheets: [resolve(__dirname, 'src/dashboard.css')],
+            },
         }),
+        {
+            name: 'dashboard-branding',
+            transformIndexHtml(html) {
+                return html.replace(/<title>.*?<\/title>/i, '<title>RS Prints Dashboard</title>');
+            },
+        },
     ],
     resolve: {
         alias: {

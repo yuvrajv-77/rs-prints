@@ -1,0 +1,66 @@
+---
+/**
+ * Dynamic Product Detail Page Route (`/products/[slug]`)
+ *
+ * Responsibilities:
+ * 1. `getStaticPaths`: Pre-renders product routes at build time by querying Vendure for active product slugs.
+ *    Provides safe fallback to local mock products if the Vendure backend is unreachable during static builds.
+ * 2. Route Rendering: Fetches product data via `getProductBySlug(slug)`, transforms it using
+ *    `mapVendureProductToStorefrontProduct`, extracts breadcrumb collection hierarchy, and renders `ProductDetailsLayout`.
+ */
+import ProductDetailsLayout from "@/layouts/ProductDetailsLayout.astro"
+import type { Product } from "@/types/product"
+import { getProducts, getProductBySlug } from "@/lib/vendure/queries/products"
+import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
+
+export async function getStaticPaths() {
+  try {
+    const products = await getProducts()
+    if (products && products.length > 0) {
+      return products.map((product) => ({
+        params: { slug: product.slug },
+      }))
+    }
+  } catch (err) {
+    console.warn("Could not fetch Vendure products in getStaticPaths, using fallback:", err)
+  }
+
+  // Fallback to mock catalog products if Vendure returns empty or is unreachable during build
+  const { getAllProducts } = await import("@/data/products")
+  return getAllProducts().map((product) => ({
+    params: { slug: product.slug },
+  }))
+}
+
+const { slug } = Astro.params
+
+let vendureProduct = null
+try {
+  vendureProduct = await getProductBySlug(slug!)
+} catch (err) {
+  console.error(`Error loading Vendure product for slug "${slug}":`, err)
+}
+
+let product: Product
+let subcollection: any = null
+let parentCollection: any = null
+
+if (vendureProduct) {
+  product = mapVendureProductToStorefrontProduct(vendureProduct)
+  subcollection = vendureProduct.collections?.[0]
+  parentCollection = subcollection?.parent
+} else {
+  const { getProductBySlug: getMockProduct } = await import("@/data/products")
+  const mockProduct = getMockProduct(slug!)
+  if (!mockProduct) {
+    return Astro.redirect("/404")
+  }
+  product = mockProduct
+}
+---
+
+<ProductDetailsLayout
+  product={product}
+  subcollection={subcollection}
+  parentCollection={parentCollection}
+/>

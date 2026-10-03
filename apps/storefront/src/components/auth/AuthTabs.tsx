@@ -25,6 +25,8 @@ import {
   ArrowLeft,
   CheckCircle2,
 } from "lucide-react"
+import { registerCustomer, loginCustomer } from "@/lib/vendure/mutations/customers"
+import { fetchCurrentUser } from "@/stores/auth"
 
 // =========================================================================
 // MOCK CREATE-ACCOUNT & EMAIL VERIFICATION SIMULATION
@@ -102,6 +104,17 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
     }
   }
 
+  const getRedirectUrl = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get("redirect") || params.get("redirectTo")
+      if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+        return redirect
+      }
+    }
+    return "/products"
+  }
+
   // ==========================================
   // SIGN IN FORM (TanStack Form)
   // ==========================================
@@ -111,24 +124,71 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      // Simulate API sign in
-      await new Promise((resolve) => setTimeout(resolve, 600))
+      try {
+        const response = await loginCustomer({
+          username: value.email.trim().toLowerCase(),
+          password: value.password,
+          rememberMe: true,
+        })
 
-      // Simulate invalid credentials check
-      if (value.password === "wrong" || value.password === "invalid") {
+        const result = response.login
+
+        if ("id" in result) {
+          toast.add({
+            title: "Welcome Back!",
+            description: "Successfully signed in. Redirecting...",
+            type: "success",
+          })
+
+          fetchCurrentUser().catch(() => {})
+
+          const destination = getRedirectUrl()
+          setTimeout(() => {
+            window.location.href = destination
+          }, 400)
+        } else if ("errorCode" in result) {
+          if (result.errorCode === "NOT_VERIFIED_ERROR") {
+            toast.add({
+              title: "Account Not Verified",
+              description:
+                result.message ||
+                "Please verify your email address before signing in. Check your inbox for the verification email.",
+              type: "error",
+            })
+          } else {
+            toast.add({
+              title: "Sign In Failed",
+              description:
+                result.message ||
+                "Incorrect email or password. Please verify your credentials and try again.",
+              type: "error",
+            })
+          }
+        } else {
+          toast.add({
+            title: "Sign In Failed",
+            description: "Unexpected response from server. Please try again.",
+            type: "error",
+          })
+        }
+      } catch (err: unknown) {
+        console.error("Sign in error:", err)
+        let errorMsg =
+          "Failed to connect to the server. Please check your connection and try again."
+        if (typeof err === "object" && err !== null && "response" in err) {
+          const resp = (err as { response?: { errors?: Array<{ message: string }> } }).response
+          if (resp?.errors?.[0]?.message) {
+            errorMsg = resp.errors[0].message
+          }
+        } else if (err instanceof Error) {
+          errorMsg = err.message
+        }
         toast.add({
-          title: "Sign In Failed",
-          description: "Incorrect password. Please verify your credentials and try again.",
+          title: "Sign In Error",
+          description: errorMsg,
           type: "error",
         })
-        return
       }
-
-      toast.add({
-        title: "Welcome Back!",
-        description: `Successfully signed in as ${value.email}`,
-        type: "success",
-      })
     },
   })
 
@@ -146,20 +206,79 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
       city: "",
     },
     onSubmit: async ({ value }) => {
-      // Simulate account creation submit
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      try {
+        const trimmedName = value.name.trim()
+        const spaceIdx = trimmedName.indexOf(" ")
+        const firstName = spaceIdx > -1 ? trimmedName.slice(0, spaceIdx) : trimmedName
+        const lastName = spaceIdx > -1 ? trimmedName.slice(spaceIdx + 1).trim() : ""
 
-      toast.add({
-        title: "Account Created!",
-        description: `Welcome to RS Prints, ${value.name}! You can now sign in.`,
-        type: "success",
-      })
+        const data = await registerCustomer({
+          emailAddress: value.email.trim().toLowerCase(),
+          password: value.password,
+          firstName,
+          lastName: lastName || undefined,
+          phoneNumber: value.phone?.trim() || undefined,
+        })
 
-      // Switch to sign in tab and populate email
-      signInForm.setFieldValue("email", value.email)
-      setSignUpStep(1)
-      signUpForm.reset()
-      handleTabChange("signin")
+        const result = data.registerCustomerAccount
+
+        if ("success" in result && result.success) {
+          toast.add({
+            title: "Account Created!",
+            description: `Welcome to RS Prints, ${firstName || value.name}! You can now sign in.`,
+            type: "success",
+          })
+
+          // Switch to sign in tab and populate email
+          signInForm.setFieldValue("email", value.email)
+          setSignUpStep(1)
+          signUpForm.reset()
+          handleTabChange("signin")
+        } else if ("errorCode" in result) {
+          if (result.errorCode === "EMAIL_ADDRESS_CONFLICT_ERROR") {
+            setExistingEmailAlert(value.email)
+            setSignUpStep(1)
+            toast.add({
+              title: "Email Already Registered",
+              description:
+                result.message ||
+                `The email "${value.email}" is already registered. Please sign in instead.`,
+              type: "error",
+            })
+          } else {
+            toast.add({
+              title: "Sign Up Failed",
+              description:
+                result.message ||
+                "Failed to register account. Please check your details and try again.",
+              type: "error",
+            })
+          }
+        } else {
+          toast.add({
+            title: "Registration Error",
+            description: "Unexpected response from server. Please try again.",
+            type: "error",
+          })
+        }
+      } catch (err: unknown) {
+        console.error("Sign up error:", err)
+        let errorMsg =
+          "Failed to connect to the server. Please check your connection and try again."
+        if (typeof err === "object" && err !== null && "response" in err) {
+          const resp = (err as { response?: { errors?: Array<{ message: string }> } }).response
+          if (resp?.errors?.[0]?.message) {
+            errorMsg = resp.errors[0].message
+          }
+        } else if (err instanceof Error) {
+          errorMsg = err.message
+        }
+        toast.add({
+          title: "Registration Failed",
+          description: errorMsg,
+          type: "error",
+        })
+      }
     },
   })
 

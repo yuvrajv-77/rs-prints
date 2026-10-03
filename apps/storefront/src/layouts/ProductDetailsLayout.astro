@@ -20,9 +20,19 @@ import { MessageCircleIcon, PhoneCallIcon } from "lucide-react"
 
 interface Props {
   product: Product
+  subcollection?: {
+    id?: string
+    name?: string
+    slug?: string
+  }
+  parentCollection?: {
+    id?: string
+    name?: string
+    slug?: string
+  }
 }
 
-const { product } = Astro.props
+const { product, subcollection, parentCollection } = Astro.props
 
 const relatedProducts = getRelatedProducts(product.slug, 3)
 
@@ -84,6 +94,26 @@ const schemaMarkup = [
         <BreadcrumbItem>
           <BreadcrumbLink href="/products">Products</BreadcrumbLink>
         </BreadcrumbItem>
+        {parentCollection && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/products#${parentCollection.slug}`}>
+                {parentCollection.name}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
+        {subcollection && subcollection.slug !== parentCollection?.slug && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/products#${subcollection.slug}`}>
+                {subcollection.name}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbPage>{product.title}</BreadcrumbPage>

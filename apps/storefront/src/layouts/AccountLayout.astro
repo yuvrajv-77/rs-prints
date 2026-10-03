@@ -1,0 +1,64 @@
+---
+import MainLayout from "@/layouts/main.astro"
+import AccountSidebar, { ACCOUNT_NAV_ITEMS } from "@/components/account/AccountSidebar"
+import { ChevronRight, Home } from "lucide-react"
+
+interface Props {
+  currentSection?: string
+  title?: string
+  description?: string
+}
+
+const {
+  currentSection = "profile",
+  title = "My Account | RS Prints",
+  description = "Manage your RS Prints account, order history, profile settings, and addresses.",
+} = Astro.props
+
+// Find label for breadcrumbs
+const activeItem = ACCOUNT_NAV_ITEMS.find((item) => {
+  const norm = item.id
+  if (currentSection === "order-history" && norm === "orders") return true
+  if (currentSection === "saved-creation" && norm === "creations") return true
+  if (currentSection === "saved-coupon" && norm === "coupons") return true
+  if (currentSection === "password" && norm === "change-password") return true
+  if (currentSection === "address-book" && norm === "addresses") return true
+  if (currentSection === "reward-history" && norm === "rewards") return true
+  return norm === currentSection
+})
+
+const sectionLabel = activeItem ? activeItem.label : "Profile"
+---
+
+<MainLayout title={title} description={description} currentActive="account">
+  <div class="min-h-[calc(100vh-5rem)] bg-neutral-50/60 py-8 sm:py-12">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Breadcrumb Bar */}
+      <nav class="mb-6 flex items-center gap-2 text-xs text-neutral-500 font-medium">
+        <a href="/" class="flex items-center gap-1 hover:text-neutral-900 transition-colors">
+          <Home className="size-3.5" />
+          <span>Home</span>
+        </a>
+        <ChevronRight className="size-3 text-neutral-400" />
+        <a href="/account/profile" class="hover:text-neutral-900 transition-colors">
+          My Account
+        </a>
+        <ChevronRight className="size-3 text-neutral-400" />
+        <span class="text-neutral-900 font-semibold">{sectionLabel}</span>
+      </nav>
+
+      {/* Main Grid: Left Sidebar + Right Content matching screenshot */}
+      <div class="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
+        {/* Left Column: Account Navigation */}
+        <aside class="w-full lg:w-72 xl:w-80 shrink-0">
+          <AccountSidebar currentSection={currentSection} client:load />
+        </aside>
+
+        {/* Right Column: Active Tab Content */}
+        <main class="w-full flex-1 min-w-0">
+          <slot />
+        </main>
+      </div>
+    </div>
+  </div>
+</MainLayout>

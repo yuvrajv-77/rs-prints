@@ -29,6 +29,7 @@ interface Props {
   description?: string
   canonicalUrl?: string
   currentActive?: string
+  groupedSections?: any[]
 }
 
 const {
@@ -36,9 +37,10 @@ const {
   description = "Explore our full collection of custom printing services: personalized apparel, home decor, custom gifts, and corporate business essentials.",
   canonicalUrl = "/products",
   currentActive = "products",
+  groupedSections: customGroupedSections,
 } = Astro.props
 
-const groupedSections = getCategorizedProducts()
+const groupedSections = customGroupedSections || getCategorizedProducts()
 const totalProductsCount = groupedSections.reduce(
   (acc, g) => acc + g.products.length,
   0

@@ -1,9 +1,11 @@
 ---
 import "@/styles/global.css"
 import Navbar from "@/components/navbar"
+import MobileNav from "@/components/navigation/MobileNav"
 import BrandLogo from "@/components/BrandLogo"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import UserNav from "@/components/UserNav"
 
 interface Props {
   title?: string
@@ -86,14 +88,16 @@ const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
     class="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20"
   >
     <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div class="container mx-auto flex h-20 items-center justify-between px-4">
-       <BrandLogo/>
+      <!-- Desktop Navigation Bar (hidden on mobile) -->
+      <div class="container mx-auto hidden md:flex h-20 items-center justify-between px-4">
+        <BrandLogo />
         <Navbar client:load />
-        <a href="/auth?tab=signin">
-          <Button size={'lg'}>
-            Sign In
-          </Button>
-        </a>
+        <UserNav client:load />
+      </div>
+
+      <!-- Mobile Navigation Bar (visible only on mobile) -->
+      <div class="block md:hidden">
+        <MobileNav client:load />
       </div>
     </header>
 

@@ -12,12 +12,15 @@ declare global {
             SUPERADMIN_USERNAME: string;
             SUPERADMIN_PASSWORD: string;
             CORS_ORIGINS?: string;
-            DB_HOST: string;
-            DB_PORT: number;
-            DB_NAME: string;
-            DB_USERNAME: string;
-            DB_PASSWORD: string;
-            DB_SCHEMA: string;
+            DATABASE_URL?: string;
+            DB_HOST?: string;
+            DB_PORT?: number;
+            DB_NAME?: string;
+            DB_USERNAME?: string;
+            DB_PASSWORD?: string;
+            DB_SCHEMA?: string;
+            DB_SYNCHRONIZE?: string;
+            DB_SSL?: string;
         }
     }
 }

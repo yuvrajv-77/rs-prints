@@ -1,18 +1,16 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { vendureClient } from "@/lib/vendure/client";
-import { GET_PRODUCTS } from "@/lib/vendure/queries/queries";
 
-const productsData = await vendureClient.request(GET_PRODUCTS);
+import { getProducts } from "@/lib/vendure/queries/products";
 
-// console.log(productsData);
-// console.log(productsData.products);
-// console.log(productsData.products.items);
+const products = await getProducts();
 
 ---
 
 <Layout title="Home - RS Prints" currentActive="home">
-  <pre>{JSON.stringify(productsData, null, 2)}</pre>
+     <pre>
+  {JSON.stringify(products, null, 2)}
+</pre>
   <div class="mx-auto">
     <a
       href="/products"
@@ -30,5 +28,6 @@ const productsData = await vendureClient.request(GET_PRODUCTS);
         decoding="async"
       />
     </a>
+
   </div>
 </Layout>

@@ -1,0 +1,19 @@
+/* RS Prints Custom Dashboard Styles */
+
+/* Hide the default Vendure SVG logo on the login page */
+.bg-sidebar svg.text-primary.h-8 {
+    display: none !important;
+}
+
+/* Display RS Prints brand heading on the login screen */
+.bg-sidebar .max-w-sm::before,
+.bg-sidebar .max-w-md::before {
+    content: "RS Prints";
+    display: block;
+    text-align: center;
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
