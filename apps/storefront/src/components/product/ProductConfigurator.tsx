@@ -19,8 +19,12 @@ import {
   SendIcon,
   ClockIcon,
   UploadIcon,
-  CheckIcon
+  CheckIcon,
+  ShoppingBag,
 } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { Toaster } from "@/components/ui/toast"
+import { addToCart } from "@/stores/cart"
 
 interface ProductConfiguratorProps {
   product: Product
@@ -95,17 +99,81 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
     }).filter((g) => g.options.length > 0)
   }, [product.optionGroups, variants])
 
-  // 2. Selection state per option group
+  // Helper: Case-insensitive fuzzy group name matcher
+  const isMatchingGroup = (groupCandidate: string, targetGroup: string): boolean => {
+    const g1 = groupCandidate.trim().toLowerCase()
+    const g2 = targetGroup.trim().toLowerCase()
+    return g1 === g2 || g1.includes(g2) || g2.includes(g1)
+  }
+
+  // 2. Selection state per option group - initialized from first active variant to ensure valid combination
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {}
+
+    // First initialize from active variant[0] options if present
+    if (variants.length > 0 && variants[0].options && variants[0].options.length > 0) {
+      for (const opt of variants[0].options) {
+        const groupName = opt.group?.name || opt.group?.code
+        if (groupName) {
+          const matchedGroup = optionGroups.find(
+            (og) =>
+              isMatchingGroup(og.name, groupName) ||
+              isMatchingGroup(og.code || "", groupName)
+          )
+          const targetKey = matchedGroup?.name || groupName
+          initial[targetKey] = opt.name
+        }
+      }
+    }
+
+    // Fill in any option group not covered by variants[0]
     for (const og of optionGroups) {
-      const firstOpt = og.options[0]?.name || ""
-      if (firstOpt) {
-        initial[og.name] = firstOpt
+      if (!initial[og.name]) {
+        const firstOpt = og.options[0]?.name || ""
+        if (firstOpt) {
+          initial[og.name] = firstOpt
+        }
       }
     }
     return initial
   })
+
+  // 2b. Compatibility helper: checks if optionName in groupName is available
+  // given currently selected options in all other groups.
+  const checkOptionAvailability = (
+    groupName: string,
+    optionName: string,
+    currentSelections: Record<string, string>
+  ): boolean => {
+    if (variants.length === 0) return true
+
+    return variants.some((variant) => {
+      // 1. Variant must contain optionName in groupName
+      const hasTargetOption = variant.options.some((opt) => {
+        const gName = opt.group?.name || opt.group?.code || ""
+        return (
+          isMatchingGroup(gName, groupName) &&
+          opt.name.toLowerCase() === optionName.toLowerCase()
+        )
+      })
+      if (!hasTargetOption) return false
+
+      // 2. Variant must also satisfy all other currently selected groups
+      return Object.entries(currentSelections).every(
+        ([otherGroup, selectedVal]) => {
+          if (otherGroup.toLowerCase() === groupName.toLowerCase()) return true
+
+          return variant.options.some((opt) => {
+            const gName = opt.group?.name || opt.group?.code || ""
+            return (
+              isMatchingGroup(gName, otherGroup) &&
+              opt.name.toLowerCase() === selectedVal.toLowerCase()
+            )
+          })
+        }
+      )
+    })
+  }
 
   // Optional Material & Print Method selections (only shown if configured on product)
   const [selectedMaterial, setSelectedMaterial] = useState<string>(
@@ -190,6 +258,25 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
 
   const subtotal = unitPrice * quantity
 
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+
+  const handleAddToCart = async () => {
+    if (!currentVariant?.id) return
+    setIsAddingToCart(true)
+    try {
+      const variantDetails = Object.entries(selectedOptions)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(", ")
+
+      await addToCart(currentVariant.id, quantity, {
+        productName: product.title,
+        variantDetails: variantDetails || undefined,
+      })
+    } finally {
+      setIsAddingToCart(false)
+    }
+  }
+
   // 6. Formatted WhatsApp inquiry message with clean variant details
   const whatsappUrl = useMemo(() => {
     const optionsSummary = Object.entries(selectedOptions)
@@ -212,10 +299,34 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
   }, [product.title, currentVariant, selectedOptions, selectedMaterial, selectedMethod, quantity, unitPrice, subtotal])
 
   const handleOptionChange = (groupName: string, value: string) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [groupName]: value,
-    }))
+    setSelectedOptions((prev) => {
+      const next: Record<string, string> = {
+        ...prev,
+        [groupName]: value,
+      }
+
+      // Check if any other option group became invalid with this new selection
+      for (const group of optionGroups) {
+        if (group.name.toLowerCase() === groupName.toLowerCase()) continue
+
+        const currentVal = next[group.name]
+        if (!currentVal) continue
+
+        // Check if currentVal is still available given new selections
+        const isStillValid = checkOptionAvailability(group.name, currentVal, next)
+        if (!isStillValid) {
+          // Auto-reconcile to the first available option in this group
+          const firstAvailable = group.options.find((opt) =>
+            checkOptionAvailability(group.name, opt.name, next)
+          )
+          if (firstAvailable) {
+            next[group.name] = firstAvailable.name
+          }
+        }
+      }
+
+      return next
+    })
   }
 
   return (
@@ -277,25 +388,38 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
               <div className="flex flex-wrap gap-2.5">
                 {groupOptions.map((opt) => {
                   const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  const isAvailable = checkOptionAvailability(group.name, opt.name, selectedOptions)
                   const hex = getColorHex(opt.name)
 
                   return (
                     <button
                       key={opt.name}
                       type="button"
-                      onClick={() => handleOptionChange(group.name, opt.name)}
-                      className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs"
-                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                      disabled={!isAvailable}
+                      onClick={() => isAvailable && handleOptionChange(group.name, opt.name)}
+                      title={!isAvailable ? `${opt.name} (Unavailable with current selections)` : opt.name}
+                      className={`relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
+                        !isAvailable
+                          ? "opacity-40 cursor-not-allowed border-dashed border-border/60 bg-muted/20 text-muted-foreground/50"
+                          : isSelected
+                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs cursor-pointer"
+                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground cursor-pointer"
                       }`}
                     >
                       <span
-                        className="size-4 rounded-full border border-black/20 shrink-0 shadow-xs"
+                        className="relative size-4 rounded-full border border-black/20 shrink-0 shadow-xs overflow-hidden"
                         style={{ backgroundColor: hex }}
-                      />
-                      <span className="capitalize">{opt.name}</span>
-                      {isSelected && <CheckIcon className="size-3 text-primary ml-0.5" />}
+                      >
+                        {!isAvailable && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="w-full h-0.5 bg-destructive rotate-45 transform" />
+                          </span>
+                        )}
+                      </span>
+                      <span className={`capitalize ${!isAvailable ? "line-through text-muted-foreground/60" : ""}`}>
+                        {opt.name}
+                      </span>
+                      {isSelected && isAvailable && <CheckIcon className="size-3 text-primary ml-0.5" />}
                     </button>
                   )
                 })}
@@ -305,39 +429,56 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
               <div className="flex flex-wrap gap-2">
                 {groupOptions.map((opt) => {
                   const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  const isAvailable = checkOptionAvailability(group.name, opt.name, selectedOptions)
+
                   return (
                     <button
                       key={opt.name}
                       type="button"
-                      onClick={() => handleOptionChange(group.name, opt.name)}
-                      className={`min-w-11 px-3.5 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary text-primary-foreground shadow-xs"
-                          : "border-border/80 bg-card text-foreground hover:border-foreground/40"
+                      disabled={!isAvailable}
+                      onClick={() => isAvailable && handleOptionChange(group.name, opt.name)}
+                      title={!isAvailable ? `${opt.name} (Unavailable with current selections)` : opt.name}
+                      className={`relative min-w-11 px-3.5 py-2 rounded-xl border text-xs font-bold uppercase transition-all overflow-hidden ${
+                        !isAvailable
+                          ? "opacity-40 cursor-not-allowed border-dashed border-border/60 bg-muted/20 text-muted-foreground/50 line-through"
+                          : isSelected
+                          ? "border-primary bg-primary text-primary-foreground shadow-xs cursor-pointer"
+                          : "border-border/80 bg-card text-foreground hover:border-foreground/40 cursor-pointer"
                       }`}
                     >
-                      {opt.name}
+                      <span>{opt.name}</span>
                     </button>
                   )
                 })}
               </div>
             ) : (
-              /* ANY OTHER GROUP (e.g. Model, Finish, Capacity): Distinct chips */
+              /* ANY OTHER GROUP (e.g. Material, Finish, Capacity): Distinct chips */
               <div className="flex flex-wrap gap-2">
                 {groupOptions.map((opt) => {
                   const isSelected = activeValue.toLowerCase() === opt.name.toLowerCase()
+                  const isAvailable = checkOptionAvailability(group.name, opt.name, selectedOptions)
+
                   return (
                     <button
                       key={opt.name}
                       type="button"
-                      onClick={() => handleOptionChange(group.name, opt.name)}
-                      className={`px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs"
-                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                      disabled={!isAvailable}
+                      onClick={() => isAvailable && handleOptionChange(group.name, opt.name)}
+                      title={!isAvailable ? `${opt.name} (Unavailable with current selections)` : opt.name}
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all ${
+                        !isAvailable
+                          ? "opacity-40 cursor-not-allowed border-dashed border-border/60 bg-muted/20 text-muted-foreground/50 line-through"
+                          : isSelected
+                          ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/30 shadow-xs cursor-pointer"
+                          : "border-border/80 bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground cursor-pointer"
                       }`}
                     >
-                      {opt.name}
+                      <span>{opt.name}</span>
+                      {!isAvailable && (
+                        <span className="text-[10px] text-muted-foreground/70 font-normal no-underline ml-0.5">
+                          (Unavailable)
+                        </span>
+                      )}
                     </button>
                   )
                 })}
@@ -347,8 +488,10 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
         )
       })}
 
-      {/* Material Selection: ONLY shown if product actually has materials */}
-      {product.materials && product.materials.length > 0 && (
+      {/* Material Selection: ONLY shown if product has legacy materials array and no Material OptionGroup */}
+      {product.materials &&
+        product.materials.length > 0 &&
+        !optionGroups.some((og) => og.name.toLowerCase().includes("material")) && (
         <div className="space-y-2.5">
           <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Material / Fabric
@@ -448,25 +591,56 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 pt-2">
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full"
+        {/* Primary Add to Cart Button */}
+        <Button
+          size="lg"
+          className="w-full gap-2.5 h-13 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer"
+          disabled={isAddingToCart || currentVariant?.stockLevel === "OUT_OF_STOCK"}
+          onClick={handleAddToCart}
         >
-          <Button size="lg" className="w-full gap-2 h-13 text-sm font-semibold">
-            <UploadIcon className="size-4" />
-            Upload Artwork & Order via WhatsApp
-          </Button>
-        </a>
+          {isAddingToCart ? (
+            <>
+              <Spinner className="size-4" />
+              <span>Adding to Cart...</span>
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="size-4.5" />
+              <span>
+                Add to Cart • ₹{subtotal.toLocaleString("en-IN")}
+              </span>
+            </>
+          )}
+        </Button>
 
-        <a href="/contact" className="w-full">
-          <Button variant="outline" size="lg" className="w-full gap-2 text-sm">
-            <SendIcon className="size-4" />
-            Request Bulk Quote / Pantone Matching
-          </Button>
-        </a>
+        {/* Secondary: WhatsApp Consultation & Bulk Quote Options */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full"
+          >
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full gap-2 h-11 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+            >
+              <UploadIcon className="size-3.5" />
+              Order via WhatsApp
+            </Button>
+          </a>
+
+          <a href="/contact" className="w-full">
+            <Button variant="outline" size="lg" className="w-full gap-2 h-11 text-xs font-semibold">
+              <SendIcon className="size-3.5" />
+              Request Bulk Quote
+            </Button>
+          </a>
+        </div>
       </div>
+
+      <Toaster />
     </div>
   )
 }

@@ -1,0 +1,15 @@
+---
+import Layout from "@/layouts/main.astro"
+import CartView from "@/components/cart/CartView"
+---
+
+<Layout
+  title="Shopping Cart | RS Prints"
+  description="Review your customized print orders, adjust quantities, apply promotional discount coupons, and proceed to secure checkout at RS Prints."
+  canonicalUrl="/cart"
+  currentActive="cart"
+>
+  <div class="py-6 sm:py-10">
+    <CartView client:load />
+  </div>
+</Layout>

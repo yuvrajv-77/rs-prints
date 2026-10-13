@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useStore } from "@nanostores/react"
 import { $currentUser, fetchCurrentUser, signOut } from "@/stores/auth"
+import { $cartCount } from "@/stores/cart"
 import {
   Sheet,
   SheetContent,
@@ -44,6 +45,7 @@ export default function MobileNav() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const { customer, initialized } = useStore($currentUser)
+  const cartCount = useStore($cartCount)
 
   useEffect(() => {
     if (!initialized) {
@@ -327,17 +329,19 @@ export default function MobileNav() {
             <User className="size-5" />
           </a>
 
-          {/* Shopping Bag Button with Badge (Screenshot 1) */}
+          {/* Shopping Bag Button with Badge */}
           <a
-            href="/products"
+            href="/cart"
             aria-label="Shopping Cart"
             className="relative flex size-9 items-center justify-center rounded-lg text-foreground/80 hover:text-foreground hover:bg-muted/80 transition-colors"
           >
             <ShoppingBag className="size-5" />
             {/* Pill Notification Badge */}
-            <span className="absolute -top-0.5 -right-0.5 flex size-4.5 items-center justify-center rounded-full bg-[#38bdf8] text-[10px] font-bold text-white shadow-xs">
-              2
-            </span>
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex size-4.5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-xs animate-in zoom-in-50 duration-200">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
           </a>
         </div>
       </div>

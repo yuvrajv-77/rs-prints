@@ -14,6 +14,8 @@ import 'dotenv/config';
 import path from 'path';
 import { AssetServerPlugin, configureS3AssetStorage } from '@vendure/asset-server-plugin';
 import { ColorPickerPlugin } from './plugins/color-picker/color-picker.plugin';
+import { RazorpayPlugin } from './plugins/razorpay/razorpay.plugin';
+import { codPaymentHandler } from './plugins/cod/cod.handler';
 
 
 const IS_DEV = process.env.APP_ENV === 'dev';
@@ -63,6 +65,12 @@ export const config: VendureConfig = {
         migrations: [path.join(__dirname, './migrations/*.+(js|ts)')],
         logging: false,
         schema: process.env.DB_SCHEMA || 'public',
+        extra: {
+            max: 10,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 30000,
+            keepAlive: true,
+        },
         ...(process.env.DATABASE_URL
             ? {
                 url: process.env.DATABASE_URL,
@@ -84,7 +92,7 @@ export const config: VendureConfig = {
             }),
     },
     paymentOptions: {
-        paymentMethodHandlers: [dummyPaymentHandler],
+        paymentMethodHandlers: [dummyPaymentHandler, codPaymentHandler],
     },
     // Custom Fields Configuration:
     // Vendure allows extending built-in entities (Product, ProductOption, Order, Customer, etc.)
@@ -177,5 +185,6 @@ export const config: VendureConfig = {
                 : path.join(__dirname, 'dashboard'),
         }),
         ColorPickerPlugin,
+        RazorpayPlugin,
     ],
 };

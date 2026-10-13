@@ -1,11 +1,34 @@
 ---
+// apps/storefront/src/pages/products/index.astro
+// Main Products Catalogue - Fetches live collections, products, and facets from Vendure backend
 import ProductsLayout from "@/layouts/ProductsLayout.astro"
 import MinimalProductCard from "@/components/product/MinimalProductCard.astro"
-import { getCategorizedProducts } from "@/data/products"
+import { getVendureGroupedSections } from "@/lib/vendure/queries/products"
 import { Badge } from "@/components/ui/badge"
+import { Filter, Tag } from "lucide-react"
 
-// Fetch categorized product sections from single source of truth
-const groupedSections = getCategorizedProducts()
+// Fetch live products, collections, and facets directly from Vendure database
+let groupedSections: any[] = []
+let facets: any[] = []
+let totalProducts = 0
+
+try {
+  const result = await getVendureGroupedSections()
+  if (result && result.groupedSections && result.groupedSections.length > 0) {
+    groupedSections = result.groupedSections
+    facets = result.facets || []
+    totalProducts = result.totalProducts || 0
+  } else {
+    const { getCategorizedProducts } = await import("@/data/products")
+    groupedSections = getCategorizedProducts()
+    totalProducts = groupedSections.reduce((acc, g) => acc + g.products.length, 0)
+  }
+} catch (err) {
+  console.warn("Could not fetch Vendure products, falling back to mock catalog:", err)
+  const { getCategorizedProducts } = await import("@/data/products")
+  groupedSections = getCategorizedProducts()
+  totalProducts = groupedSections.reduce((acc, g) => acc + g.products.length, 0)
+}
 ---
 
 <ProductsLayout
@@ -13,74 +36,131 @@ const groupedSections = getCategorizedProducts()
   description="Explore our full collection of custom printing services: personalized apparel, home decor, custom gifts, and corporate business essentials."
   canonicalUrl="/products"
   currentActive="products"
+  groupedSections={groupedSections}
 >
-  <div class="space-y-14">
-    {groupedSections.map((group) => (
-      <div
-        id={group.id}
-        data-category-section={group.id}
-        data-category-title={group.title}
-        class="scroll-mt-28 space-y-7 transition-all duration-200"
-      >
-        <!-- Section Group Header -->
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-3 border-b border-border/70">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <h2 class="font-heading text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                {group.title}
-              </h2>
-              <Badge variant="secondary" className="text-[11px] font-mono px-2 py-0.5 ml-1">
-                {group.products.length} {group.products.length === 1 ? "item" : "items"}
-              </Badge>
+  <div class="space-y-12">
+    <!-- Active Facets / Attributes Overview Bar -->
+    {facets && facets.length > 0 && facets.some((f) => f.values && f.values.some((v: any) => v.name && v.name.trim().length > 0)) && (
+      <div class="rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 rounded-lg bg-primary/10 text-primary">
+              <Filter className="size-4" />
             </div>
-            <p class="text-xs sm:text-sm text-muted-foreground max-w-xl">
-              {group.description}
-            </p>
+            <h2 class="text-sm font-bold tracking-tight text-foreground">
+              Available Attributes & Facets ({totalProducts} Products Total)
+            </h2>
           </div>
-
-          <a
-            href="#top"
-            class="text-[11px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1 self-start sm:self-auto transition-colors"
-          >
-            Back to top &uarr;
-          </a>
+          <span class="text-xs text-muted-foreground font-mono">
+            Live Catalogue
+          </span>
         </div>
 
-        <!-- Subcategories Content -->
-        <div class="space-y-8">
-          {group.subcategories.map((sub) => (
-            <div
-              data-subcategory-section={sub.id}
-              data-subcategory-title={sub.title}
-              class="space-y-3.5 transition-all duration-200"
-            >
-              {group.subcategories.length > 1 && (
-                <div class="flex items-center justify-between pt-1">
-                  <div class="flex items-center gap-2">
-                    <h3 class="text-xs sm:text-sm font-semibold tracking-wide uppercase text-foreground/80">
-                      {sub.title}
-                    </h3>
-                    <span class="text-[11px] text-muted-foreground font-mono">
-                      ({sub.products.length})
-                    </span>
-                  </div>
-                </div>
-              )}
+        <p class="text-xs text-muted-foreground leading-relaxed">
+          Filter products across categories using material, color, and finish attributes.
+        </p>
 
-              <!-- Minimal Cards Grid using Reusable MinimalProductCard Component -->
-              <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-3.5 sm:gap-4.5">
-                {sub.products.map((item) => (
-                  <MinimalProductCard
-                    product={item}
-                    parentCategorySlug={group.id}
-                    categorySlug={sub.id}
-                  />
-                ))}
+        <!-- Active Facets retrieved from Vendure -->
+        <div class="flex flex-wrap gap-2.5 pt-1">
+          {facets
+            .filter((facet) => facet.values && facet.values.some((val: any) => val.name && val.name.trim().length > 0))
+            .map((facet) => (
+              <div class="inline-flex items-center gap-1.5 rounded-lg bg-card border border-border px-3 py-1.5 text-xs shadow-xs">
+                <Tag className="size-3 text-primary/70" />
+                <span class="font-semibold text-foreground">{facet.name}:</span>
+                <div class="flex items-center gap-1 flex-wrap">
+                  {facet.values
+                    .filter((val: any) => val.name && val.name.trim().length > 0)
+                    .map((val: any) => (
+                      <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
+                        {val.name}
+                      </Badge>
+                    ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
-    ))}
+    )}
+
+    <!-- Product Groups (Mapped from Vendure Collections) -->
+    {groupedSections.length === 0 ? (
+      <div class="text-center py-16 text-muted-foreground space-y-2">
+        <p class="font-medium text-foreground">No products found in catalog.</p>
+        <p class="text-xs">Check that your Vendure server is running and products are published.</p>
+      </div>
+    ) : (
+      groupedSections
+        .filter((group) => group.products && group.products.length > 0)
+        .map((group) => (
+          <div
+            id={group.id}
+            data-category-section={group.id}
+            data-category-title={group.title}
+            class="scroll-mt-28 space-y-7 transition-all duration-200"
+          >
+            <!-- Section Group Header -->
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pb-3 border-b border-border/70">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <h2 class="font-heading text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                    {group.title}
+                  </h2>
+                  <Badge variant="secondary" className="text-[11px] font-mono px-2 py-0.5 ml-1">
+                    {group.products.length} {group.products.length === 1 ? "item" : "items"}
+                  </Badge>
+                </div>
+                <p class="text-xs sm:text-sm text-muted-foreground max-w-xl">
+                  {group.description}
+                </p>
+              </div>
+
+              <a
+                href="#top"
+                class="text-[11px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1 self-start sm:self-auto transition-colors"
+              >
+                Back to top &uarr;
+              </a>
+            </div>
+
+            <!-- Subcategories Content -->
+            <div class="space-y-8">
+              {group.subcategories
+                .filter((sub: any) => sub.products && sub.products.length > 0)
+                .map((sub: any) => (
+                  <div
+                    data-subcategory-section={sub.id}
+                    data-subcategory-title={sub.title}
+                    class="space-y-3.5 transition-all duration-200"
+                  >
+                    {group.subcategories.filter((s: any) => s.products && s.products.length > 0).length > 1 && (
+                      <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-2">
+                          <h3 class="text-xs sm:text-sm font-semibold tracking-wide uppercase text-foreground/80">
+                            {sub.title}
+                          </h3>
+                          <span class="text-[11px] text-muted-foreground font-mono">
+                            ({sub.products.length})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <!-- Minimal Cards Grid using Reusable MinimalProductCard Component -->
+                    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-3.5 sm:gap-4.5">
+                      {sub.products.map((item: any) => (
+                        <MinimalProductCard
+                          product={item}
+                          parentCategorySlug={group.id}
+                          categorySlug={sub.id}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        ))
+    )}
   </div>
 </ProductsLayout>

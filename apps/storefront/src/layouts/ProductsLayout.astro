@@ -1,4 +1,4 @@
----
+---                   
 import Layout from "@/layouts/main.astro"
 import { getCategorizedProducts } from "@/data/products"
 import brandConfig from "@/data/brandConfig.json"
@@ -42,22 +42,26 @@ const {
 
 const groupedSections = customGroupedSections || getCategorizedProducts()
 const totalProductsCount = groupedSections.reduce(
-  (acc, g) => acc + g.products.length,
+  (acc, g) => acc + (g.products?.length || 0),
   0
 )
 
-const categoriesForNav = groupedSections.map((parent) => ({
-  id: parent.id,
-  title: parent.title,
-  description: parent.description,
-  totalCount: parent.totalCount,
-  subcategories: parent.subcategories.map((sub) => ({
-    id: sub.id,
-    title: sub.title,
-    description: sub.description,
-    count: sub.products.length,
-  })),
-}))
+const categoriesForNav = groupedSections
+  .filter((parent) => parent.products && parent.products.length > 0)
+  .map((parent) => ({
+    id: parent.id,
+    title: parent.title,
+    description: parent.description,
+    totalCount: parent.products.length,
+    subcategories: (parent.subcategories || [])
+      .filter((sub: any) => sub.products && sub.products.length > 0)
+      .map((sub: any) => ({
+        id: sub.id,
+        title: sub.title,
+        description: sub.description,
+        count: sub.products.length,
+      })),
+  }))
 ---
 
 <Layout

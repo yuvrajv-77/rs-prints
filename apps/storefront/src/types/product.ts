@@ -50,7 +50,7 @@ export interface ProductSpecGroup {
   /** Key-value list of specifications within this group */
   items: {
     label: string
-    value: string
+    value: string | string[]
   }[]
 }
 
@@ -169,6 +169,8 @@ export interface Product {
   badge?: string
   /** Internal catalogue / SKU code used for print inventory reference */
   catalogueCode?: string
+  /** Catalogue reference page number */
+  cataloguePage?: number | string
   /** Average customer rating score (1.0 to 5.0) */
   rating?: number
   /** Total count of customer reviews */
@@ -180,7 +182,7 @@ export interface Product {
   /** Supported print technologies (e.g. "DTF", "Screen Printing", "Sublimation") */
   printMethods?: string[]
   /** Simple list of option names for fallback displays */
-  options?: string[]
+  options?: (string | string[])[]
   /** Full Vendure option groups (Size, Color, etc.) for interactive configurators */
   optionGroups?: ProductOptionGroup[]
   /** List of purchasable product variants associated with this product */

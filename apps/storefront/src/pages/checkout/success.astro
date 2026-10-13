@@ -1,0 +1,16 @@
+---
+import Layout from "@/layouts/main.astro"
+import OrderSuccessView from "@/components/checkout/OrderSuccessView"
+
+const url = new URL(Astro.request.url)
+const orderCode = url.searchParams.get("code") || ""
+---
+
+<Layout
+  title="Order Confirmed | RS Prints"
+  description="Your customized print order has been placed and confirmed successfully at RS Prints."
+  canonicalUrl="/checkout/success"
+  currentActive="cart"
+>
+  <OrderSuccessView client:load orderCode={orderCode} />
+</Layout>

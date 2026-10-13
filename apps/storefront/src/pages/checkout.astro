@@ -1,0 +1,15 @@
+---
+import Layout from "@/layouts/main.astro"
+import CheckoutView from "@/components/checkout/CheckoutView"
+---
+
+<Layout
+  title="Secure Checkout | RS Prints"
+  description="Complete your customized print order securely with Razorpay (UPI, Credit/Debit Cards, Netbanking) or Cash on Delivery at RS Prints."
+  canonicalUrl="/checkout"
+  currentActive="cart"
+>
+  <div class="py-4 sm:py-6">
+    <CheckoutView client:load />
+  </div>
+</Layout>

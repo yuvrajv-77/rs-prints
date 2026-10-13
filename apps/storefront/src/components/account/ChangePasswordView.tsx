@@ -24,17 +24,17 @@ export default function ChangePasswordView() {
     e.preventDefault()
 
     if (!currentPassword) {
-      toast.error("Please enter your current password")
+      toast.add({ title: "Please enter your current password", type: "error" })
       return
     }
 
     if (!hasMinLength) {
-      toast.error("New password must be at least 8 characters")
+      toast.add({ title: "New password must be at least 8 characters", type: "error" })
       return
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.add({ title: "Passwords do not match", type: "error" })
       return
     }
 
@@ -42,7 +42,7 @@ export default function ChangePasswordView() {
     await new Promise((resolve) => setTimeout(resolve, 600))
     setLoading(false)
 
-    toast.success("Password updated successfully!")
+    toast.add({ title: "Password updated successfully!", type: "success" })
     setCurrentPassword("")
     setNewPassword("")
     setConfirmPassword("")
@@ -50,7 +50,7 @@ export default function ChangePasswordView() {
 
   return (
     <div className="w-full">
-      <Toaster position="bottom-right" />
+      <Toaster />
 
       <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 mb-6 font-heading sm:font-sans">
         Change Password
