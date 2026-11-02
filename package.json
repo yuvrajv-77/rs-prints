@@ -2,6 +2,7 @@
   "name": "rs-prints",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@12.4.1",
   "scripts": {
     "dev": "concurrently -n server,storefront -c blue,magenta \"pnpm --filter server dev\" \"pnpm --filter storefront dev\"",
     "dev:server": "pnpm --filter server dev",
