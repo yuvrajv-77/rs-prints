@@ -4,7 +4,7 @@ import {
     DefaultSchedulerPlugin,
     DefaultSearchPlugin,
     VendureConfig,
-    LanguageCode,
+
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
 // import { AssetServerPlugin } from '@vendure/asset-server-plugin';
@@ -13,7 +13,7 @@ import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import 'dotenv/config';
 import path from 'path';
 import { AssetServerPlugin, configureS3AssetStorage } from '@vendure/asset-server-plugin';
-import { ColorPickerPlugin } from './plugins/color-picker/color-picker.plugin';
+
 import { RazorpayPlugin } from './plugins/razorpay/razorpay.plugin';
 import { codPaymentHandler } from './plugins/cod/cod.handler';
 
@@ -94,44 +94,6 @@ export const config: VendureConfig = {
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler, codPaymentHandler],
     },
-    // Custom Fields Configuration:
-    // Vendure allows extending built-in entities (Product, ProductOption, Order, Customer, etc.)
-    // with custom fields. These must be defined under `customFields` on the root config object
-    // (NEVER inside `plugins`, which is reserved exclusively for Vendure plugin classes/modules).
-    //
-    // Note: When adding or modifying custom fields, a database migration is required
-    // (e.g. `npm run migration:generate -- add-color-code` then `npm run migration:run`)
-    // so TypeORM creates the corresponding column in the database table (e.g. `product_option.customFieldsColorcode`).
-    customFields: {
-        ProductOption: [
-            {
-                // Property key exposed in GraphQL (`customFields.colorCode`)
-                // and the column name in the database table.
-                name: 'colorCode',
-
-                // Stored as a hex color string (e.g. #FF5733)
-                type: 'string',
-
-                // Exposes this field via the Shop API for the storefront
-                public: true,
-
-                // Nullable for options that don't represent colors (e.g. Size 'S', 'M', 'L')
-                nullable: true,
-
-                // Custom UI component in the Vendure Admin dashboard:
-                // Displays an interactive color picker alongside a direct hex code input!
-                ui: {
-                    component: 'color-picker-input',
-                },
-
-                // Display label shown in the Vendure Admin UI
-                label: [{ languageCode: LanguageCode.en, value: 'Color' }],
-
-                // Helper text rendered below the input in the Admin UI
-                description: [{ languageCode: LanguageCode.en, value: 'Select color using the color picker or enter a hex code (#000000)' }],
-            },
-        ],
-    },
     plugins: [
         GraphiqlPlugin.init(),
         // AssetServerPlugin.init({
@@ -184,7 +146,7 @@ export const config: VendureConfig = {
                 ? path.join(__dirname, '../dist/dashboard')
                 : path.join(__dirname, 'dashboard'),
         }),
-        ColorPickerPlugin,
+
         RazorpayPlugin,
     ],
 };
