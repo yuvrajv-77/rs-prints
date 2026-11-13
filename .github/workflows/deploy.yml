@@ -1,0 +1,234 @@
+name: Production CI/CD Pipeline
+
+# ==============================================================================
+# RS Prints - Production CI/CD Deployment Workflow
+# ==============================================================================
+# This workflow automates building the Vendure backend and Dashboard on a
+# powerful GitHub-hosted Ubuntu runner, preventing out-of-memory errors on your
+# Oracle Cloud VM. Once compiled and verified, the build is securely transferred
+# and deployed to Oracle VM over SSH.
+# ==============================================================================
+
+# Trigger on pushes to the 'main' branch
+# 'workflow_dispatch' enables a manual "Run workflow" button in GitHub Actions
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Prevent overlapping deployments running concurrently
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Vendure
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------------------
+      # Step 1: Check out the repository source code
+      # ------------------------------------------------------------------------
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------------
+      # Step 2: Install pnpm using the exact version specified in package.json
+      # ------------------------------------------------------------------------
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+          run_install: false
+
+      # ------------------------------------------------------------------------
+      # Step 3: Set up Node.js 24 with pnpm dependency caching enabled
+      # ------------------------------------------------------------------------
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      # ------------------------------------------------------------------------
+      # Step 4: Install dependencies using the frozen lockfile
+      # ------------------------------------------------------------------------
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ------------------------------------------------------------------------
+      # Step 5: Compile the Vendure backend and Dashboard on GitHub Actions
+      # (This compiles TypeScript and runs Vite with ample 16GB RAM)
+      # ------------------------------------------------------------------------
+      - name: Build Vendure Backend & Dashboard
+        run: pnpm --filter server build
+
+      # ------------------------------------------------------------------------
+      # Step 6: Verify all critical production build outputs exist
+      # If any file is missing, fail the workflow before touching Oracle VM
+      # ------------------------------------------------------------------------
+      - name: Verify Build Artifacts
+        run: |
+          echo "Verifying compiled production files..."
+
+          # Verify backend server entry point
+          if [ ! -f "apps/server/dist/index.js" ]; then
+            echo "::error::Compiled server entrypoint apps/server/dist/index.js is missing!"
+            exit 1
+          fi
+
+          # Verify compiled Vendure configuration
+          if [ ! -f "apps/server/dist/vendure-config.js" ]; then
+            echo "::error::Compiled vendure-config.js is missing!"
+            exit 1
+          fi
+
+          # Verify compiled Dashboard index.html
+          if [ ! -f "apps/server/dist/dashboard/index.html" ]; then
+            echo "::error::Dashboard build output apps/server/dist/dashboard/index.html is missing!"
+            exit 1
+          fi
+
+          # Verify compiled Dashboard assets directory
+          if [ ! -d "apps/server/dist/dashboard/assets" ]; then
+            echo "::error::Dashboard assets directory apps/server/dist/dashboard/assets is missing!"
+            exit 1
+          fi
+
+          echo "All production artifacts verified successfully."
+
+      # ------------------------------------------------------------------------
+      # Step 7: Create a lightweight deployment archive (~2MB compressed)
+      # Includes compiled dist, email templates, and package manifests.
+      # Excludes node_modules, .env, and local uploads.
+      # ------------------------------------------------------------------------
+      - name: Package Production Build
+        run: |
+          tar -czf deploy.tar.gz \
+            package.json \
+            pnpm-lock.yaml \
+            pnpm-workspace.yaml \
+            .npmrc \
+            apps/server/package.json \
+            apps/server/dist \
+            apps/server/static/email/templates
+
+          echo "Deployment package successfully created:"
+          ls -lh deploy.tar.gz
+
+      # ------------------------------------------------------------------------
+      # Step 8: Set up SSH key for authenticating with the Oracle VM
+      # ------------------------------------------------------------------------
+      - name: Configure SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ORACLE_SSH_KEY }}
+
+      # ------------------------------------------------------------------------
+      # Step 9: Add Oracle VM to SSH known hosts to prevent MITM prompt
+      # ------------------------------------------------------------------------
+      - name: Add Oracle Host to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.ORACLE_PORT || '22' }} -H "${{ secrets.ORACLE_HOST }}" >> ~/.ssh/known_hosts
+
+      # ------------------------------------------------------------------------
+      # Step 10: Securely transfer the build package to the Oracle staging directory
+      # ------------------------------------------------------------------------
+      - name: Transfer Build Package to Oracle VM
+        run: |
+          ssh -p ${{ secrets.ORACLE_PORT || '22' }} ${{ secrets.ORACLE_USER }}@${{ secrets.ORACLE_HOST }} "mkdir -p ~/.rs-prints-staging"
+          scp -P ${{ secrets.ORACLE_PORT || '22' }} deploy.tar.gz ${{ secrets.ORACLE_USER }}@${{ secrets.ORACLE_HOST }}:~/.rs-prints-staging/deploy.tar.gz
+
+      # ------------------------------------------------------------------------
+      # Step 11: Safely unpack in staging, update dependencies, backup & restart
+      # ------------------------------------------------------------------------
+      - name: Deploy and Restart on Oracle VM
+        run: |
+          ssh -p ${{ secrets.ORACLE_PORT || '22' }} ${{ secrets.ORACLE_USER }}@${{ secrets.ORACLE_HOST }} 'bash -se' << 'EOF'
+            set -euo pipefail
+
+            # Ensure all standard Node/npm/pnpm bin locations are in PATH
+            export PATH="$HOME/.local/share/pnpm:$HOME/.npm-global/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+            TARGET_DIR="${{ secrets.ORACLE_TARGET_DIR || '/home/ubuntu/apps/rs-prints' }}"
+            STAGING_DIR="$HOME/.rs-prints-staging"
+
+            echo "=== Starting RS Prints Deployment ==="
+            echo "Target Directory: $TARGET_DIR"
+
+            # 1. Unpack inside temporary staging directory
+            cd "$STAGING_DIR"
+            tar -xzf deploy.tar.gz
+            rm -f deploy.tar.gz
+
+            # 2. Strict verification in staging before touching the live app
+            if [ ! -f "$STAGING_DIR/apps/server/dist/dashboard/index.html" ]; then
+              echo "Error: Verification failed. Staging dashboard output missing!"
+              exit 1
+            fi
+            if [ ! -f "$STAGING_DIR/apps/server/dist/index.js" ]; then
+              echo "Error: Verification failed. Staging backend output missing!"
+              exit 1
+            fi
+
+            # 3. Synchronize package manifests to target
+            cp "$STAGING_DIR/package.json" "$TARGET_DIR/package.json"
+            cp "$STAGING_DIR/pnpm-lock.yaml" "$TARGET_DIR/pnpm-lock.yaml"
+            cp "$STAGING_DIR/pnpm-workspace.yaml" "$TARGET_DIR/pnpm-workspace.yaml"
+            cp "$STAGING_DIR/.npmrc" "$TARGET_DIR/.npmrc"
+            cp "$STAGING_DIR/apps/server/package.json" "$TARGET_DIR/apps/server/package.json"
+
+            # 4. Synchronize email templates (leaves static/assets untouched)
+            mkdir -p "$TARGET_DIR/apps/server/static/email/templates"
+            cp -r "$STAGING_DIR/apps/server/static/email/templates/"* "$TARGET_DIR/apps/server/static/email/templates/"
+
+            # 5. Install or update production dependencies (no compilation runs on Oracle)
+            cd "$TARGET_DIR"
+            echo "Updating production dependencies..."
+            pnpm install --prod --frozen-lockfile
+
+            # 6. Create backup of current dist directory for rollback capability
+            if [ -d "$TARGET_DIR/apps/server/dist" ]; then
+              rm -rf "$TARGET_DIR/apps/server/dist.bak"
+              cp -r "$TARGET_DIR/apps/server/dist" "$TARGET_DIR/apps/server/dist.bak"
+            fi
+
+            # 7. Atomically promote the new dist directory
+            rm -rf "$TARGET_DIR/apps/server/dist"
+            cp -r "$STAGING_DIR/apps/server/dist" "$TARGET_DIR/apps/server/dist"
+
+            # 8. Clean up staging folder
+            rm -rf "$STAGING_DIR"
+
+            # 9. Restart application with automated rollback on failure
+            echo "Restarting application process..."
+            RESTART_CMD="${{ secrets.ORACLE_RESTART_CMD }}"
+            if [ -z "$RESTART_CMD" ]; then
+              if command -v pm2 > /dev/null 2>&1; then
+                RESTART_CMD="pm2 restart all || pm2 restart rs-prints"
+              elif [ -f "$HOME/restart.sh" ]; then
+                RESTART_CMD="bash $HOME/restart.sh"
+              else
+                echo "Warning: No ORACLE_RESTART_CMD specified and PM2 or restart.sh not found."
+                RESTART_CMD="echo 'No restart command configured. Please restart manually.'"
+              fi
+            fi
+
+            echo "Executing: $RESTART_CMD"
+            if ! eval "$RESTART_CMD"; then
+              echo "Error: Restart command failed! Initiating rollback..."
+              if [ -d "$TARGET_DIR/apps/server/dist.bak" ]; then
+                rm -rf "$TARGET_DIR/apps/server/dist"
+                mv "$TARGET_DIR/apps/server/dist.bak" "$TARGET_DIR/apps/server/dist"
+                eval "$RESTART_CMD" || true
+                echo "Rollback completed. Restored previous working build."
+              fi
+              exit 1
+            fi
+
+            echo "=== Deployment Completed Successfully ==="
+          EOF
+
