@@ -9,6 +9,7 @@ admin-ui/
 .astro/
 .vendure/
 .tanstack/
+.wrangler/
 
 # Vendure asset & email storage
 apps/server/static/assets

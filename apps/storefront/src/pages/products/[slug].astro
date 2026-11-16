@@ -10,27 +10,8 @@
  */
 import ProductDetailsLayout from "@/layouts/ProductDetailsLayout.astro"
 import type { Product } from "@/types/product"
-import { getProducts, getProductBySlug } from "@/lib/vendure/queries/products"
+import { getProductBySlug } from "@/lib/vendure/queries/products"
 import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
-
-export async function getStaticPaths() {
-  try {
-    const products = await getProducts()
-    if (products && products.length > 0) {
-      return products.map((product) => ({
-        params: { slug: product.slug },
-      }))
-    }
-  } catch (err) {
-    console.warn("Could not fetch Vendure products in getStaticPaths, using fallback:", err)
-  }
-
-  // Fallback to mock catalog products if Vendure returns empty or is unreachable during build
-  const { getAllProducts } = await import("@/data/products")
-  return getAllProducts().map((product) => ({
-    params: { slug: product.slug },
-  }))
-}
 
 const { slug } = Astro.params
 

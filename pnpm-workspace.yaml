@@ -7,3 +7,14 @@ allowBuilds:
   bcrypt: true
   '@apollo/protobufjs': true
   msw: true
+  workerd: true
+
+minimumReleaseAgeExclude:
+  - '@cloudflare/workerd-darwin-64@1.20261116.1'
+  - '@cloudflare/workerd-darwin-arm64@1.20261116.1'
+  - '@cloudflare/workerd-linux-64@1.20261116.1'
+  - '@cloudflare/workerd-linux-arm64@1.20261116.1'
+  - '@cloudflare/workerd-windows-64@1.20261116.1'
+  - miniflare@5.20261116.0-beta
+  - workerd@1.20261116.1
+  - wrangler@4.163.0
