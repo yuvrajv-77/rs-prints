@@ -4,9 +4,11 @@
  * Default: read-only preview.
  * Apply: node --env-file=.env.test catalogue/rebuild-normalized-catalogue.mjs --apply
  *
- * This script is ADDITIVE: it never deletes products or changes collections.
- * It can resume after interruption by reusing products, option groups and SKUs
- * already created by a previous run.
+ * Default: read-only preview.
+ * --apply: additive import (preserves existing products).
+ * --apply --reset-test: DESTRUCTIVE test-catalogue reset, then rebuild.
+ * Collections are never deleted or modified. Shared option groups are ensured
+ * before any product deletion or creation.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +16,8 @@ import path from 'node:path';
 const readJson = name => JSON.parse(fs.readFileSync(path.join(import.meta.dirname, name), 'utf8'));
 const plan = readJson('normalized-catalogue-plan.json');
 const apply = process.argv.includes('--apply');
+const resetTest = process.argv.includes('--reset-test');
+if (resetTest && !apply) throw new Error('--reset-test requires --apply.');
 const endpoint = process.env.VENDURE_ADMIN_API_URL || `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
 const languageCode = 'en';
 const slugify = value => value.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -69,7 +73,7 @@ for (const model of plan.productModels) {
 }
 
 const report = {
-  mode: apply ? 'APPLY_ADDITIVE_RESUMABLE' : 'DRY_RUN',
+  mode: resetTest ? 'APPLY_DESTRUCTIVE_TEST_RESET_AND_REBUILD' : apply ? 'APPLY_ADDITIVE_RESUMABLE' : 'DRY_RUN',
   endpoint,
   normalizedSourceItems: plan.sourceItems.length,
   normalizedParentProducts: plan.productModels.length,
@@ -78,7 +82,7 @@ const report = {
   plannedVariants: prepared.reduce((sum, product) => sum + product.variants.length, 0),
   blockedProducts: blockers,
   errors,
-  existingProducts: 'PRESERVED',
+  existingProducts: resetTest ? 'ALL TEST DATABASE PRODUCTS WILL BE DELETED BEFORE REBUILD' : 'PRESERVED',
   collections: 'PRESERVED: no collection mutation is performed.',
   pricingAndStock: 'Products and variants remain disabled; price placeholder is 0 until confirmed.',
 };
@@ -95,6 +99,9 @@ if (!apply) {
 }
 
 if (process.env.CATALOGUE_IMPORT_ALLOW !== 'true') throw new Error('Blocked: set CATALOGUE_IMPORT_ALLOW=true explicitly.');
+if (resetTest && process.env.CATALOGUE_ALLOW_TEST_PRODUCT_RESET !== 'YES_DELETE_ALL_TEST_PRODUCTS') {
+  throw new Error('Blocked: destructive reset requires CATALOGUE_ALLOW_TEST_PRODUCT_RESET=YES_DELETE_ALL_TEST_PRODUCTS in .env.test.');
+}
 if ((process.env.CATALOGUE_IMPORT_ENV || '').toLowerCase() !== 'development') throw new Error('Blocked: CATALOGUE_IMPORT_ENV must be development.');
 if (process.env.CATALOGUE_TEST_DATABASE_CONFIRMATION !== 'I_CONFIRM_THIS_IS_THE_RS_PRINTS_TEST_DATABASE') {
   throw new Error('Blocked: confirm the .env.test database using CATALOGUE_TEST_DATABASE_CONFIRMATION.');
@@ -153,7 +160,7 @@ const groupInputFields = introspection.groupInput?.inputFields || [];
 if (!groupInputFields.some(field => field.name === 'options')) throw new Error('CreateProductOptionGroupInput.options is unavailable. No writes performed.');
 
 const snapshot = await gql(`
-  query AdditiveImportPreflight {
+  query CatalogueRebuildPreflight {
     products(options: { take: 1000 }) {
       items {
         id slug name
@@ -187,6 +194,20 @@ for (const product of prepared) {
   }
 }
 
+
+// Build every shared option group before product creation. Colour is a shared
+// vocabulary; specialised groups (Handle Colour, Base Colour, etc.) remain
+// separate so product choices retain their actual meaning.
+const colourVocabulary = [
+  'Black', 'White', 'Red', 'Blue', 'Green', 'Dark Green', 'Light Green',
+  'Neon Green', 'Pink', 'Purple', 'Yellow', 'Light Yellow', 'Orange',
+  'Brown', 'Gold', 'Silver', 'Rose Gold', 'Light Blue',
+];
+if (optionGroupsToEnsure.has('COLOUR')) {
+  const colour = optionGroupsToEnsure.get('COLOUR');
+  colour.values = [...new Set([...colour.values, ...colourVocabulary])];
+}
+
 // Ensure every shared option group and every required option value exists.
 for (const [code, definition] of optionGroupsToEnsure) {
   let group = groupByCode.get(code);
@@ -217,6 +238,31 @@ for (const [code, definition] of optionGroupsToEnsure) {
     }
   }
   groupByCode.set(code, group);
+}
+
+
+if (resetTest) {
+  // The local Admin API + explicit .env.test confirmations are mandatory.
+  // Delete products only. Facets, facet values, collections, assets,
+  // option groups, and their option values are intentionally preserved.
+  const productIds = snapshot.products.items.map(product => product.id);
+  console.log(JSON.stringify({
+    destructiveAction: 'DELETE_ALL_PRODUCTS_IN_CONFIRMED_TEST_DATABASE',
+    productsToDelete: productIds.length,
+    collectionsToPreserve: snapshot.facets.items.find(f => f.code === 'catalogue_collection')?.values.length ?? null,
+    sharedOptionGroupsReady: groupByCode.size,
+  }, null, 2));
+  for (const id of productIds) {
+    const result = await gql(`
+      mutation DeleteTestCatalogueProduct($id: ID!) {
+        deleteProduct(id: $id) { result message }
+      }
+    `, { id });
+    if (result.deleteProduct.result !== 'DELETED') {
+      throw new Error(`Product deletion stopped for id ${id}: ${result.deleteProduct.message || result.deleteProduct.result}. No new products have been imported yet; rerun after resolving the issue.`);
+    }
+  }
+  console.log(`Deleted ${productIds.length} existing test-database products. Collections and shared option groups were preserved.`);
 }
 
 let createdProducts = 0;
@@ -307,5 +353,7 @@ console.log(JSON.stringify({
   collectionsModified: 0,
   oldProductsDeleted: 0,
   enabledProducts: 0,
-  note: 'Existing products and collections were preserved. All imported products and variants remain disabled.',
+  note: resetTest
+    ? 'Existing test-database products were deleted; collections and shared option groups were preserved. Imported products and variants remain disabled.'
+    : 'Existing products and collections were preserved. All imported products and variants remain disabled.',
 }, null, 2));
