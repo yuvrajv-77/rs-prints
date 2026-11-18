@@ -9,7 +9,7 @@ import path from 'node:path';
 
 const plan = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'normalized-catalogue-plan.json'), 'utf8'));
 const endpoint = process.env.VENDURE_ADMIN_API_URL || `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
-if (!/^https?:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d+)?\\//i.test(endpoint)) {
+if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: verification is restricted to a localhost Admin API endpoint.');
 }
 if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
