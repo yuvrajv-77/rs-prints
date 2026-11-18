@@ -44,11 +44,16 @@ const result = await post(`query InputShapeCheck {
 const schema = result.data.__schema;
 const wantedInputs = [
   'CreateProductOptionGroupInput',
+  'CreateGroupOptionInput',
   'CreateProductOptionInput',
   'CreateProductInput',
   'CreateProductVariantInput',
 ];
-const inputs = Object.fromEntries(wantedInputs.map(name => {
+const inputNames = new Set([
+  ...wantedInputs,
+  ...schema.types.filter(item => item.kind === 'INPUT_OBJECT' && /TranslationInput$/.test(item.name)).map(item => item.name),
+]);
+const inputs = Object.fromEntries([...inputNames].sort().map(name => {
   const type = schema.types.find(item => item.name === name);
   return [name, type ? type.inputFields : null];
 }));
