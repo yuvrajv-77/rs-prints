@@ -4,13 +4,42 @@ This folder contains the first transcription of the 17-page RS Prints supplier c
 
 ## Contents
 
-- `rs-prints-catalogue.json`: 138 product records, source page references, visible specifications, category assignments and review notes.
-- `import-catalogue.mjs`: creates facets, a shared apparel size option group, products, variants and category collections.
+- `rs-prints-catalogue.json`: 138 product records, source page references, visible specifications, finalized hierarchical collection assignments and review notes.
+- `import-catalogue.mjs`: creates facets, a shared apparel size option group, products, variants and hierarchical collections.
+
+## Final collection hierarchy
+
+- **Mugs**
+  - Ceramic Mugs
+  - Glass Mugs
+- **Drinkware**
+  - Aluminium Bottles
+  - Stainless Steel Bottles & Drinkware
+  - Kids Bottles
+  - Glass Drinkware (non-mug glass products)
+- **Clothing**
+  - Custom T-Shirts
+  - Custom Polo T-Shirts
+- **Bags**
+  - Custom Bags
+  - Custom Tote Bags
+- **Home & Living**
+  - Fur Pillows
+  - Flip Sequin
+- **Gifts & Accessories**
+  - MDF Products
+  - MDF Collage Frames
+  - Glass Frames
+  - Stone & Wooden Frames
+  - Sublimation Accessories
+  - Hard Board Products
+
+Every catalogue entry is assigned to one leaf collection. The original supplier category is retained, while product-name classification splits glass mugs from non-mug glass drinkware and regular T-shirts from polo T-shirts. Parent collections filter across their child collection values; child collections inherit the parent filter and add their own leaf filter.
 
 ## Catalogue modelling
 
-- **Collections:** one top-level collection per catalogue category.
-- **Facets:** `Catalogue category` for product grouping and `Material` where the PDF explicitly states a material.
+- **Collections:** hierarchical parent and child collections as listed above.
+- **Facets:** `Catalogue category` preserves the original supplier grouping, `Catalogue collection` drives leaf collection membership, and `Material` is used where the PDF explicitly states a material.
 - **Options:** `Size` is a product option group on the two cotton T-shirt listings where XS through 2XL is legible. Those become six explicit variants per product.
 - **SKUs:** printed supplier codes are retained where legible. Identifiers labelled `internal_provisional` or `provisional_sequence` are internal working identifiers and must not be mistaken for supplier codes.
 - **Pricing and visibility:** no prices are present in the PDF. The importer creates variants with a zero placeholder price and leaves both products and variants disabled. Add real prices and enable products only after review.
@@ -41,7 +70,7 @@ node --env-file=.env.test catalogue/import-catalogue.mjs --limit=3
 
 The script requires `SUPERADMIN_USERNAME` and `SUPERADMIN_PASSWORD` from the environment file. It refuses to run unless both safety switches are set and the target environment is explicitly marked local, development or staging. It authenticates once, defaults to a 3-product pilot, and skips products whose slug already exists. It does not delete or overwrite catalogue records. Only use `--all` after the pilot has been reviewed. Variants use a zero placeholder price because Vendure requires a price when creating variants; products and variants remain disabled until real prices are entered.
 
-After import, inspect the products, variants, facets and collection variant counts in the Vendure Dashboard. Reindex search if required by the deployment.
+After import, inspect the products, variants, facets, parent-child collection hierarchy and collection variant counts in the Vendure Dashboard. Reindex search if required by the deployment.
 
 ## Security
 
