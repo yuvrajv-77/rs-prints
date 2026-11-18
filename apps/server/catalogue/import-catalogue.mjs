@@ -355,6 +355,22 @@ for (const parent of catalogue.collectionTree) {
   }
 }
 
+// Hide obsolete flat categories that have been replaced by the new hierarchy.
+// Keep the records instead of deleting them, so existing data is not destroyed.
+for (const legacySlug of ['apparel', 'kids-water-bottles', 'hard-board', 'stone-frames', 'sublimation-products']) {
+  const legacyCollection = collectionBySlug.get(legacySlug);
+  if (!legacyCollection) continue;
+  try {
+    await gql(`
+      mutation HideLegacyCollection($input: UpdateCollectionInput!) {
+        updateCollection(input: $input) { id isPrivate }
+      }
+    `, { input: { id: legacyCollection.id, isPrivate: true } });
+  } catch (error) {
+    failures.push({ collection: legacySlug, error: error.message });
+  }
+}
+
 console.log(JSON.stringify({
   endpoint,
   requestedProducts: selectedProducts.length,
