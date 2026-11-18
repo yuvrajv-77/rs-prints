@@ -1784,7 +1784,7 @@
       ],
       "variantGeneration": "explicit_combinations_only",
       "confidence": "medium",
-      "review": "Confirm whether both square pillow products have the same dimensions and fur construction."
+      "review": "Confirm red and pink square pillows share the same size and fur construction."
     },
     {
       "productCode": "FLIP-SEQUIN-SQUARE",
@@ -1796,10 +1796,19 @@
       ],
       "optionGroups": [
         {
-          "name": "Back",
+          "name": "Backing",
           "values": [
             "White",
             "Colour"
+          ]
+        },
+        {
+          "name": "Sequin Colour",
+          "values": [
+            "Red",
+            "Blue",
+            "Gold",
+            "White"
           ]
         }
       ],
@@ -1817,10 +1826,19 @@
       ],
       "optionGroups": [
         {
-          "name": "Back",
+          "name": "Backing",
           "values": [
             "White",
             "Colour"
+          ]
+        },
+        {
+          "name": "Sequin Colour",
+          "values": [
+            "Red",
+            "Blue",
+            "Gold",
+            "White"
           ]
         }
       ],
@@ -2450,15 +2468,31 @@
     },
     {
       "productCode": "RS-MDF_PRODUCTS-A051",
-      "name": "MDF Sublimation Product",
+      "name": "Sublimation Tea Coaster",
       "collectionSlug": "mdf-products",
       "sourceCodes": [
         "A051"
       ],
-      "optionGroups": [],
+      "optionGroups": [
+        {
+          "name": "Shape",
+          "values": [
+            "Round",
+            "Square",
+            "Rectangle"
+          ]
+        },
+        {
+          "name": "Backing",
+          "values": [
+            "White",
+            "Brown"
+          ]
+        }
+      ],
       "variantGeneration": "single_default_variant",
       "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "review": "Page 9 shows round, square and rectangular coaster forms, with white and brown backing. Confirm which combinations are actually supplied."
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_01",
@@ -2641,16 +2675,25 @@
       "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
     },
     {
-      "productCode": "RS-FUR_PILLOWS-A070",
-      "name": "Fur Heart Pillow, Red",
+      "productCode": "FUR-HEART-PILLOW",
+      "name": "Fur Heart Pillow",
       "collectionSlug": "fur-pillows",
       "sourceCodes": [
-        "A070"
+        "A070",
+        "A072"
       ],
-      "optionGroups": [],
+      "optionGroups": [
+        {
+          "name": "Colour",
+          "values": [
+            "Red",
+            "Pink"
+          ]
+        }
+      ],
       "variantGeneration": "single_default_variant",
       "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "review": "Confirm both heart pillows share the same size and fur construction; page 11 shows matching shape in red and pink."
     },
     {
       "productCode": "RS-FUR_PILLOWS-A071",
