@@ -25,14 +25,6 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A111",
-      "sourceName": "Motto Ceramic Mug",
-      "sourcePage": 1,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "ceramic-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
       "sourceCode": "A003",
       "sourceName": "Cone Mug",
       "sourcePage": 1,
@@ -73,40 +65,16 @@
       "sourceStatus": "transcribed"
     },
     {
+      "sourceCode": "A111",
+      "sourceName": "Motto Ceramic Mug",
+      "sourcePage": 1,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "ceramic-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
       "sourceCode": "A008",
       "sourceName": "Golden & Silver Mug",
-      "sourcePage": 2,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "ceramic-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A113",
-      "sourceName": "Golden Handle Mug",
-      "sourcePage": 2,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "ceramic-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A112",
-      "sourceName": "Electro Plated Mug",
-      "sourcePage": 2,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "ceramic-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A143",
-      "sourceName": "Gold Electro Plated Mug",
-      "sourcePage": 2,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "ceramic-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A114",
-      "sourceName": "Pink Electro Plated Mug",
       "sourcePage": 2,
       "sourceSpecification": "325 ml; 11 oz",
       "collectionSlug": "ceramic-mugs",
@@ -133,6 +101,38 @@
       "sourceName": "Heart Cut Magic Mug",
       "sourcePage": 2,
       "sourceSpecification": "300 ml; 10 oz",
+      "collectionSlug": "ceramic-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A112",
+      "sourceName": "Electro Plated Mug",
+      "sourcePage": 2,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "ceramic-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A113",
+      "sourceName": "Golden Handle Mug",
+      "sourcePage": 2,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "ceramic-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A114",
+      "sourceName": "Pink Electro Plated Mug",
+      "sourcePage": 2,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "ceramic-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A143",
+      "sourceName": "Gold Electro Plated Mug",
+      "sourcePage": 2,
+      "sourceSpecification": "325 ml; 11 oz",
       "collectionSlug": "ceramic-mugs",
       "sourceStatus": "transcribed"
     },
@@ -209,30 +209,6 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A015",
-      "sourceName": "Frosted Glass Mug",
-      "sourcePage": 4,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "glass-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A016",
-      "sourceName": "Clear Glass Mug",
-      "sourcePage": 4,
-      "sourceSpecification": "325 ml; 11 oz",
-      "collectionSlug": "glass-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A120",
-      "sourceName": "Color Glass Mug",
-      "sourcePage": 4,
-      "sourceSpecification": null,
-      "collectionSlug": "glass-mugs",
-      "sourceStatus": "transcribed"
-    },
-    {
       "sourceCode": "A014",
       "sourceName": "Gradient Color Glass Mug (Frosted)",
       "sourcePage": 4,
@@ -243,6 +219,22 @@
     {
       "sourceCode": "A014C",
       "sourceName": "Full Color Glass Mug (Frosted)",
+      "sourcePage": 4,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "glass-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A015",
+      "sourceName": "Frosted Glass Mug",
+      "sourcePage": 4,
+      "sourceSpecification": "325 ml; 11 oz",
+      "collectionSlug": "glass-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A016",
+      "sourceName": "Clear Glass Mug",
       "sourcePage": 4,
       "sourceSpecification": "325 ml; 11 oz",
       "collectionSlug": "glass-mugs",
@@ -265,6 +257,14 @@
       "sourceStatus": "transcribed"
     },
     {
+      "sourceCode": "A120",
+      "sourceName": "Color Glass Mug",
+      "sourcePage": 4,
+      "sourceSpecification": null,
+      "collectionSlug": "glass-mugs",
+      "sourceStatus": "transcribed"
+    },
+    {
       "sourceCode": "A018",
       "sourceName": "Frosted Beer Glass",
       "sourcePage": 5,
@@ -281,10 +281,18 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A118",
-      "sourceName": "Color Beer Glass",
+      "sourceCode": "A020",
+      "sourceName": "Frosted Mason Jar",
       "sourcePage": 5,
-      "sourceSpecification": "770 ml; 16 oz",
+      "sourceSpecification": "475 ml",
+      "collectionSlug": "glass-drinkware",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A021",
+      "sourceName": "Clear Mason Jar with Lid",
+      "sourcePage": 5,
+      "sourceSpecification": "475 ml",
       "collectionSlug": "glass-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -321,50 +329,18 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A141",
-      "sourceName": "Frosted Skinny Tumbler with Plastic Lid",
+      "sourceCode": "A117",
+      "sourceName": "Mason Jar without Lid",
       "sourcePage": 5,
-      "sourceSpecification": "590 ml; 20 oz",
+      "sourceSpecification": "400 ml",
       "collectionSlug": "glass-drinkware",
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A121",
-      "sourceName": "Gradient Color Glass Tumbler with Bamboo Lid",
+      "sourceCode": "A118",
+      "sourceName": "Color Beer Glass",
       "sourcePage": 5,
-      "sourceSpecification": "590 ml; 20 oz",
-      "collectionSlug": "glass-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A142",
-      "sourceName": "Gradient Color Glass Tumbler with Bamboo Lid (Frosted)",
-      "sourcePage": 5,
-      "sourceSpecification": "590 ml; 20 oz",
-      "collectionSlug": "glass-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A020",
-      "sourceName": "Frosted Mason Jar",
-      "sourcePage": 5,
-      "sourceSpecification": "475 ml",
-      "collectionSlug": "glass-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A021",
-      "sourceName": "Clear Mason Jar with Lid",
-      "sourcePage": 5,
-      "sourceSpecification": "475 ml",
-      "collectionSlug": "glass-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A122",
-      "sourceName": "Gradient Color Jar with Bamboo Lid",
-      "sourcePage": 5,
-      "sourceSpecification": "475 ml",
+      "sourceSpecification": "770 ml; 16 oz",
       "collectionSlug": "glass-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -377,10 +353,34 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A117",
-      "sourceName": "Mason Jar without Lid",
+      "sourceCode": "A121",
+      "sourceName": "Gradient Color Glass Tumbler with Bamboo Lid",
       "sourcePage": 5,
-      "sourceSpecification": "400 ml",
+      "sourceSpecification": "590 ml; 20 oz",
+      "collectionSlug": "glass-drinkware",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A122",
+      "sourceName": "Gradient Color Jar with Bamboo Lid",
+      "sourcePage": 5,
+      "sourceSpecification": "475 ml",
+      "collectionSlug": "glass-drinkware",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A141",
+      "sourceName": "Frosted Skinny Tumbler with Plastic Lid",
+      "sourcePage": 5,
+      "sourceSpecification": "590 ml; 20 oz",
+      "collectionSlug": "glass-drinkware",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A142",
+      "sourceName": "Gradient Color Glass Tumbler with Bamboo Lid (Frosted)",
+      "sourcePage": 5,
+      "sourceSpecification": "590 ml; 20 oz",
       "collectionSlug": "glass-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -417,8 +417,24 @@
       "sourceStatus": "transcribed"
     },
     {
+      "sourceCode": "A123",
+      "sourceName": "Aluminium Bottle",
+      "sourcePage": 6,
+      "sourceSpecification": null,
+      "collectionSlug": "aluminium-bottles",
+      "sourceStatus": "transcribed"
+    },
+    {
       "sourceCode": "A124",
       "sourceName": "Aluminium Bottle BB12 / BB32",
+      "sourcePage": 6,
+      "sourceSpecification": null,
+      "collectionSlug": "aluminium-bottles",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A127",
+      "sourceName": "Aluminium Bottle",
       "sourcePage": 6,
       "sourceSpecification": null,
       "collectionSlug": "aluminium-bottles",
@@ -433,19 +449,19 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A123",
-      "sourceName": "Aluminium Bottle",
-      "sourcePage": 6,
-      "sourceSpecification": null,
-      "collectionSlug": "aluminium-bottles",
+      "sourceCode": "A027",
+      "sourceName": "Cola Bottle BB16",
+      "sourcePage": 7,
+      "sourceSpecification": "500 ml",
+      "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "A127",
-      "sourceName": "Aluminium Bottle",
-      "sourcePage": 6,
-      "sourceSpecification": null,
-      "collectionSlug": "aluminium-bottles",
+      "sourceCode": "A109",
+      "sourceName": "Pink Skinny Tumbler BB21",
+      "sourcePage": 7,
+      "sourceSpecification": "500 ml",
+      "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceStatus": "transcribed"
     },
     {
@@ -469,22 +485,6 @@
       "sourceName": "Stainless Steel Mug with Handle & Side Lid BB31",
       "sourcePage": 7,
       "sourceSpecification": "600 ml",
-      "collectionSlug": "stainless-steel-bottles-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A027",
-      "sourceName": "Cola Bottle BB16",
-      "sourcePage": 7,
-      "sourceSpecification": "500 ml",
-      "collectionSlug": "stainless-steel-bottles-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A109",
-      "sourceName": "Pink Skinny Tumbler BB21",
-      "sourcePage": 7,
-      "sourceSpecification": "500 ml",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -517,14 +517,6 @@
       "sourceName": "Tumbler with Lid & Straw BB14",
       "sourcePage": 8,
       "sourceSpecification": "450 ml",
-      "collectionSlug": "stainless-steel-bottles-drinkware",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "A151",
-      "sourceName": "Temperature Bottle BB19",
-      "sourcePage": 8,
-      "sourceSpecification": "350 ml",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -573,6 +565,14 @@
       "sourceName": "Yeti Coffee Mug",
       "sourcePage": 8,
       "sourceSpecification": "400 ml",
+      "collectionSlug": "stainless-steel-bottles-drinkware",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "A151",
+      "sourceName": "Temperature Bottle BB19",
+      "sourcePage": 8,
+      "sourceSpecification": "350 ml",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceStatus": "transcribed"
     },
@@ -649,116 +649,116 @@
       "sourceStatus": "transcribed"
     },
     {
-      "sourceCode": "MDF-COLLAGE-01",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A053",
+      "sourceName": "Sweet Heart MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "12 × 8 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-02",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A054",
+      "sourceName": "Family MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-03",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A055",
+      "sourceName": "Love MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-04",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "20 × 20 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-05",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "15 × 15 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-06",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "15 × 15 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-07",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "12 × 8 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-08",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "18 × 12 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-09",
-      "sourceName": "MDF Collage Frame",
-      "sourcePage": 10,
-      "sourceSpecification": "16 × 12 in",
-      "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "MDF-COLLAGE-10",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A056",
+      "sourceName": "Love MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "12 × 16 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-11",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A057",
+      "sourceName": "Friends MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "20 × 20 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A058",
+      "sourceName": "Family MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-12",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A059",
+      "sourceName": "Birthday MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-13",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A060",
+      "sourceName": "Sweet Home MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "12 × 8 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A061",
+      "sourceName": "Happy Birthday MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "18 × 12 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A062",
+      "sourceName": "Number Clock MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "16 × 12 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A063",
+      "sourceName": "Forever MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "12 × 16 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A064",
+      "sourceName": "Photo Clock MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
-      "sourceCode": "MDF-COLLAGE-14",
-      "sourceName": "MDF Collage Frame",
+      "sourceCode": "A065",
+      "sourceName": "Number Clock MDF Collage Frame",
       "sourcePage": 10,
       "sourceSpecification": "15 × 15 in",
       "collectionSlug": "mdf-collage-frames",
-      "sourceStatus": "transcribed"
+      "sourceStatus": "transcribed_from_high_resolution_page"
+    },
+    {
+      "sourceCode": "A066",
+      "sourceName": "Photo Clock MDF Collage Frame",
+      "sourcePage": 10,
+      "sourceSpecification": "15 × 15 in",
+      "collectionSlug": "mdf-collage-frames",
+      "sourceStatus": "transcribed_from_high_resolution_page"
     },
     {
       "sourceCode": "A067",
@@ -905,11 +905,107 @@
       "sourceStatus": "transcribed"
     },
     {
+      "sourceCode": "AC-HB-013",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-014",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-015",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-016",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-017",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-018",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-019",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-020",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "AC-HB-021",
+      "sourceName": "Hard Board Sublimation Product",
+      "sourcePage": 14,
+      "sourceSpecification": null,
+      "collectionSlug": "hard-board-products",
+      "sourceStatus": "added_from_visual_source"
+    },
+    {
+      "sourceCode": "APP-TOTE-BLENDED-PLUSH",
+      "sourceName": "Blended Plush Tote Bag",
+      "sourcePage": 15,
+      "sourceSpecification": "37 × 42 cm",
+      "collectionSlug": "custom-tote-bags",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "APP-TSHIRT-BLACK-COLLAR",
+      "sourceName": "Black Collar T-Shirt",
+      "sourcePage": 15,
+      "sourceSpecification": "Cotton; sizes as printed, OCR unclear",
+      "collectionSlug": "custom-polo-t-shirts",
+      "sourceStatus": "transcribed"
+    },
+    {
       "sourceCode": "APP-TSHIRT-BLACK-COTTON",
       "sourceName": "Black T-Shirt",
       "sourcePage": 15,
       "sourceSpecification": "Cotton; XS, S, M, L, XL, 2XL",
       "collectionSlug": "custom-t-shirts",
+      "sourceStatus": "transcribed"
+    },
+    {
+      "sourceCode": "APP-TSHIRT-WHITE-COLLAR",
+      "sourceName": "White Collar T-Shirt",
+      "sourcePage": 15,
+      "sourceSpecification": "Cotton; sizes as printed, OCR unclear",
+      "collectionSlug": "custom-polo-t-shirts",
       "sourceStatus": "transcribed"
     },
     {
@@ -926,30 +1022,6 @@
       "sourcePage": 15,
       "sourceSpecification": "Polyester",
       "collectionSlug": "custom-t-shirts",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "APP-TSHIRT-WHITE-COLLAR",
-      "sourceName": "White Collar T-Shirt",
-      "sourcePage": 15,
-      "sourceSpecification": "Cotton; sizes as printed, OCR unclear",
-      "collectionSlug": "custom-polo-t-shirts",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "APP-TSHIRT-BLACK-COLLAR",
-      "sourceName": "Black Collar T-Shirt",
-      "sourcePage": 15,
-      "sourceSpecification": "Cotton; sizes as printed, OCR unclear",
-      "collectionSlug": "custom-polo-t-shirts",
-      "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "APP-TOTE-BLENDED-PLUSH",
-      "sourceName": "Blended Plush Tote Bag",
-      "sourcePage": 15,
-      "sourceSpecification": "37 × 42 cm",
-      "collectionSlug": "custom-tote-bags",
       "sourceStatus": "transcribed"
     },
     {
@@ -1119,78 +1191,6 @@
       "sourceSpecification": null,
       "collectionSlug": "stone-wooden-frames",
       "sourceStatus": "transcribed"
-    },
-    {
-      "sourceCode": "AC-HB-013",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-014",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-015",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-016",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-017",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-018",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-019",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-020",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
-    },
-    {
-      "sourceCode": "AC-HB-021",
-      "sourceName": "Hard Board Sublimation Product",
-      "sourcePage": 14,
-      "sourceSpecification": null,
-      "collectionSlug": "hard-board-products",
-      "sourceStatus": "added_from_visual_source"
     }
   ],
   "productModels": [
@@ -2462,171 +2462,171 @@
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_01",
-      "name": "MDF Collage Frame",
+      "name": "Sweet Heart MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-01"
+        "A053"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_02",
-      "name": "MDF Collage Frame",
+      "name": "Family MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-02"
+        "A054"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_03",
-      "name": "MDF Collage Frame",
+      "name": "Love MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-03"
+        "A055"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_04",
-      "name": "MDF Collage Frame",
+      "name": "Love MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-04"
+        "A056"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_05",
-      "name": "MDF Collage Frame",
+      "name": "Friends MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-05"
+        "A057"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_06",
-      "name": "MDF Collage Frame",
+      "name": "Family MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-06"
+        "A058"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_07",
-      "name": "MDF Collage Frame",
+      "name": "Birthday MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-07"
+        "A059"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_08",
-      "name": "MDF Collage Frame",
+      "name": "Sweet Home MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-08"
+        "A060"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_09",
-      "name": "MDF Collage Frame",
+      "name": "Happy Birthday MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-09"
+        "A061"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_10",
-      "name": "MDF Collage Frame",
+      "name": "Number Clock MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-10"
+        "A062"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_11",
-      "name": "MDF Collage Frame",
+      "name": "Forever MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-11"
+        "A063"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_12",
-      "name": "MDF Collage Frame",
+      "name": "Photo Clock MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-12"
+        "A064"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_13",
-      "name": "MDF Collage Frame",
+      "name": "Number Clock MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-13"
+        "A065"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_14",
-      "name": "MDF Collage Frame",
+      "name": "Photo Clock MDF Collage Frame",
       "collectionSlug": "mdf-collage-frames",
       "sourceCodes": [
-        "MDF-COLLAGE-14"
+        "A066"
       ],
       "optionGroups": [],
       "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-FUR_PILLOWS-A068",
