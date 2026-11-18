@@ -30,16 +30,16 @@ Do not run this against the production database. First create a separate disposa
 From `apps/server`:
 
 ```bash
-# Ensure this shell's .env points to the staging database only.
-# Set the explicit safety switches for this one-off run:
+# Use your separate test environment file, never the production .env.
+# The importer defaults to a 3-product pilot. Do not use --all yet.
 export CATALOGUE_IMPORT_ALLOW=true
 export CATALOGUE_IMPORT_ENV=staging
 export VENDURE_ADMIN_API_URL=http://localhost:3000/admin-api
 
-node --env-file=.env catalogue/import-catalogue.mjs
+node --env-file=.env.test catalogue/import-catalogue.mjs --limit=3
 ```
 
-The script requires `SUPERADMIN_USERNAME` and `SUPERADMIN_PASSWORD` from the environment file. It refuses to run unless both safety switches are set and the target environment is explicitly marked local, development or staging. It skips products whose slug already exists and does not delete or overwrite catalogue records.
+The script requires `SUPERADMIN_USERNAME` and `SUPERADMIN_PASSWORD` from the environment file. It refuses to run unless both safety switches are set and the target environment is explicitly marked local, development or staging. It authenticates once, defaults to a 3-product pilot, and skips products whose slug already exists. It does not delete or overwrite catalogue records. Only use `--all` after the pilot has been reviewed. Variants use a zero placeholder price because Vendure requires a price when creating variants; products and variants remain disabled until real prices are entered.
 
 After import, inspect the products, variants, facets and collection variant counts in the Vendure Dashboard. Reindex search if required by the deployment.
 
