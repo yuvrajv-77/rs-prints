@@ -1655,8 +1655,100 @@
         }
       ],
       "variantGeneration": "explicit_combinations_only",
-      "confidence": "medium",
-      "review": "Source confirms black cotton and white cotton sizes. White polyester is shown but its size availability is unclear. Generate only source-supported combinations, not the full Cartesian product."
+      "confidence": "high",
+      "review": null,
+      "variantCombinations": [
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "XS"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "S"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "M"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "L"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "XL"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "2XL"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "XS"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "S"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "M"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "L"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "XL"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "2XL"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "XS"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "S"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "M"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "L"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "XL"
+        },
+        {
+          "Colour": "White",
+          "Material": "Polyester",
+          "Size": "2XL"
+        }
+      ]
     },
     {
       "productCode": "APP-COLLAR-TSHIRT",
@@ -1693,8 +1785,70 @@
         }
       ],
       "variantGeneration": "explicit_combinations_only",
-      "confidence": "medium",
-      "review": "PDF size labels are visually unclear; verify before creating size variants."
+      "confidence": "high",
+      "review": null,
+      "variantCombinations": [
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "XS"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "S"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "M"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "L"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "XL"
+        },
+        {
+          "Colour": "White",
+          "Material": "Cotton",
+          "Size": "2XL"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "XS"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "S"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "M"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "L"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "XL"
+        },
+        {
+          "Colour": "Black",
+          "Material": "Cotton",
+          "Size": "2XL"
+        }
+      ]
     },
     {
       "productCode": "MDF-KEYCHAIN",
@@ -1816,7 +1970,41 @@
       ],
       "variantGeneration": "explicit_combinations_only",
       "confidence": "high",
-      "review": null
+      "review": null,
+      "variantCombinations": [
+        {
+          "Backing": "White",
+          "Sequin Colour": "Red"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "Blue"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "Gold"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "White"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Red"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Blue"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Gold"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "White"
+        }
+      ]
     },
     {
       "productCode": "FLIP-SEQUIN-HEART",
@@ -1846,7 +2034,41 @@
       ],
       "variantGeneration": "explicit_combinations_only",
       "confidence": "high",
-      "review": null
+      "review": null,
+      "variantCombinations": [
+        {
+          "Backing": "White",
+          "Sequin Colour": "Red"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "Blue"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "Gold"
+        },
+        {
+          "Backing": "White",
+          "Sequin Colour": "White"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Red"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Blue"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "Gold"
+        },
+        {
+          "Backing": "Colour",
+          "Sequin Colour": "White"
+        }
+      ]
     },
     {
       "productCode": "RS-CERAMIC_MUGS-A001",
@@ -2494,7 +2716,33 @@
       ],
       "variantGeneration": "single_default_variant",
       "confidence": "medium",
-      "review": "Page 9 shows round, square and rectangular coaster forms, with white and brown backing. Confirm which combinations are actually supplied."
+      "review": "The catalogue image shows round, square and rectangular coaster forms with white and brown backing presentations. Confirm supplier availability before enabling or pricing.",
+      "variantCombinations": [
+        {
+          "Shape": "Round",
+          "Backing": "White"
+        },
+        {
+          "Shape": "Round",
+          "Backing": "Brown"
+        },
+        {
+          "Shape": "Square",
+          "Backing": "White"
+        },
+        {
+          "Shape": "Square",
+          "Backing": "Brown"
+        },
+        {
+          "Shape": "Rectangle",
+          "Backing": "White"
+        },
+        {
+          "Shape": "Rectangle",
+          "Backing": "Brown"
+        }
+      ]
     },
     {
       "productCode": "RS-MDF_COLLAGE_FRAMES-MDF_COLLAGE_01",
