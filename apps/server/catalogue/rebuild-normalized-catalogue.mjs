@@ -183,10 +183,13 @@ for (const product of prepared) {
   for (const group of product.optionGroups) {
     const code = codeOf(group.name);
     const existing = optionGroupsToEnsure.get(code);
-    if (existing && JSON.stringify(existing.values) !== JSON.stringify(group.values)) {
-      throw new Error(`Conflicting option values for shared option group ${group.name}. Use distinct option group names/codes.`);
-    }
-    optionGroupsToEnsure.set(code, { name: group.name, values: group.values });
+    optionGroupsToEnsure.set(code, {
+      name: group.name,
+      // Vendure option groups are global. Merge the vocabulary across products;
+      // each product still attaches only the group and its own variants use only
+      // the values declared in that product's normalized model.
+      values: [...new Set([...(existing?.values || []), ...group.values])],
+    });
   }
 }
 
