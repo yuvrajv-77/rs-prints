@@ -2698,18 +2698,6 @@
       "review": "Confirm both heart pillows share the same size and fur construction; page 11 shows matching shape in red and pink."
     },
     {
-      "productCode": "RS-FUR_PILLOWS-A071",
-      "name": "Fur Heart Pillow, Pink",
-      "collectionSlug": "fur-pillows",
-      "sourceCodes": [
-        "A071"
-      ],
-      "optionGroups": [],
-      "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
-    },
-    {
       "productCode": "RS-FUR_PILLOWS-A072",
       "name": "Long Fur Heart Pillow",
       "collectionSlug": "fur-pillows",
