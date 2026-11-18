@@ -22,6 +22,15 @@ import path from 'node:path';
 
 const manifestPath = path.join(import.meta.dirname, 'rs-prints-catalogue.json');
 const catalogue = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+const allRequested = process.argv.includes('--all');
+const limitArg = process.argv.find(arg => arg.startsWith('--limit='));
+const limit = allRequested ? catalogue.products.length : Number(limitArg?.split('=')[1] || 3);
+if (!Number.isInteger(limit) || limit < 1) {
+  throw new Error('Use --limit=N with a positive integer, or --all after the pilot import has been reviewed.');
+}
+const selectedProducts = catalogue.products.slice(0, limit);
+
 const endpoint = process.env.VENDURE_ADMIN_API_URL || `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
 
 if (process.env.CATALOGUE_IMPORT_ALLOW !== 'true') {
@@ -51,26 +60,28 @@ async function gql(query, variables = {}) {
   return body.data;
 }
 
-const login = await gql(`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      ... on CurrentUser { id identifier }
-      ... on ErrorResult { errorCode message }
-    }
-  }
-`, { username: process.env.SUPERADMIN_USERNAME, password: process.env.SUPERADMIN_PASSWORD });
-if (!login.login?.id) throw new Error(`Vendure login failed: ${login.login?.message || 'unknown error'}`);
-// Vendure bearer token is returned in the response header. Re-login to capture it directly.
+// Authenticate once and retain the token returned by Vendure.
 const loginResponse = await fetch(endpoint, {
   method: 'POST',
   headers: { 'content-type': 'application/json' },
   body: JSON.stringify({
-    query: 'mutation($username: String!, $password: String!) { login(username: $username, password: $password) { ... on CurrentUser { id } } }',
+    query: `mutation Login($username: String!, $password: String!) {
+      login(username: $username, password: $password) {
+        ... on CurrentUser { id identifier }
+        ... on ErrorResult { errorCode message }
+      }
+    }`,
     variables: { username: process.env.SUPERADMIN_USERNAME, password: process.env.SUPERADMIN_PASSWORD },
   }),
 });
+const loginBody = await loginResponse.json();
+if (!loginResponse.ok || loginBody.errors?.length || !loginBody.data?.login?.id) {
+  throw new Error(`Vendure login failed: ${JSON.stringify(loginBody.errors || loginBody.data?.login || loginBody)}`);
+}
 authToken = loginResponse.headers.get('vendure-auth-token') || '';
-if (!authToken) throw new Error('Login succeeded but Vendure did not return vendure-auth-token. Check auth tokenMethod.');
+if (!authToken) {
+  throw new Error('Login succeeded but no vendure-auth-token header was returned. Check authOptions.tokenMethod in vendure-config.ts.');
+}
 
 const languageCode = 'en';
 const translations = (name, description = '') => [{ languageCode, name, description }];
@@ -186,7 +197,7 @@ let skippedProducts = 0;
 let createdVariants = 0;
 const failures = [];
 
-for (const item of catalogue.products) {
+for (const item of selectedProducts) {
   const slug = item.slug || `${slugify(item.name)}-${slugify(item.code)}`;
   if (productBySlug.has(slug)) {
     skippedProducts++;
@@ -285,9 +296,11 @@ for (const category of catalogue.categories) {
 
 console.log(JSON.stringify({
   endpoint,
+  requestedProducts: selectedProducts.length,
   createdProducts,
   skippedProducts,
   createdVariants,
   collectionsExpected: catalogue.categories.length,
+  importMode: allRequested ? 'all' : 'pilot',
   failures,
 }, null, 2));
