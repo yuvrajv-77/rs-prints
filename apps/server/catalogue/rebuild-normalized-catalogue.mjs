@@ -116,7 +116,7 @@ if (process.env.CATALOGUE_TEST_DATABASE_CONFIRMATION !== 'I_CONFIRM_THIS_IS_THE_
   throw new Error('Blocked: confirm the .env.test database using CATALOGUE_TEST_DATABASE_CONFIRMATION.');
 }
 if (!process.env.DATABASE_URL) throw new Error('Blocked: DATABASE_URL is missing. Verify that .env.test is loaded.');
-if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\\d+)?\//i.test(endpoint)) {
+if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: Admin API must be localhost for this test-only rebuild.');
 }
 if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) throw new Error('Missing Vendure superadmin credentials.');
