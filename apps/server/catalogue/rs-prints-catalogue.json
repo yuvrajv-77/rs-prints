@@ -8,7 +8,9 @@
     "Product names, codes and specifications transcribed from the supplied image-only PDF.",
     "Where the PDF does not provide a readable name, the product title is a conservative category description based on the visible item and code.",
     "Do not treat missing price or stock as zero. Importer creates zero-priced draft variants disabled until prices are entered.",
-    "Some catalogue codes and OCR readings need human verification, especially pages 9, 10, 14 and 16."
+    "Some catalogue codes and OCR readings need human verification, especially pages 9, 10, 14 and 16.",
+    "Codes explicitly marked internal_provisional or provisional_sequence are working identifiers, not printed catalogue SKUs.",
+    "The PDF is image-only. Product-level image crops have not yet been prepared; imageSource records the source page to guide cropping."
   ],
   "categories": [
     "Ceramic Mugs",
@@ -23,7 +25,8 @@
     "Hard Board",
     "Apparel",
     "Glass Frames",
-    "Stone Frames"
+    "Stone Frames",
+    "Kids Water Bottles"
   ],
   "products": [
     {
@@ -35,7 +38,12 @@
       "slug": "white-mug-a001",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A111",
@@ -46,7 +54,12 @@
       "slug": "motto-ceramic-mug-a111",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A003",
@@ -57,7 +70,12 @@
       "slug": "cone-mug-a003",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A004",
@@ -68,7 +86,12 @@
       "slug": "white-heart-handle-mug-a004",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A004C",
@@ -79,7 +102,12 @@
       "slug": "3-tone-heart-handle-mug-a004c",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A006",
@@ -90,7 +118,12 @@
       "slug": "3-tone-mug-a006",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A007",
@@ -101,7 +134,12 @@
       "slug": "neon-mug-a007",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A008",
@@ -112,7 +150,12 @@
       "slug": "golden-silver-mug-a008",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A113",
@@ -123,7 +166,12 @@
       "slug": "golden-handle-mug-a113",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A112",
@@ -134,7 +182,12 @@
       "slug": "electro-plated-mug-a112",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A143",
@@ -145,7 +198,12 @@
       "slug": "gold-electro-plated-mug-a143",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A114",
@@ -156,7 +214,12 @@
       "slug": "pink-electro-plated-mug-a114",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A012",
@@ -167,7 +230,12 @@
       "slug": "magic-glossy-matte-mug-a012",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A013",
@@ -178,7 +246,12 @@
       "slug": "heart-cut-mug-a013",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A013M",
@@ -189,7 +262,12 @@
       "slug": "heart-cut-magic-mug-a013m",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A002",
@@ -200,7 +278,12 @@
       "slug": "white-tea-mug-a002",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A002C",
@@ -211,7 +294,12 @@
       "slug": "3-tone-tea-mug-a002c",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A005",
@@ -222,7 +310,12 @@
       "slug": "color-patch-mug-a005",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A010",
@@ -233,7 +326,12 @@
       "slug": "german-beer-stein-mug-a010",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A144",
@@ -244,7 +342,12 @@
       "slug": "blue-berry-mug-a144",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A145",
@@ -255,7 +358,12 @@
       "slug": "coco-milk-white-mug-a145",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A146",
@@ -266,7 +374,12 @@
       "slug": "merry-gold-mug-a146",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A147",
@@ -277,7 +390,12 @@
       "slug": "rose-gold-mug-a147",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A148",
@@ -288,7 +406,12 @@
       "slug": "cork-base-mug-a148",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A015",
@@ -299,7 +422,12 @@
       "slug": "frosted-glass-mug-a015",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A016",
@@ -310,7 +438,12 @@
       "slug": "clear-glass-mug-a016",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A120",
@@ -321,7 +454,12 @@
       "slug": "color-glass-mug-a120",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A014",
@@ -332,7 +470,12 @@
       "slug": "gradient-color-glass-mug-frosted-a014",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A014C",
@@ -343,7 +486,12 @@
       "slug": "full-color-glass-mug-frosted-a014c",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A115",
@@ -354,7 +502,12 @@
       "slug": "borosilicate-glass-mug-clear-color-handle-a115",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A116",
@@ -365,7 +518,12 @@
       "slug": "borosilicate-glass-mug-frosted-color-handle-a116",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A018",
@@ -376,7 +534,12 @@
       "slug": "frosted-beer-glass-a018",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A019",
@@ -387,7 +550,12 @@
       "slug": "clear-beer-glass-a019",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A118",
@@ -398,7 +566,12 @@
       "slug": "color-beer-glass-a118",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A022",
@@ -409,7 +582,12 @@
       "slug": "shooter-glass-a022",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A023",
@@ -420,7 +598,12 @@
       "slug": "shot-glass-with-patch-a023",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A024",
@@ -431,7 +614,12 @@
       "slug": "shot-glass-gold-rim-a024",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A025",
@@ -442,7 +630,12 @@
       "slug": "shot-glass-clear-a025",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A141",
@@ -453,7 +646,12 @@
       "slug": "frosted-skinny-tumbler-with-plastic-lid-a141",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A121",
@@ -464,7 +662,12 @@
       "slug": "gradient-color-glass-tumbler-with-bamboo-lid-a121",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A142",
@@ -475,7 +678,12 @@
       "slug": "gradient-color-glass-tumbler-with-bamboo-lid-frosted-a142",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A020",
@@ -486,7 +694,12 @@
       "slug": "frosted-mason-jar-a020",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A021",
@@ -497,7 +710,12 @@
       "slug": "clear-mason-jar-with-lid-a021",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A122",
@@ -508,7 +726,12 @@
       "slug": "gradient-color-jar-with-bamboo-lid-a122",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A119",
@@ -519,7 +742,12 @@
       "slug": "gradient-color-jar-clear-a119",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A117",
@@ -530,7 +758,12 @@
       "slug": "mason-jar-without-lid-a117",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A039",
@@ -541,7 +774,12 @@
       "slug": "aluminium-water-bottle-bb5-bb6-a039",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A040",
@@ -552,7 +790,12 @@
       "slug": "aluminium-water-bottle-bb13-a040",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A042",
@@ -563,7 +806,12 @@
       "slug": "aluminium-water-bottle-bb7-bb8-a042",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A043",
@@ -574,7 +822,12 @@
       "slug": "aluminium-water-bottle-bb09-bb10-a043",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A124",
@@ -585,7 +838,12 @@
       "slug": "aluminium-bottle-bb12-bb32-a124",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A150",
@@ -596,7 +854,12 @@
       "slug": "aluminium-big-mouth-bottle-bb28-a150",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A123",
@@ -607,7 +870,12 @@
       "slug": "aluminium-bottle-a123",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A127",
@@ -618,7 +886,12 @@
       "slug": "aluminium-bottle-a127",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A130",
@@ -629,7 +902,12 @@
       "slug": "stainless-steel-cap-vacuum-bottle-bb30-a130",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A131",
@@ -640,7 +918,12 @@
       "slug": "double-wall-stainless-steel-cap-vacuum-bottle-bb27-a131",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A132",
@@ -651,7 +934,12 @@
       "slug": "stainless-steel-mug-with-handle-side-lid-bb31-a132",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A027",
@@ -662,7 +950,12 @@
       "slug": "cola-bottle-bb16-a027",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A109",
@@ -673,7 +966,12 @@
       "slug": "pink-skinny-tumbler-bb21-a109",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A134",
@@ -684,7 +982,12 @@
       "slug": "stainless-steel-tumbler-bb29-a134",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A029",
@@ -695,7 +998,12 @@
       "slug": "big-mouth-tumbler-bb15-a029",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A030",
@@ -706,7 +1014,12 @@
       "slug": "starbucks-tumbler-bb12-a030",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A031",
@@ -717,7 +1030,12 @@
       "slug": "tumbler-with-lid-straw-bb14-a031",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A151",
@@ -728,7 +1046,12 @@
       "slug": "temperature-bottle-bb19-a151",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A033",
@@ -739,7 +1062,12 @@
       "slug": "double-wall-coke-can-bb25-a033",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A034",
@@ -750,7 +1078,12 @@
       "slug": "wine-cup-bb18-a034",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A035",
@@ -761,7 +1094,12 @@
       "slug": "bottle-bb17-a035",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A036",
@@ -772,7 +1110,12 @@
       "slug": "travel-mug-bb20-a036",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A037",
@@ -783,7 +1126,12 @@
       "slug": "skinny-tumbler-bb21-a037",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A038",
@@ -794,7 +1142,12 @@
       "slug": "yeti-coffee-mug-a038",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A044",
@@ -805,7 +1158,12 @@
       "slug": "mdf-keychain-a044",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A045",
@@ -816,7 +1174,12 @@
       "slug": "mdf-keychain-a045",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A046",
@@ -827,7 +1190,12 @@
       "slug": "mdf-keychain-a046",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A047",
@@ -838,7 +1206,12 @@
       "slug": "mdf-keychain-a047",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A048",
@@ -849,7 +1222,12 @@
       "slug": "mdf-keychain-a048",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A049",
@@ -860,7 +1238,12 @@
       "slug": "mdf-keychain-a049",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A050",
@@ -871,7 +1254,12 @@
       "slug": "mdf-keychain-a050",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A051",
@@ -882,7 +1270,12 @@
       "slug": "mdf-sublimation-product-a051",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A052",
@@ -893,161 +1286,236 @@
       "slug": "sublimation-fridge-magnet-a052",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A053",
+      "code": "MDF-COLLAGE-01",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "12 × 8 in",
-      "slug": "mdf-collage-frame-a053",
+      "slug": "mdf-collage-frame-01",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A054",
+      "code": "MDF-COLLAGE-02",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a054",
+      "slug": "mdf-collage-frame-02",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A055",
+      "code": "MDF-COLLAGE-03",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a055",
+      "slug": "mdf-collage-frame-03",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A056",
+      "code": "MDF-COLLAGE-04",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "20 × 20 in",
-      "slug": "mdf-collage-frame-a056",
+      "slug": "mdf-collage-frame-04",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A057",
+      "code": "MDF-COLLAGE-05",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a057",
+      "slug": "mdf-collage-frame-05",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A058",
+      "code": "MDF-COLLAGE-06",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a058",
+      "slug": "mdf-collage-frame-06",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A059",
+      "code": "MDF-COLLAGE-07",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "12 × 8 in",
-      "slug": "mdf-collage-frame-a059",
+      "slug": "mdf-collage-frame-07",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A060",
+      "code": "MDF-COLLAGE-08",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "18 × 12 in",
-      "slug": "mdf-collage-frame-a060",
+      "slug": "mdf-collage-frame-08",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A061",
+      "code": "MDF-COLLAGE-09",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "16 × 12 in",
-      "slug": "mdf-collage-frame-a061",
+      "slug": "mdf-collage-frame-09",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A062",
+      "code": "MDF-COLLAGE-10",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "12 × 16 in",
-      "slug": "mdf-collage-frame-a062",
+      "slug": "mdf-collage-frame-10",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A063",
+      "code": "MDF-COLLAGE-11",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a063",
+      "slug": "mdf-collage-frame-11",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A064",
+      "code": "MDF-COLLAGE-12",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a064",
+      "slug": "mdf-collage-frame-12",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A065",
+      "code": "MDF-COLLAGE-13",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a065",
+      "slug": "mdf-collage-frame-13",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A066",
+      "code": "MDF-COLLAGE-14",
       "name": "MDF Collage Frame",
       "category": "MDF Collage Frames",
       "sourcePage": 10,
       "specification": "15 × 15 in",
-      "slug": "mdf-collage-frame-a066",
+      "slug": "mdf-collage-frame-14",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A067",
@@ -1058,7 +1526,12 @@
       "slug": "fur-pillow-square-red-a067",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A068",
@@ -1069,7 +1542,12 @@
       "slug": "long-fur-square-pillow-red-a068",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A069",
@@ -1080,7 +1558,12 @@
       "slug": "fur-square-pillow-pink-a069",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A070",
@@ -1091,7 +1574,12 @@
       "slug": "fur-heart-pillow-red-a070",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A071",
@@ -1102,7 +1590,12 @@
       "slug": "fur-heart-pillow-pink-a071",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A072",
@@ -1113,7 +1606,12 @@
       "slug": "long-fur-heart-pillow-a072",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A073",
@@ -1124,7 +1622,12 @@
       "slug": "led-square-pillow-a073",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A074",
@@ -1135,7 +1638,12 @@
       "slug": "led-heart-pillow-a074",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A075",
@@ -1146,7 +1654,12 @@
       "slug": "magic-square-with-white-back-a075",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A076",
@@ -1157,7 +1670,12 @@
       "slug": "magic-square-with-color-back-a076",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A077",
@@ -1168,7 +1686,12 @@
       "slug": "square-with-magic-patch-heart-emboss-a077",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A078",
@@ -1179,7 +1702,12 @@
       "slug": "square-with-magic-patch-love-emboss-a078",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A079",
@@ -1190,7 +1718,12 @@
       "slug": "magic-heart-with-white-back-a079",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A080",
@@ -1201,7 +1734,12 @@
       "slug": "magic-heart-with-color-back-a080",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A081",
@@ -1212,7 +1750,12 @@
       "slug": "sublimation-mouse-pad-a081",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A082",
@@ -1223,7 +1766,12 @@
       "slug": "pin-badge-a082",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A083",
@@ -1234,7 +1782,12 @@
       "slug": "magnet-58-mm-a083",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A084",
@@ -1245,73 +1798,113 @@
       "slug": "hard-board-sublimation-product-a084",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 14,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A085",
+      "code": "APP-TSHIRT-BLACK-COTTON",
       "name": "Black T-Shirt",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "Cotton; XS, S, M, L, XL, 2XL",
-      "slug": "black-t-shirt-a085",
+      "slug": "black-t-shirt-app-tshirt-black-cotton",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "optionGroup": "apparel_size",
+      "material": "Cotton",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A086",
+      "code": "APP-TSHIRT-WHITE-COTTON",
       "name": "White T-Shirt",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "Cotton; XS, S, M, L, XL, 2XL",
-      "slug": "white-t-shirt-a086",
+      "slug": "white-t-shirt-app-tshirt-white-cotton",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "optionGroup": "apparel_size",
+      "material": "Cotton",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A087",
+      "code": "APP-TSHIRT-WHITE-POLYESTER",
       "name": "White T-Shirt",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "Polyester",
-      "slug": "white-t-shirt-a087",
+      "slug": "white-t-shirt-app-tshirt-white-polyester",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "material": "Polyester",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A088",
+      "code": "APP-TSHIRT-WHITE-COLLAR",
       "name": "White Collar T-Shirt",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "Cotton; sizes as printed, OCR unclear",
-      "slug": "white-collar-t-shirt-a088",
+      "slug": "white-collar-t-shirt-app-tshirt-white-collar",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A089",
+      "code": "APP-TSHIRT-BLACK-COLLAR",
       "name": "Black Collar T-Shirt",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "Cotton; sizes as printed, OCR unclear",
-      "slug": "black-collar-t-shirt-a089",
+      "slug": "black-collar-t-shirt-app-tshirt-black-collar",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
-      "code": "A090",
+      "code": "APP-TOTE-BLENDED-PLUSH",
       "name": "Blended Plush Tote Bag",
       "category": "Apparel",
       "sourcePage": 15,
       "specification": "37 × 42 cm",
-      "slug": "blended-plush-tote-bag-a090",
+      "slug": "blended-plush-tote-bag-app-tote-blended-plush",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A090B",
@@ -1322,7 +1915,12 @@
       "slug": "sublimation-glass-frame-bl-01-a090b",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A091",
@@ -1333,7 +1931,12 @@
       "slug": "sublimation-glass-frame-bl-03-a091",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A092",
@@ -1344,7 +1947,12 @@
       "slug": "sublimation-glass-frame-bl-04-a092",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A093",
@@ -1355,7 +1963,12 @@
       "slug": "sublimation-glass-frame-bl-11-a093",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A094",
@@ -1366,7 +1979,12 @@
       "slug": "sublimation-glass-frame-bl-14-a094",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A095",
@@ -1377,7 +1995,12 @@
       "slug": "sublimation-glass-frame-bl-28-a095",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A096",
@@ -1388,7 +2011,12 @@
       "slug": "sublimation-glass-frame-bl-29-a096",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A097",
@@ -1399,7 +2027,12 @@
       "slug": "sublimation-glass-frame-bl-31-a097",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A098",
@@ -1410,7 +2043,12 @@
       "slug": "sublimation-glass-frame-bl-48-a098",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A099",
@@ -1421,29 +2059,44 @@
       "slug": "sublimation-glass-frame-bl-50-a099",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A135",
       "name": "Kids Water Bottle",
-      "category": "Glass Frames",
+      "category": "Kids Water Bottles",
       "sourcePage": 16,
       "specification": null,
       "slug": "kids-water-bottle-a135",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "A136",
       "name": "Kids Water Bottle",
-      "category": "Glass Frames",
+      "category": "Kids Water Bottles",
       "sourcePage": 16,
       "specification": null,
       "slug": "kids-water-bottle-a136",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-01",
@@ -1454,7 +2107,12 @@
       "slug": "stone-frame-semicircle-sh-01",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "provisional_sequence",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-02",
@@ -1465,7 +2123,12 @@
       "slug": "stone-frame-semicircle-sh-02",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "codeType": "provisional_sequence",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-03",
@@ -1476,7 +2139,11 @@
       "slug": "stone-frame-natural-edge-sh-03",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-04",
@@ -1487,7 +2154,11 @@
       "slug": "stone-frame-natural-edge-sh-04",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-05",
@@ -1498,7 +2169,11 @@
       "slug": "stone-frame-up-opening-sh-05",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-11",
@@ -1509,7 +2184,11 @@
       "slug": "stone-frame-right-open-sh-11",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-19",
@@ -1520,7 +2199,11 @@
       "slug": "stone-frame-square-sh-19",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-38",
@@ -1531,7 +2214,11 @@
       "slug": "wooden-frame-sh-38",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     },
     {
       "code": "SH-39",
@@ -1542,7 +2229,11 @@
       "slug": "wooden-frame-sh-39",
       "pricePaise": null,
       "image": null,
-      "status": "needs_review"
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      }
     }
   ]
 }
