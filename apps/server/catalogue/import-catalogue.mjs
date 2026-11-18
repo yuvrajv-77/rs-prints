@@ -120,8 +120,23 @@ async function ensureFacet(code, name, values) {
       })),
     }});
     facet = result.createFacet;
-    facetByCode.set(code, facet);
+  } else {
+    const existingValueCodes = new Set((facet.values || []).map(value => value.code));
+    const missingValues = values.filter(value => !existingValueCodes.has(codeOf(value)));
+    if (missingValues.length) {
+      const created = await gql(`
+        mutation CreateFacetValues($input: [CreateFacetValueInput!]!) {
+          createFacetValues(input: $input) { id code name }
+        }
+      `, { input: missingValues.map(value => ({
+        facetId: facet.id,
+        code: codeOf(value),
+        translations: [{ languageCode, name: value }],
+      })) });
+      facet.values = [...(facet.values || []), ...created.createFacetValues];
+    }
   }
+  facetByCode.set(code, facet);
   return facet;
 }
 
@@ -135,8 +150,8 @@ const materialValueByName = new Map((materialFacet?.values || []).map(v => [v.na
 
 const sizeGroupCode = 'apparel_size';
 let sizeGroup = optionGroupByCode.get(sizeGroupCode);
+const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
 if (!sizeGroup) {
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
   const result = await gql(`
     mutation CreateOptionGroup($input: CreateProductOptionGroupInput!) {
       createProductOptionGroup(input: $input) {
@@ -149,8 +164,22 @@ if (!sizeGroup) {
     options: sizes.map(size => ({ code: size.toLowerCase(), translations: [{ languageCode, name: size }] })),
   }});
   sizeGroup = result.createProductOptionGroup;
-  optionGroupByCode.set(sizeGroupCode, sizeGroup);
+} else {
+  const existingOptionCodes = new Set((sizeGroup.options || []).map(option => option.code));
+  for (const size of sizes.filter(value => !existingOptionCodes.has(value.toLowerCase()))) {
+    const created = await gql(`
+      mutation CreateOption($input: CreateProductOptionInput!) {
+        createProductOption(input: $input) { id code name }
+      }
+    `, { input: {
+      productOptionGroupId: sizeGroup.id,
+      code: size.toLowerCase(),
+      translations: [{ languageCode, name: size }],
+    }});
+    sizeGroup.options.push(created.createProductOption);
+  }
 }
+optionGroupByCode.set(sizeGroupCode, sizeGroup);
 
 let createdProducts = 0;
 let skippedProducts = 0;
