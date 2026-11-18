@@ -43,7 +43,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A111",
@@ -59,7 +60,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A003",
@@ -75,7 +77,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A004",
@@ -91,7 +94,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A004C",
@@ -107,7 +111,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A006",
@@ -123,7 +128,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A007",
@@ -139,7 +145,8 @@
       "imageSource": {
         "pdfPage": 1,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A008",
@@ -155,7 +162,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A113",
@@ -171,7 +179,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A112",
@@ -187,7 +196,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A143",
@@ -203,7 +213,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A114",
@@ -219,7 +230,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A012",
@@ -235,7 +247,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A013",
@@ -251,7 +264,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A013M",
@@ -267,7 +281,8 @@
       "imageSource": {
         "pdfPage": 2,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A002",
@@ -283,7 +298,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A002C",
@@ -299,7 +315,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A005",
@@ -315,7 +332,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A010",
@@ -331,7 +349,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A144",
@@ -347,7 +366,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A145",
@@ -363,7 +383,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A146",
@@ -379,7 +400,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A147",
@@ -395,7 +417,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A148",
@@ -411,7 +434,8 @@
       "imageSource": {
         "pdfPage": 3,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "ceramic-mugs"
     },
     {
       "code": "A015",
@@ -427,7 +451,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A016",
@@ -443,7 +468,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A120",
@@ -459,7 +485,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A014",
@@ -475,7 +502,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A014C",
@@ -491,7 +519,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A115",
@@ -507,7 +536,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A116",
@@ -523,7 +553,8 @@
       "imageSource": {
         "pdfPage": 4,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-mugs"
     },
     {
       "code": "A018",
@@ -539,7 +570,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A019",
@@ -555,7 +587,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A118",
@@ -571,7 +604,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A022",
@@ -587,7 +621,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A023",
@@ -603,7 +638,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A024",
@@ -619,7 +655,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A025",
@@ -635,7 +672,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A141",
@@ -651,7 +689,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A121",
@@ -667,7 +706,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A142",
@@ -683,7 +723,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A020",
@@ -699,7 +740,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A021",
@@ -715,7 +757,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A122",
@@ -731,7 +774,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A119",
@@ -747,7 +791,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A117",
@@ -763,7 +808,8 @@
       "imageSource": {
         "pdfPage": 5,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-drinkware"
     },
     {
       "code": "A039",
@@ -779,7 +825,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A040",
@@ -795,7 +842,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A042",
@@ -811,7 +859,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A043",
@@ -827,7 +876,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A124",
@@ -843,7 +893,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A150",
@@ -859,7 +910,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A123",
@@ -875,7 +927,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A127",
@@ -891,7 +944,8 @@
       "imageSource": {
         "pdfPage": 6,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "aluminium-bottles"
     },
     {
       "code": "A130",
@@ -907,7 +961,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A131",
@@ -923,7 +978,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A132",
@@ -939,7 +995,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A027",
@@ -955,7 +1012,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A109",
@@ -971,7 +1029,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A134",
@@ -987,7 +1046,8 @@
       "imageSource": {
         "pdfPage": 7,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A029",
@@ -1003,7 +1063,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A030",
@@ -1019,7 +1080,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A031",
@@ -1035,7 +1097,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A151",
@@ -1051,7 +1114,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A033",
@@ -1067,7 +1131,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A034",
@@ -1083,7 +1148,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A035",
@@ -1099,7 +1165,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A036",
@@ -1115,7 +1182,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A037",
@@ -1131,7 +1199,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A038",
@@ -1147,7 +1216,8 @@
       "imageSource": {
         "pdfPage": 8,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
     },
     {
       "code": "A044",
@@ -1163,7 +1233,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A045",
@@ -1179,7 +1250,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A046",
@@ -1195,7 +1267,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A047",
@@ -1211,7 +1284,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A048",
@@ -1227,7 +1301,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A049",
@@ -1243,7 +1318,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A050",
@@ -1259,7 +1335,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A051",
@@ -1275,7 +1352,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "A052",
@@ -1291,7 +1369,8 @@
       "imageSource": {
         "pdfPage": 9,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-products"
     },
     {
       "code": "MDF-COLLAGE-01",
@@ -1307,7 +1386,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-02",
@@ -1323,7 +1403,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-03",
@@ -1339,7 +1420,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-04",
@@ -1355,7 +1437,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-05",
@@ -1371,7 +1454,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-06",
@@ -1387,7 +1471,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-07",
@@ -1403,7 +1488,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-08",
@@ -1419,7 +1505,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-09",
@@ -1435,7 +1522,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-10",
@@ -1451,7 +1539,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-11",
@@ -1467,7 +1556,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-12",
@@ -1483,7 +1573,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-13",
@@ -1499,7 +1590,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "MDF-COLLAGE-14",
@@ -1515,7 +1607,8 @@
       "imageSource": {
         "pdfPage": 10,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "mdf-collage-frames"
     },
     {
       "code": "A067",
@@ -1531,7 +1624,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A068",
@@ -1547,7 +1641,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A069",
@@ -1563,7 +1658,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A070",
@@ -1579,7 +1675,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A071",
@@ -1595,7 +1692,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A072",
@@ -1611,7 +1709,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A073",
@@ -1627,7 +1726,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A074",
@@ -1643,7 +1743,8 @@
       "imageSource": {
         "pdfPage": 11,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "fur-pillows"
     },
     {
       "code": "A075",
@@ -1659,7 +1760,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A076",
@@ -1675,7 +1777,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A077",
@@ -1691,7 +1794,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A078",
@@ -1707,7 +1811,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A079",
@@ -1723,7 +1828,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A080",
@@ -1739,7 +1845,8 @@
       "imageSource": {
         "pdfPage": 12,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "flip-sequin"
     },
     {
       "code": "A081",
@@ -1755,7 +1862,8 @@
       "imageSource": {
         "pdfPage": 13,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "sublimation-accessories"
     },
     {
       "code": "A082",
@@ -1771,7 +1879,8 @@
       "imageSource": {
         "pdfPage": 13,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "sublimation-accessories"
     },
     {
       "code": "A083",
@@ -1787,7 +1896,8 @@
       "imageSource": {
         "pdfPage": 13,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "sublimation-accessories"
     },
     {
       "code": "A084",
@@ -1803,7 +1913,8 @@
       "imageSource": {
         "pdfPage": 14,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "hard-board-products"
     },
     {
       "code": "APP-TSHIRT-BLACK-COTTON",
@@ -1821,7 +1932,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-t-shirts"
     },
     {
       "code": "APP-TSHIRT-WHITE-COTTON",
@@ -1839,7 +1951,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-t-shirts"
     },
     {
       "code": "APP-TSHIRT-WHITE-POLYESTER",
@@ -1856,7 +1969,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-t-shirts"
     },
     {
       "code": "APP-TSHIRT-WHITE-COLLAR",
@@ -1872,7 +1986,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-polo-t-shirts"
     },
     {
       "code": "APP-TSHIRT-BLACK-COLLAR",
@@ -1888,7 +2003,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-polo-t-shirts"
     },
     {
       "code": "APP-TOTE-BLENDED-PLUSH",
@@ -1904,7 +2020,8 @@
       "imageSource": {
         "pdfPage": 15,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "custom-tote-bags"
     },
     {
       "code": "A090B",
@@ -1920,7 +2037,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A091",
@@ -1936,7 +2054,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A092",
@@ -1952,7 +2071,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A093",
@@ -1968,7 +2088,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A094",
@@ -1984,7 +2105,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A095",
@@ -2000,7 +2122,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A096",
@@ -2016,7 +2139,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A097",
@@ -2032,7 +2156,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A098",
@@ -2048,7 +2173,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A099",
@@ -2064,7 +2190,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "glass-frames"
     },
     {
       "code": "A135",
@@ -2080,7 +2207,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "kids-bottles"
     },
     {
       "code": "A136",
@@ -2096,7 +2224,8 @@
       "imageSource": {
         "pdfPage": 16,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "kids-bottles"
     },
     {
       "code": "SH-01",
@@ -2112,7 +2241,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-02",
@@ -2128,7 +2258,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-03",
@@ -2143,7 +2274,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-04",
@@ -2158,7 +2290,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-05",
@@ -2173,7 +2306,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-11",
@@ -2188,7 +2322,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-19",
@@ -2203,7 +2338,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-38",
@@ -2218,7 +2354,8 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
     },
     {
       "code": "SH-39",
@@ -2233,7 +2370,175 @@
       "imageSource": {
         "pdfPage": 17,
         "cropStatus": "not_cropped"
-      }
+      },
+      "collectionSlug": "stone-wooden-frames"
+    }
+  ],
+  "collectionTree": [
+    {
+      "name": "Mugs",
+      "slug": "mugs",
+      "children": [
+        {
+          "name": "Ceramic Mugs",
+          "slug": "ceramic-mugs",
+          "sourceCategories": [
+            "Ceramic Mugs"
+          ]
+        },
+        {
+          "name": "Glass Mugs",
+          "slug": "glass-mugs",
+          "sourceCategories": [
+            "Glass Drinkware"
+          ],
+          "match": "name contains mug"
+        }
+      ]
+    },
+    {
+      "name": "Drinkware",
+      "slug": "drinkware",
+      "children": [
+        {
+          "name": "Aluminium Bottles",
+          "slug": "aluminium-bottles",
+          "sourceCategories": [
+            "Aluminium Bottles"
+          ]
+        },
+        {
+          "name": "Stainless Steel Bottles & Drinkware",
+          "slug": "stainless-steel-bottles-drinkware",
+          "sourceCategories": [
+            "Stainless Steel Drinkware"
+          ]
+        },
+        {
+          "name": "Kids Bottles",
+          "slug": "kids-bottles",
+          "sourceCategories": [
+            "Kids Water Bottles"
+          ]
+        },
+        {
+          "name": "Glass Drinkware",
+          "slug": "glass-drinkware",
+          "sourceCategories": [
+            "Glass Drinkware"
+          ],
+          "match": "name does not contain mug"
+        }
+      ]
+    },
+    {
+      "name": "Clothing",
+      "slug": "clothing",
+      "children": [
+        {
+          "name": "Custom T-Shirts",
+          "slug": "custom-t-shirts",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "t-shirt and not collar"
+        },
+        {
+          "name": "Custom Polo T-Shirts",
+          "slug": "custom-polo-t-shirts",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "collar t-shirt"
+        }
+      ]
+    },
+    {
+      "name": "Bags",
+      "slug": "bags",
+      "children": [
+        {
+          "name": "Custom Bags",
+          "slug": "custom-bags",
+          "sourceCategories": []
+        },
+        {
+          "name": "Custom Tote Bags",
+          "slug": "custom-tote-bags",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "tote bag"
+        }
+      ]
+    },
+    {
+      "name": "Home & Living",
+      "slug": "home-living",
+      "children": [
+        {
+          "name": "Fur Pillows",
+          "slug": "fur-pillows",
+          "sourceCategories": [
+            "Fur Pillows"
+          ]
+        },
+        {
+          "name": "Flip Sequin",
+          "slug": "flip-sequin",
+          "sourceCategories": [
+            "Flip Sequin"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gifts & Accessories",
+      "slug": "gifts-accessories",
+      "children": [
+        {
+          "name": "MDF Products",
+          "slug": "mdf-products",
+          "sourceCategories": [
+            "MDF Products"
+          ]
+        },
+        {
+          "name": "MDF Collage Frames",
+          "slug": "mdf-collage-frames",
+          "sourceCategories": [
+            "MDF Collage Frames"
+          ]
+        },
+        {
+          "name": "Glass Frames",
+          "slug": "glass-frames",
+          "sourceCategories": [
+            "Glass Frames"
+          ]
+        },
+        {
+          "name": "Stone & Wooden Frames",
+          "slug": "stone-wooden-frames",
+          "sourceCategories": [
+            "Stone Frames"
+          ]
+        },
+        {
+          "name": "Sublimation Accessories",
+          "slug": "sublimation-accessories",
+          "sourceCategories": [
+            "Sublimation Products"
+          ]
+        },
+        {
+          "name": "Hard Board Products",
+          "slug": "hard-board-products",
+          "sourceCategories": [
+            "Hard Board"
+          ]
+        }
+      ]
     }
   ]
 }
