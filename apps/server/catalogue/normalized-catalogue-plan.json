@@ -1553,29 +1553,29 @@
       "review": null
     },
     {
-      "productCode": "ALU-BOTTLE-BB28",
-      "name": "Aluminium Bottle BB28",
+      "productCode": "ALU-BOTTLE-BB28-750",
+      "name": "Aluminium Bottle BB28 (750 ml)",
       "collectionSlug": "aluminium-bottles",
       "sourceCodes": [
         "A127"
       ],
       "optionGroups": [
         {
-          "name": "Lid Colour",
+          "name": "Lid / Colour Presentation",
           "values": [
-            "Red",
-            "Black",
-            "Blue"
+            "Red lid",
+            "Black lid",
+            "Blue lid"
           ]
         }
       ],
       "variantGeneration": "explicit_combinations_only",
       "confidence": "medium",
-      "review": "The panel shows three lid/body presentations; verify whether these are customer-selectable colours or different lid configurations."
+      "review": "The panel shows three lid/body presentations. Confirm whether these are selectable lid/colour options or different lid configurations."
     },
     {
-      "productCode": "ALU-BOTTLE-BB26",
-      "name": "Aluminium Bottle BB26",
+      "productCode": "ALU-BOTTLE-BB28",
+      "name": "Aluminium Bottle BB28",
       "collectionSlug": "aluminium-bottles",
       "sourceCodes": [
         "A123"
@@ -1586,8 +1586,7 @@
           "values": [
             "Red",
             "Blue",
-            "Black",
-            "Purple"
+            "Black"
           ]
         }
       ],
@@ -1596,8 +1595,8 @@
       "review": null
     },
     {
-      "productCode": "ALU-BOTTLE-BB28-SPORT",
-      "name": "Aluminium Big Mouth Bottle BB28",
+      "productCode": "ALU-BOTTLE-BB26",
+      "name": "Aluminium Bottle BB26",
       "collectionSlug": "aluminium-bottles",
       "sourceCodes": [
         "A150"
@@ -1609,7 +1608,7 @@
             "Red",
             "Blue",
             "Black",
-            "Pink"
+            "Purple"
           ]
         }
       ],
@@ -2214,16 +2213,24 @@
       "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
     },
     {
-      "productCode": "RS-ALUMINIUM_BOTTLES-A124",
-      "name": "Aluminium Bottle BB12 / BB32",
+      "productCode": "ALU-BOTTLE-BB12-BB32",
+      "name": "Aluminium Big Mouth Bottle BB12 / BB32",
       "collectionSlug": "aluminium-bottles",
       "sourceCodes": [
         "A124"
       ],
-      "optionGroups": [],
+      "optionGroups": [
+        {
+          "name": "Model",
+          "values": [
+            "BB12",
+            "BB32"
+          ]
+        }
+      ],
       "variantGeneration": "single_default_variant",
       "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "review": "Both are shown under one source code A124 and both labelled 600 ml, but the product forms differ. Confirm whether model should be a customer option or separate products."
     },
     {
       "productCode": "RS-STAINLESS_STEEL_BOTTLES_DRINKWARE-A130",
@@ -2299,27 +2306,43 @@
     },
     {
       "productCode": "RS-STAINLESS_STEEL_BOTTLES_DRINKWARE-A029",
-      "name": "Big Mouth Tumbler BB15",
+      "name": "Big Mouth Bottle BB12",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceCodes": [
         "A029"
       ],
-      "optionGroups": [],
-      "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "optionGroups": [
+        {
+          "name": "Colour",
+          "values": [
+            "White",
+            "Silver"
+          ]
+        }
+      ],
+      "variantGeneration": "explicit_combinations_only",
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-STAINLESS_STEEL_BOTTLES_DRINKWARE-A030",
-      "name": "Starbucks Tumbler BB12",
+      "name": "Starbucks Tumbler BB14",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceCodes": [
         "A030"
       ],
-      "optionGroups": [],
-      "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "optionGroups": [
+        {
+          "name": "Colour",
+          "values": [
+            "White",
+            "Silver"
+          ]
+        }
+      ],
+      "variantGeneration": "explicit_combinations_only",
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-STAINLESS_STEEL_BOTTLES_DRINKWARE-A031",
@@ -2407,15 +2430,23 @@
     },
     {
       "productCode": "RS-STAINLESS_STEEL_BOTTLES_DRINKWARE-A038",
-      "name": "Yeti Coffee Mug",
+      "name": "Travel Mug BB20",
       "collectionSlug": "stainless-steel-bottles-drinkware",
       "sourceCodes": [
         "A038"
       ],
-      "optionGroups": [],
-      "variantGeneration": "single_default_variant",
-      "confidence": "medium",
-      "review": "Keep as separate model unless visual audit establishes a shared model with selectable options."
+      "optionGroups": [
+        {
+          "name": "Colour",
+          "values": [
+            "White",
+            "Silver"
+          ]
+        }
+      ],
+      "variantGeneration": "explicit_combinations_only",
+      "confidence": "high",
+      "review": null
     },
     {
       "productCode": "RS-MDF_PRODUCTS-A051",
@@ -3108,10 +3139,6 @@
       "reason": "Confirm whether the two pictured body styles correspond exactly to glossy and matte."
     },
     {
-      "productCode": "ALU-BOTTLE-BB28",
-      "reason": "The panel shows three lid/body presentations; verify whether these are customer-selectable colours or different lid configurations."
-    },
-    {
       "productCode": "APP-ROUND-TSHIRT",
       "reason": "Source confirms black cotton and white cotton sizes. White polyester is shown but its size availability is unclear. Generate only source-supported combinations, not the full Cartesian product."
     },
@@ -3154,6 +3181,10 @@
     {
       "productCode": "RS-GLASS-FRAMES",
       "reason": "BL-01 through BL-50 are distinct frame models/designs; A090 printed code collision needs source-reference-only handling."
+    },
+    {
+      "productCode": "ALU-BOTTLE-BB12-BB32",
+      "reason": "A124 panel shows BB12 and BB32 at 600 ml under one printed code; determine if one product with model choice or two distinct product models."
     }
   ]
 }
