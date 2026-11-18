@@ -100,8 +100,8 @@ async function listExisting() {
       productOptionGroups(options: { take: 100 }) {
         items { id code name options { id code name } }
       }
-      collections(options: { take: 100 }) {
-        items { id slug name }
+      collections(options: { take: 200 }) {
+        items { id slug name parentId }
       }
     }
   `);
@@ -158,6 +158,13 @@ const materialFacet = materialNames.length
   ? await ensureFacet('material', 'Material', materialNames)
   : null;
 const materialValueByName = new Map((materialFacet?.values || []).map(v => [v.name, v]));
+const collectionLeaves = catalogue.collectionTree.flatMap(parent => parent.children);
+const collectionFacet = await ensureFacet(
+  'catalogue_collection',
+  'Catalogue collection',
+  collectionLeaves.map(item => item.slug),
+);
+const collectionValueBySlug = new Map(collectionFacet.values.map(value => [value.code.toLowerCase().replace(/_/g, '-'), value]));
 
 const sizeGroupCode = 'apparel_size';
 let sizeGroup = optionGroupByCode.get(sizeGroupCode);
@@ -201,17 +208,17 @@ const failures = [];
 for (const item of selectedProducts) {
   const slug = item.slug || `${slugify(item.name)}-${slugify(item.code)}`;
   const existingProduct = productBySlug.get(slug);
-  if (existingProduct?.variants?.length) {
-    skippedProducts++;
-    continue;
-  }
   try {
+    const collectionValue = collectionValueBySlug.get(item.collectionSlug);
+    if (!collectionValue) throw new Error(`Missing collection facet value for ${item.collectionSlug}`);
+    const facetValueIds = [
+      categoryValueByName.get(item.category)?.id,
+      collectionValue.id,
+      item.material ? materialValueByName.get(item.material)?.id : null,
+    ].filter(Boolean);
+
     let product = existingProduct;
     if (!product) {
-      const facetValueIds = [categoryValueByName.get(item.category)?.id].filter(Boolean);
-      if (item.material && materialValueByName.has(item.material)) {
-        facetValueIds.push(materialValueByName.get(item.material).id);
-      }
       const description = [
         item.specification ? `Specification: ${item.specification}` : null,
         `Catalogue code: ${item.code}`,
@@ -231,7 +238,17 @@ for (const item of selectedProducts) {
       product = created.createProduct;
       createdProducts++;
     } else {
-      // The previous attempt created the product but failed before creating variants.
+      // Keep existing catalogue facets and add the new collection classification.
+      await gql(`
+        mutation UpdateProductFacets($input: UpdateProductInput!) {
+          updateProduct(input: $input) { id }
+        }
+      `, { input: { id: product.id, facetValueIds } });
+      if (existingProduct.variants?.length) {
+        skippedProducts++;
+        continue;
+      }
+      // Resume products created before their variants were successfully added.
       resumedProducts++;
     }
 
@@ -271,34 +288,70 @@ for (const item of selectedProducts) {
   }
 }
 
-for (const category of catalogue.categories) {
-  const slug = slugify(category);
-  if (collectionBySlug.has(slug)) continue;
-  const value = categoryValueByName.get(category);
-  if (!value) continue;
-  try {
+const collectionFilter = ids => [{
+  code: 'facet-value-filter',
+  arguments: [
+    { name: 'facetValueIds', value: JSON.stringify(ids) },
+    { name: 'containsAny', value: 'true' },
+  ],
+}];
+
+async function saveCollection({ name, slug, description, parentId, facetValueIds }) {
+  const existingCollection = collectionBySlug.get(slug);
+  const translationsInput = [{ languageCode, name, slug, description }];
+  if (existingCollection) {
     await gql(`
-      mutation CreateCollection($input: CreateCollectionInput!) {
-        createCollection(input: $input) { id name slug }
+      mutation UpdateCollection($input: UpdateCollectionInput!) {
+        updateCollection(input: $input) { id name slug parentId }
       }
     `, { input: {
-      inheritFilters: false,
-      filters: [{
-        code: 'facet-value-filter',
-        arguments: [
-          { name: 'facetValueIds', value: JSON.stringify([value.id]) },
-          { name: 'containsAny', value: 'true' },
-        ],
-      }],
-      translations: [{
-        languageCode,
-        name: category,
-        slug,
-        description: `RS Prints catalogue: ${category}`,
-      }],
+      id: existingCollection.id,
+      ...(parentId ? { parentId } : {}),
+      inheritFilters: true,
+      filters: collectionFilter(facetValueIds),
+      translations: translationsInput,
     }});
+    return existingCollection;
+  }
+  const result = await gql(`
+    mutation CreateCollection($input: CreateCollectionInput!) {
+      createCollection(input: $input) { id name slug parentId }
+    }
+  `, { input: {
+    ...(parentId ? { parentId } : {}),
+    inheritFilters: true,
+    filters: collectionFilter(facetValueIds),
+    translations: translationsInput,
+  }});
+  const created = result.createCollection;
+  collectionBySlug.set(slug, created);
+  return created;
+}
+
+for (const parent of catalogue.collectionTree) {
+  try {
+    const childValues = parent.children
+      .map(child => collectionValueBySlug.get(child.slug)?.id)
+      .filter(Boolean);
+    const parentCollection = await saveCollection({
+      name: parent.name,
+      slug: parent.slug,
+      description: `RS Prints catalogue: ${parent.name}`,
+      facetValueIds: childValues,
+    });
+    for (const child of parent.children) {
+      const value = collectionValueBySlug.get(child.slug);
+      if (!value) throw new Error(`Missing collection facet value for ${child.slug}`);
+      await saveCollection({
+        name: child.name,
+        slug: child.slug,
+        description: `RS Prints catalogue: ${parent.name} / ${child.name}`,
+        parentId: parentCollection.id,
+        facetValueIds: [value.id],
+      });
+    }
   } catch (error) {
-    failures.push({ collection: category, error: error.message });
+    failures.push({ collection: parent.name, error: error.message });
   }
 }
 
@@ -309,7 +362,7 @@ console.log(JSON.stringify({
   resumedProducts,
   skippedProducts,
   createdVariants,
-  collectionsExpected: catalogue.categories.length,
+  collectionsExpected: catalogue.collectionTree.reduce((count, parent) => count + 1 + parent.children.length, 0),
   importMode: allRequested ? 'all' : 'pilot',
   failures,
 }, null, 2));
