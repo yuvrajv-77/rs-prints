@@ -193,38 +193,47 @@ if (!sizeGroup) {
 optionGroupByCode.set(sizeGroupCode, sizeGroup);
 
 let createdProducts = 0;
+let resumedProducts = 0;
 let skippedProducts = 0;
 let createdVariants = 0;
 const failures = [];
 
 for (const item of selectedProducts) {
   const slug = item.slug || `${slugify(item.name)}-${slugify(item.code)}`;
-  if (productBySlug.has(slug)) {
+  const existingProduct = productBySlug.get(slug);
+  if (existingProduct?.variants?.length) {
     skippedProducts++;
     continue;
   }
   try {
-    const facetValueIds = [categoryValueByName.get(item.category)?.id].filter(Boolean);
-    if (item.material && materialValueByName.has(item.material)) {
-      facetValueIds.push(materialValueByName.get(item.material).id);
-    }
-    const description = [
-      item.specification ? `Specification: ${item.specification}` : null,
-      `Catalogue code: ${item.code}`,
-      `Source: RS Prints catalogue, page ${item.sourcePage}`,
-      'Price and stock not supplied in source catalogue.',
-    ].filter(Boolean).join('\\n');
-
-    const created = await gql(`
-      mutation CreateProduct($input: CreateProductInput!) {
-        createProduct(input: $input) { id name slug }
+    let product = existingProduct;
+    if (!product) {
+      const facetValueIds = [categoryValueByName.get(item.category)?.id].filter(Boolean);
+      if (item.material && materialValueByName.has(item.material)) {
+        facetValueIds.push(materialValueByName.get(item.material).id);
       }
-    `, { input: {
-      enabled: false,
-      facetValueIds,
-      translations: [{ languageCode, name: item.name, slug, description }],
-    }});
-    const product = created.createProduct;
+      const description = [
+        item.specification ? `Specification: ${item.specification}` : null,
+        `Catalogue code: ${item.code}`,
+        `Source: RS Prints catalogue, page ${item.sourcePage}`,
+        'Price and stock not supplied in source catalogue.',
+      ].filter(Boolean).join('\\n');
+
+      const created = await gql(`
+        mutation CreateProduct($input: CreateProductInput!) {
+          createProduct(input: $input) { id name slug }
+        }
+      `, { input: {
+        enabled: false,
+        facetValueIds,
+        translations: [{ languageCode, name: item.name, slug, description }],
+      }});
+      product = created.createProduct;
+      createdProducts++;
+    } else {
+      // The previous attempt created the product but failed before creating variants.
+      resumedProducts++;
+    }
 
     let variantInputs;
     if (item.optionGroup === 'apparel_size') {
@@ -298,6 +307,7 @@ console.log(JSON.stringify({
   endpoint,
   requestedProducts: selectedProducts.length,
   createdProducts,
+  resumedProducts,
   skippedProducts,
   createdVariants,
   collectionsExpected: catalogue.categories.length,
