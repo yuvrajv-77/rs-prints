@@ -262,6 +262,9 @@ if (resetTest) {
       throw new Error(`Product deletion stopped for id ${id}: ${result.deleteProduct.message || result.deleteProduct.result}. No new products have been imported yet; rerun after resolving the issue.`);
     }
   }
+  // The preflight map contains now-deleted records. Clear it so the rebuild
+  // creates fresh parent products instead of reusing stale database IDs.
+  productsBySlug.clear();
   console.log(`Deleted ${productIds.length} existing test-database products. Collections and shared option groups were preserved.`);
 }
 
