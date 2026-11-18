@@ -266,7 +266,6 @@ for (const item of selectedProducts) {
       }
     `, { input: variantInputs });
     createdVariants += variantResult.createProductVariants.filter(Boolean).length;
-    createdProducts++;
   } catch (error) {
     failures.push({ code: item.code, name: item.name, error: error.message });
   }
