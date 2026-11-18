@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "currency": "INR",
-  "status": "draft_structural_plan",
+  "status": "draft_requires_review",
   "source": {
     "file": "RS Prints Product Catalogue (1).pdf",
     "pages": 17,
@@ -13,7 +13,9 @@
     "Never create full Cartesian combinations by default.",
     "Do not invent price, stock or availability.",
     "Keep uncertain mappings in review list.",
-    "Keep existing Vendure collection hierarchy; do not recreate collections."
+    "Keep existing Vendure collection hierarchy; do not recreate collections.",
+    "A model with more than one option group must provide an explicit variantCombinations array before any variants are generated.",
+    "Do not assume all values across multiple option groups are mutually compatible."
   ],
   "sourceItems": [
     {
@@ -2680,7 +2682,7 @@
       "collectionSlug": "fur-pillows",
       "sourceCodes": [
         "A070",
-        "A072"
+        "A071"
       ],
       "optionGroups": [
         {
