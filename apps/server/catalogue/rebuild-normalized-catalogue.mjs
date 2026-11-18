@@ -42,7 +42,7 @@ const prepared = [];
 for (const code of duplicate(sourceCodes)) errors.push(`Duplicate source item: ${code}`);
 for (const code of duplicate(mappedCodes)) errors.push(`Source item mapped more than once: ${code}`);
 for (const code of sourceCodes) if (!mappedCodes.includes(code)) errors.push(`Unmapped source item: ${code}`);
-for (const code of mappedCodes) if (!sourceCodes.includes(code)) errors.push(`Unknown source reference: ${code}');
+for (const code of mappedCodes) if (!sourceCodes.includes(code)) errors.push(`Unknown source reference: ${code}`);
 
 for (const model of plan.productModels) {
   const groups = model.optionGroups || [];
