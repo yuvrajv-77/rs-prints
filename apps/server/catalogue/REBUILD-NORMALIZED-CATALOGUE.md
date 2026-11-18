@@ -1,20 +1,18 @@
-# Normalized catalogue rebuild
+# Normalized catalogue import
 
-The old `import-catalogue.mjs` imports the first-pass one-row-per-product manifest. Do not use it for the corrected catalogue.
+Use `rebuild-normalized-catalogue.mjs` for the corrected catalogue. Do not use the old `import-catalogue.mjs`.
 
-## What the new rebuild does
+## Safety behaviour
 
-`rebuild-normalized-catalogue.mjs` is intended for the local Vendure instance connected to the test database only.
+- Default mode is read-only preview.
+- Apply mode is **additive**: it creates the normalized products and variants alongside existing products.
+- It does not delete existing products or modify, delete, or recreate collections.
+- It reuses matching normalized products, option groups, and SKUs on a rerun, so an interrupted import can resume.
+- New products and variants remain disabled with a zero placeholder price until prices and stock are confirmed.
+- It refuses to apply if source mappings, SKUs, or explicit multi-option combinations fail validation.
+- It only permits a localhost Admin API and requires explicit test-database confirmation.
 
-- Default mode is read-only preview. It does not log in to Vendure or write to the database.
-- Apply mode first checks the legacy imported product slugs against the old manifest.
-- It deletes only those exact legacy product records, then creates the normalized parent products and their variants.
-- It does not delete, update, or recreate collections.
-- New products and variants are disabled and use a zero placeholder price until pricing and stock are confirmed.
-- Option groups are shared Vendure option groups. Their value vocabulary is merged globally, while each product's variants use only values in that product's own model.
-- It refuses to apply while multi-option models lack explicit valid variant combinations.
-
-## Step 1: pull the branch
+## 1. Pull the latest branch
 
 From the repository root:
 
@@ -22,11 +20,11 @@ From the repository root:
 git pull origin catalogue-setup
 ```
 
-## Step 2: verify the test environment
+## 2. Confirm the test database
 
-Open `apps/server/.env.test` and independently verify that `DATABASE_URL` points to the disposable/test database, not production. Do not paste the connection string into chat.
+Open `apps/server/.env.test` and independently verify that `DATABASE_URL` points to the test database, not production. Never paste the connection string into chat.
 
-The rebuild also requires these environment values in `.env.test`:
+Ensure these values exist in `.env.test`:
 
 ```dotenv
 CATALOGUE_IMPORT_ALLOW=true
@@ -34,9 +32,9 @@ CATALOGUE_IMPORT_ENV=development
 CATALOGUE_TEST_DATABASE_CONFIRMATION=I_CONFIRM_THIS_IS_THE_RS_PRINTS_TEST_DATABASE
 ```
 
-Keep the existing Vendure credentials in that file. The Admin API must be local (default `http://localhost:3000/admin-api`).
+Keep the existing Vendure superadmin credentials in that file. Start the local Vendure server connected to `.env.test`.
 
-## Step 3: run the read-only preview
+## 3. Run the preview
 
 From `apps/server`:
 
@@ -44,22 +42,18 @@ From `apps/server`:
 node --env-file=.env.test catalogue/rebuild-normalized-catalogue.mjs
 ```
 
-This is the only command to run at this stage. It must not change the database.
+Expected plan: 132 parent products and 252 variants, with zero blockers and zero errors. This command does not write to the database.
 
-## Apply mode is not ready yet
+## 4. Apply to the test database
 
-The current plan intentionally blocks five multi-option product models until their valid combinations are explicitly specified:
-
-- Round-neck T-shirts
-- Collar T-shirts
-- Flip-sequin square pillows
-- Flip-sequin heart pillows
-- MDF coasters
-
-Do not run with `--apply` until those combination rules have been reviewed and the dry-run report shows zero blockers. The apply command, once approved, will be:
+Only after checking the preview and independently confirming that the local server is connected to the test database:
 
 ```powershell
 node --env-file=.env.test catalogue/rebuild-normalized-catalogue.mjs --apply
 ```
 
-Never run this script with production credentials or a production database URL.
+The script reports created/reused products and variants. If it stops partway through, fix the reported issue and rerun the same command. It is designed to reuse already-created normalized records.
+
+## Important
+
+The import intentionally does not delete the old 138 products. Once the new catalogue has been checked in the Vendure dashboard, the old test products can be cleaned up separately. Do not run this against production.
