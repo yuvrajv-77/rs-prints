@@ -10,7 +10,8 @@ if ((process.env.APP_ENV || '').toLowerCase() !== 'dev') throw new Error('Blocke
 if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL. Load .env with --env-file=.env.');
 if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) throw new Error('Missing Vendure superadmin credentials.');
 const endpoint = process.env.VENDURE_ADMIN_API_URL || 'http://localhost:' + (process.env.VENDURE_SERVER_PORT || 3000) + '/admin-api';
-if (!/^https?:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d+)?\\//i.test(endpoint)) throw new Error('Only localhost Admin API is allowed.');
+const endpointUrl = new URL(endpoint);
+if (!['localhost','127.0.0.1'].includes(endpointUrl.hostname) || endpointUrl.pathname !== '/admin-api') throw new Error('Only the localhost /admin-api endpoint is allowed.');
 
 const plan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'catalogue', 'normalized-catalogue-plan.json'), 'utf8'));
 if (plan.currency !== 'INR' || plan.sourceItems.length !== 147 || plan.productModels.length !== 132) throw new Error('Unexpected catalogue plan or currency. No writes made.');
@@ -84,13 +85,15 @@ query VariantPreflight {
  createVariantInput: __type(name:"CreateProductVariantInput") {
   inputFields { name type { kind name ofType { kind name ofType { kind name } } } }
  }
+ globalFlag: __type(name:"GlobalFlag") { enumValues { name }
+ }
 }`,{},token);
 const products = snap.data.products.items || [];
 const bySlug = new Map(products.map(p=>[p.slug,p]));
 const optionGroups = snap.data.productOptionGroups.items || [];
 const byGroupCode = new Map(optionGroups.map(g=>[g.code,g]));
 const fields = new Set((snap.data.createVariantInput?.inputFields || []).map(f=>f.name));
-for (const field of ['productId','sku','price','enabled','optionIds','translations','stockOnHand']) {
+for (const field of ['productId','sku','price','enabled','optionIds','translations','stockOnHand','trackInventory']) {
  if (!fields.has(field)) errors.push('CreateProductVariantInput.'+field+' is unavailable.');
 }
 for (const v of prepared) {
@@ -104,6 +107,8 @@ for (const v of prepared) {
   if (!(group.options||[]).some(o=>o.name===v.combo[definition.name])) errors.push('Missing option value: '+definition.name+' / '+v.combo[definition.name]);
  }
 }
+const globalFlags = new Set((snap.data.globalFlag?.enumValues || []).map(v=>v.name));
+if (!globalFlags.has('TRUE')) errors.push('Vendure GlobalFlag.TRUE is unavailable; inventory tracking cannot be explicitly enabled.');
 if (errors.length) throw new Error('Vendure preflight stopped before writes:\n'+errors.join('\n'));
 
 const skuOwners = new Map();
@@ -127,7 +132,7 @@ const inputs = prepared.map(v=>{
   return group.options.find(o=>o.name===v.combo[def.name]).id;
  });
  return {
-  productId:p.id, enabled:true, sku:v.sku, price:v.price, stockOnHand:v.stockOnHand, optionIds,
+  productId:p.id, enabled:true, sku:v.sku, price:v.price, stockOnHand:v.stockOnHand, trackInventory:'TRUE', optionIds,
   translations:[{languageCode:'en',name:v.groups.length?v.productName+' - '+v.groups.map(g=>v.combo[g.name]).join(' / '):v.productName}]
  };
 });
