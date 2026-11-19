@@ -14,7 +14,7 @@ if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
   throw new Error('Missing Vendure superadmin credentials in .env.');
 }
 const endpoint = process.env.VENDURE_ADMIN_API_URL ||
-  \`http://localhost:\${process.env.VENDURE_SERVER_PORT || 3000}/admin-api\`;
+  `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
 if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: only a localhost Vendure Admin API is permitted.');
 }
@@ -37,7 +37,7 @@ async function request(query, variables = {}, token = '') {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(token ? { authorization: \`Bearer \${token}\` } : {}),
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ query, variables }),
   });
@@ -48,20 +48,20 @@ async function request(query, variables = {}, token = '') {
   return { data: body.data, headers: response.headers };
 }
 
-const login = await request(\`mutation Login($username: String!, $password: String!) {
+const login = await request(`mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
     ... on CurrentUser { id identifier }
     ... on ErrorResult { errorCode message }
   }
-}\`, {
+}`, {
   username: process.env.SUPERADMIN_USERNAME,
   password: process.env.SUPERADMIN_PASSWORD,
 });
-if (!login.data.login?.id) throw new Error(\`Vendure login failed: \${JSON.stringify(login.data.login)}\`);
+if (!login.data.login?.id) throw new Error(`Vendure login failed: ${JSON.stringify(login.data.login)}`);
 const token = login.headers.get('vendure-auth-token');
 if (!token) throw new Error('Vendure did not return an auth token.');
 
-const snapshot = await request(\`query FacetPreflight {
+const snapshot = await request(`query FacetPreflight {
   facets(options: { take: 200 }) {
     items { id code name values { id code name } }
   }
@@ -71,21 +71,21 @@ const snapshot = await request(\`query FacetPreflight {
   facetValueInput: __type(name: "CreateFacetValueInput") {
     inputFields { name type { kind name ofType { kind name ofType { kind name } } } }
   }
-}\`, {}, token);
+}`, {}, token);
 
 const facetFields = new Set((snapshot.data.facetInput?.inputFields || []).map(field => field.name));
 const valueFields = new Set((snapshot.data.facetValueInput?.inputFields || []).map(field => field.name));
 for (const field of ['code', 'translations', 'values']) {
-  if (!facetFields.has(field)) throw new Error(\`CreateFacetInput.\${field} unavailable. No writes made.\`);
+  if (!facetFields.has(field)) throw new Error(`CreateFacetInput.${field} unavailable. No writes made.`);
 }
 for (const field of ['code', 'translations']) {
-  if (!valueFields.has(field)) throw new Error(\`CreateFacetValueInput.\${field} unavailable. No writes made.\`);
+  if (!valueFields.has(field)) throw new Error(`CreateFacetValueInput.${field} unavailable. No writes made.`);
 }
 
 const existing = snapshot.data.facets.items || [];
 const byCode = new Map(existing.map(facet => [facet.code, facet]));
 const duplicateCodes = existing.map(facet => facet.code).filter((code, i, all) => all.indexOf(code) !== i);
-if (duplicateCodes.length) throw new Error(\`Duplicate existing facet codes: \${[...new Set(duplicateCodes)].join(', ')}\`);
+if (duplicateCodes.length) throw new Error(`Duplicate existing facet codes: ${[...new Set(duplicateCodes)].join(', ')}`);
 
 const missingFacets = [];
 const missingValues = [];
@@ -116,9 +116,9 @@ console.log(JSON.stringify({
 if (missingFacets.length) {
   const declarations = [], selections = [], variables = {};
   missingFacets.forEach((facet, i) => {
-    const key = \`f\${i}\`;
-    declarations.push(\`$\${key}: CreateFacetInput!\`);
-    selections.push(\`\${key}: createFacet(input: $\${key}) { id code name values { id code name } }\`);
+    const key = `f${i}`;
+    declarations.push(`$${key}: CreateFacetInput!`);
+    selections.push(`${key}: createFacet(input: $${key}) { id code name values { id code name } }`);
     variables[key] = {
       code: facet.code,
       translations: [{ languageCode: 'en', name: facet.name }],
@@ -128,39 +128,39 @@ if (missingFacets.length) {
       })),
     };
   });
-  await request(\`mutation CreateFacets(\${declarations.join(', ')}) { \${selections.join(' ')} }\`, variables, token);
+  await request(`mutation CreateFacets(${declarations.join(', ')}) { ${selections.join(' ')} }`, variables, token);
 }
 
 if (missingValues.length) {
   const declarations = [], selections = [], variables = {};
   missingValues.forEach((value, i) => {
-    const key = \`v\${i}\`;
-    declarations.push(\`$\${key}: CreateFacetValueInput!\`);
-    selections.push(\`\${key}: createFacetValue(input: $\${key}) { id code name }\`);
+    const key = `v${i}`;
+    declarations.push(`$${key}: CreateFacetValueInput!`);
+    selections.push(`${key}: createFacetValue(input: $${key}) { id code name }`);
     variables[key] = {
       facetId: value.facetId,
       code: value.code,
       translations: [{ languageCode: 'en', name: value.value }],
     };
   });
-  await request(\`mutation CreateFacetValues(\${declarations.join(', ')}) { \${selections.join(' ')} }\`, variables, token);
+  await request(`mutation CreateFacetValues(${declarations.join(', ')}) { ${selections.join(' ')} }`, variables, token);
 }
 
-const verification = await request(\`query VerifyFacets {
+const verification = await request(`query VerifyFacets {
   facets(options: { take: 200 }) { items { id code name values { id code name } } }
-}\`, {}, token);
+}`, {}, token);
 const finalFacets = new Map((verification.data.facets.items || []).map(facet => [facet.code, facet]));
 const problems = [];
 for (const definition of definitions) {
   const facet = finalFacets.get(definition.code);
   if (!facet) {
-    problems.push(\`Missing facet: \${definition.code}\`);
+    problems.push(`Missing facet: ${definition.code}`);
     continue;
   }
   const values = new Set(facet.values.map(value => value.code));
   for (const value of definition.values) {
     const code = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    if (!values.has(code)) problems.push(\`Missing value: \${definition.name} / \${value}\`);
+    if (!values.has(code)) problems.push(`Missing value: ${definition.name} / ${value}`);
   }
 }
 console.log(JSON.stringify({
