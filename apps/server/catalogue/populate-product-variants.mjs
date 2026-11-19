@@ -36,6 +36,7 @@ const basePrice = {
   'custom-bags':299,'custom-tote-bags':349,'glass-frames':499,'stone-wooden-frames':599
 };
 const errors = [], heldReport = [], prepared = [], skuSet = new Set();
+for (const model of plan.productModels) if (!held[model.productCode] && !Object.hasOwn(basePrice, model.collectionSlug)) throw new Error('No provisional price configured for collection '+model.collectionSlug+'. No writes made.');
 for (const model of plan.productModels) {
   if (held[model.productCode]) { heldReport.push({productCode:model.productCode,reason:held[model.productCode]}); continue; }
   const groups = model.optionGroups || [];
