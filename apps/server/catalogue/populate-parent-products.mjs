@@ -144,7 +144,7 @@ const collectionUpdateFields = new Set((snapshot.data.updateCollectionInput?.inp
 for (const field of ['translations', 'enabled', 'facetValueIds']) {
   if (!createFields.has(field)) errors.push(`CreateProductInput.${field} is unavailable`);
 }
-for (const field of ['translations', 'facetValueIds']) {
+for (const field of ['translations', 'facetValueIds', 'enabled']) {
   if (!updateFields.has(field)) errors.push(`UpdateProductInput.${field} is unavailable`);
 }
 if (!collectionUpdateFields.has('filters')) errors.push('UpdateCollectionInput.filters is unavailable');
@@ -223,6 +223,7 @@ function facetIdsFor(model) {
 let createdProducts = 0;
 let reusedProducts = 0;
 let updatedProducts = 0;
+let productsEnabled = 0;
 let attachedOptionGroups = 0;
 let unchangedOptionGroups = 0;
 const productIdsByCollection = new Map();
@@ -237,25 +238,28 @@ for (const model of plan.productModels) {
     const result = await request(`mutation CreateParentProduct($input: CreateProductInput!) {
       createProduct(input: $input) { id name slug enabled }
     }`, { input: {
-      enabled: false,
+      enabled: true,
       facetValueIds: expectedFacetIds,
       translations: [{ languageCode, name: model.name, slug, description: descriptionFor(model) }],
     } }, token);
     product = result.data.createProduct;
     productId = product.id;
     createdProducts++;
+    productsEnabled++;
   } else {
     productId = product.id;
     reusedProducts++;
     const existingFacetIds = new Set((product.facetValues || []).map(value => value.id));
     const mergedFacetIds = unique([...(product.facetValues || []).map(value => value.id), ...expectedFacetIds]);
     const needsFacetUpdate = mergedFacetIds.length !== existingFacetIds.size;
-    if (needsFacetUpdate) {
+    const needsEnable = product.enabled !== true;
+    if (needsFacetUpdate || needsEnable) {
       await request(`mutation UpdateParentProduct($input: UpdateProductInput!) {
-        updateProduct(input: $input) { id slug }
-      }`, { input: { id: productId, facetValueIds: mergedFacetIds } }, token);
+        updateProduct(input: $input) { id slug enabled }
+      }`, { input: { id: productId, enabled: true, facetValueIds: mergedFacetIds } }, token);
       updatedProducts++;
     }
+    if (needsEnable) productsEnabled++;
   }
 
   const currentGroupIds = new Set((product.optionGroups || []).map(group => group.id));
@@ -317,11 +321,11 @@ console.log(JSON.stringify({
   optionGroupsAttached: attachedOptionGroups,
   existingOptionGroupAttachmentsReused: unchangedOptionGroups,
   variantsCreated: 0,
-  productsEnabled: 0,
+  productsEnabled,
   collectionFiltersUpdated: updatedCollections,
   collectionsPreserved: true,
   pricesStockAssetsImagesChanged: false,
   descriptions: '4-5 catalogue-grounded bullet points per product',
   reviewQueue: plan.reviewQueue.length,
-  note: 'Parent products only. No product variants were created. All products remain disabled until variants, prices and stock are configured.',
+  note: 'Parent products are enabled as requested. No product variants, prices or stock were created, so products are not yet purchasable.',
 }, null, 2));
