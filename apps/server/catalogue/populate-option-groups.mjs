@@ -145,15 +145,15 @@ for (const definition of expected) {
   }
 }
 
-const plannedWrites = missingGroups.length + missingOptions.length;
+const missingGroupOptionValues = missingGroups.reduce((sum, group) => sum + group.values.length, 0);
+const plannedWrites = missingGroups.length + missingGroupOptionValues + missingOptions.length;
 console.log(JSON.stringify({
   mode: 'CREATE_MISSING_OPTION_GROUPS_AND_VALUES_ONLY',
   endpoint,
   expectedSharedGroups: expected.length,
   existingSharedGroups: existing.length,
   groupsToCreate: missingGroups.length,
-  optionValuesToCreate: missingGroups.reduce((sum, group) => sum + group.values.length, 0) +
-    missingOptions.length,
+  optionValuesToCreate: missingGroupOptionValues + missingOptions.length,
   existingOptionValuesReused: expected.reduce((sum, definition) => {
     const group = byCode.get(definition.code);
     if (!group) return sum;
