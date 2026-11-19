@@ -6,8 +6,8 @@
  * Creates missing facets/values only. Never changes products, variants,
  * collections, option groups, prices, stock, or assets.
  */
-if ((process.env.APP_ENV || 'development').toLowerCase() !== 'development') {
-  throw new Error('Blocked: APP_ENV must be development.');
+if ((process.env.APP_ENV || '').toLowerCase() !== 'dev') {
+  throw new Error('Blocked: APP_ENV must be dev. Check apps/server/.env and run with --env-file=.env.');
 }
 if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL. Run with --env-file=.env.');
 if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
@@ -75,7 +75,7 @@ const snapshot = await request(`query FacetPreflight {
 
 const facetFields = new Set((snapshot.data.facetInput?.inputFields || []).map(field => field.name));
 const valueFields = new Set((snapshot.data.facetValueInput?.inputFields || []).map(field => field.name));
-for (const field of ['code', 'translations', 'values']) {
+for (const field of ['code', 'translations', 'values', 'isPrivate']) {
   if (!facetFields.has(field)) throw new Error(`CreateFacetInput.${field} unavailable. No writes made.`);
 }
 for (const field of ['code', 'translations']) {
@@ -121,6 +121,7 @@ if (missingFacets.length) {
     selections.push(`${key}: createFacet(input: $${key}) { id code name values { id code name } }`);
     variables[key] = {
       code: facet.code,
+      isPrivate: false,
       translations: [{ languageCode: 'en', name: facet.name }],
       values: facet.values.map(value => ({
         code: value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
