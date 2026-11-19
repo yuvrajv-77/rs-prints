@@ -75,7 +75,7 @@ const snapshot = await request(`query FacetPreflight {
 
 const facetFields = new Set((snapshot.data.facetInput?.inputFields || []).map(field => field.name));
 const valueFields = new Set((snapshot.data.facetValueInput?.inputFields || []).map(field => field.name));
-for (const field of ['code', 'translations', 'values']) {
+for (const field of ['code', 'translations', 'values', 'isPrivate']) {
   if (!facetFields.has(field)) throw new Error(`CreateFacetInput.${field} unavailable. No writes made.`);
 }
 for (const field of ['code', 'translations']) {
@@ -121,6 +121,7 @@ if (missingFacets.length) {
     selections.push(`${key}: createFacet(input: $${key}) { id code name values { id code name } }`);
     variables[key] = {
       code: facet.code,
+      isPrivate: false,
       translations: [{ languageCode: 'en', name: facet.name }],
       values: facet.values.map(value => ({
         code: value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
