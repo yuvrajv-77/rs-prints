@@ -30,6 +30,53 @@ const definitions = [
       'Cotton', 'Polyester', 'MDF', 'Wood', 'Stone',
     ],
   },
+  {
+    name: 'Capacity',
+    code: 'capacity',
+    values: [
+      '45 ml; 1.5 oz',
+      '90 ml; 3 oz',
+      '175 ml; 6 oz',
+      '275 ml',
+      '275 ml; 10 oz',
+      '300 ml',
+      '300 ml; 10 oz',
+      '325 ml; 10.5 oz',
+      '325 ml; 11 oz',
+      '350 ml',
+      '350 ml; 12 oz',
+      '360 ml; 12 oz',
+      '400 ml',
+      '450 ml',
+      '475 ml',
+      '500 ml',
+      '590 ml; 20 oz',
+      '600 ml',
+      '650 ml; 22 oz',
+      '770 ml; 16 oz',
+    ],
+  },
+  {
+    name: 'Dimensions',
+    code: 'dimensions',
+    values: [
+      '12 × 8 in',
+      '12 × 16 in',
+      '16 × 12 in',
+      '18 × 12 in',
+      '15 × 15 in',
+      '20 × 20 in',
+      '15 × 15 cm',
+      '15 × 20 cm',
+      '18 × 26 cm',
+      '20 × 20 cm',
+      '20 × 30 cm',
+      '12 × 17 cm',
+      '37 × 42 cm',
+      '44 mm / 58 mm',
+      '58 mm',
+    ],
+  },
 ];
 
 async function request(query, variables = {}, token = '') {
@@ -110,7 +157,7 @@ console.log(JSON.stringify({
   existingFacetsReused: definitions.length - missingFacets.length,
   missingValuesToAdd: missingValues.length,
   databaseWrites: writes,
-  note: 'Only the Material facet is included. Colour, Size, Finish, Capacity and other customer-selectable variant choices remain option groups.',
+  note: 'Material, Capacity and Dimensions are product-level filters based on catalogue specifications. Customer-selectable choices such as Colour, Apparel Size, Finish and variant Capacity remain option groups.',
 }, null, 2));
 
 if (missingFacets.length) {
@@ -179,6 +226,6 @@ console.log(JSON.stringify({
   }, 0),
   problems,
   databaseWrites: writes,
-  note: 'No products, variants, collections, option groups, prices, stock, or assets were changed.',
+  note: 'Only missing facet definitions and values were created. No products, variants, collections, option groups, prices, stock, or assets were changed.',
 }, null, 2));
 if (problems.length) process.exitCode = 1;
