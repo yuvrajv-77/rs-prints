@@ -34,8 +34,13 @@ const codeOf = value => slugify(value).replace(/-/g, '_').toUpperCase();
 const skuPart = value => String(value).normalize('NFKD').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toUpperCase();
 
 const expectedByCode = {
-  'APP-ROUND-TSHIRT': 18,
-  'APP-COLLAR-TSHIRT': 12
+  'APP-ROUND-TSHIRT': 24,
+  'APP-COLLAR-TSHIRT': 24
+};
+const requestedOptions = {
+  Colour: ['Black', 'White'],
+  Material: ['Cotton', 'Polyester'],
+  'Apparel Size': ['XS', 'S', 'M', 'L', 'XL', '2XL']
 };
 const basePriceINR = 399;
 const stockOnHand = 10;
@@ -48,33 +53,29 @@ for (const model of models) {
     errors.push('Unexpected option-group order/names for ' + model.productCode + ': ' + groups.map(g => g.name).join(', '));
     continue;
   }
-  if (!Array.isArray(model.variantCombinations)) {
-    errors.push('Missing explicit variantCombinations for ' + model.productCode);
-    continue;
+  // Owner-approved rule: generate the full 2 x 2 x 6 combination set for BOTH T-shirt types.
+  // The owner will manage supplier availability later in the Vendure dashboard.
+  for (const group of groups) {
+    const requested = requestedOptions[group.name];
+    if (!requested || requested.length !== group.values.length || requested.some(value => !group.values.includes(value))) {
+      errors.push('Shared option values do not match the agreed T-shirt options for ' + group.name + '. Expected ' + JSON.stringify(requested) + ', found ' + JSON.stringify(group.values));
+    }
   }
 
-  const combos = model.variantCombinations.map(sourceCombo => {
-    const combo = { ...sourceCombo };
-    if (Object.hasOwn(combo, 'Size')) {
-      combo['Apparel Size'] = combo.Size;
-      delete combo.Size;
+  const combos = [];
+  for (const colour of requestedOptions.Colour) {
+    for (const material of requestedOptions.Material) {
+      for (const size of requestedOptions['Apparel Size']) {
+        combos.push({ Colour: colour, Material: material, 'Apparel Size': size });
+      }
     }
-    return combo;
-  });
+  }
 
   if (combos.length !== expectedByCode[model.productCode]) {
     errors.push(model.productCode + ' expected ' + expectedByCode[model.productCode] + ' combinations, found ' + combos.length);
   }
 
   for (const combo of combos) {
-    if (Object.keys(combo).sort().join('|') !== ['Apparel Size', 'Colour', 'Material'].sort().join('|')) {
-      errors.push('Wrong option keys for ' + model.productCode + ': ' + JSON.stringify(combo));
-      continue;
-    }
-    for (const group of groups) {
-      if (!group.values.includes(combo[group.name])) errors.push('Invalid ' + group.name + ' value for ' + model.productCode + ': ' + combo[group.name]);
-    }
-
     const sku = model.productCode + '-' + [combo.Colour, combo.Material, combo['Apparel Size']].map(skuPart).join('-');
     let priceINR = basePriceINR;
     if (combo['Apparel Size'] === '2XL') priceINR += 50;
@@ -94,7 +95,7 @@ for (const model of models) {
 }
 
 if (errors.length) throw new Error('Catalogue validation failed before login/writes:\n' + errors.join('\n'));
-if (prepared.length !== 30) throw new Error('Expected exactly 30 T-shirt variants, prepared ' + prepared.length + '. No writes made.');
+if (prepared.length !== 48) throw new Error('Expected exactly 48 T-shirt variants, prepared ' + prepared.length + '. No writes made.');
 
 async function gql(query, variables = {}, token = '') {
   const response = await fetch(endpoint, {
@@ -231,8 +232,10 @@ for (const variant of prepared) byProduct[variant.productCode] = (byProduct[vari
 console.log(JSON.stringify({
   status: 'TSHIRT_VARIANTS_REPAIRED',
   authenticatedAs: login.data.login.identifier,
-  source: 'RS Prints Product Catalogue (1).pdf, page 15',
+  source: 'Owner-approved full option matrix for both T-shirt types',
   plannedVariants: prepared.length,
+  expectedPerProduct: 24,
+  agreedOptions: requestedOptions,
   createdVariants: created,
   alreadyMatchingVariants: prepared.length - missing.length,
   products: byProduct,
