@@ -1,0 +1,2544 @@
+{
+  "source": "RS Prints Product Catalogue (1).pdf",
+  "sourcePages": 17,
+  "currency": "INR",
+  "pricingStatus": "not_provided",
+  "imageStatus": "pending_individual_crops",
+  "notes": [
+    "Product names, codes and specifications transcribed from the supplied image-only PDF.",
+    "Where the PDF does not provide a readable name, the product title is a conservative category description based on the visible item and code.",
+    "Do not treat missing price or stock as zero. Importer creates zero-priced draft variants disabled until prices are entered.",
+    "Some catalogue codes and OCR readings need human verification, especially pages 9, 10, 14 and 16.",
+    "Codes explicitly marked internal_provisional or provisional_sequence are working identifiers, not printed catalogue SKUs.",
+    "The PDF is image-only. Product-level image crops have not yet been prepared; imageSource records the source page to guide cropping."
+  ],
+  "categories": [
+    "Ceramic Mugs",
+    "Glass Drinkware",
+    "Aluminium Bottles",
+    "Stainless Steel Drinkware",
+    "MDF Products",
+    "MDF Collage Frames",
+    "Fur Pillows",
+    "Flip Sequin",
+    "Sublimation Products",
+    "Hard Board",
+    "Apparel",
+    "Glass Frames",
+    "Stone Frames",
+    "Kids Water Bottles"
+  ],
+  "products": [
+    {
+      "code": "A001",
+      "name": "White Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": "325 ml; 11 oz",
+      "slug": "white-mug-a001",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A111",
+      "name": "Motto Ceramic Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": "325 ml; 11 oz",
+      "slug": "motto-ceramic-mug-a111",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A003",
+      "name": "Cone Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": null,
+      "slug": "cone-mug-a003",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A004",
+      "name": "White Heart Handle Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": null,
+      "slug": "white-heart-handle-mug-a004",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A004C",
+      "name": "3 Tone Heart Handle Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": null,
+      "slug": "3-tone-heart-handle-mug-a004c",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A006",
+      "name": "3 Tone Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": "325 ml; 11 oz",
+      "slug": "3-tone-mug-a006",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A007",
+      "name": "Neon Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 1,
+      "specification": "325 ml; 11 oz",
+      "slug": "neon-mug-a007",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 1,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A008",
+      "name": "Golden & Silver Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "325 ml; 11 oz",
+      "slug": "golden-silver-mug-a008",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A113",
+      "name": "Golden Handle Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "325 ml; 11 oz",
+      "slug": "golden-handle-mug-a113",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A112",
+      "name": "Electro Plated Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "325 ml; 11 oz",
+      "slug": "electro-plated-mug-a112",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A143",
+      "name": "Gold Electro Plated Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "325 ml; 11 oz",
+      "slug": "gold-electro-plated-mug-a143",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A114",
+      "name": "Pink Electro Plated Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "325 ml; 11 oz",
+      "slug": "pink-electro-plated-mug-a114",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A012",
+      "name": "Magic Glossy & Matte Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": null,
+      "slug": "magic-glossy-matte-mug-a012",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A013",
+      "name": "Heart Cut Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "300 ml; 10 oz",
+      "slug": "heart-cut-mug-a013",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A013M",
+      "name": "Heart Cut Magic Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 2,
+      "specification": "300 ml; 10 oz",
+      "slug": "heart-cut-magic-mug-a013m",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 2,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A002",
+      "name": "White Tea Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "175 ml; 6 oz",
+      "slug": "white-tea-mug-a002",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A002C",
+      "name": "3 Tone Tea Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "175 ml; 6 oz",
+      "slug": "3-tone-tea-mug-a002c",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A005",
+      "name": "Color Patch Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "325 ml; 11 oz",
+      "slug": "color-patch-mug-a005",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A010",
+      "name": "German Beer Stein Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "650 ml; 22 oz",
+      "slug": "german-beer-stein-mug-a010",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A144",
+      "name": "Blue Berry Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "275 ml",
+      "slug": "blue-berry-mug-a144",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A145",
+      "name": "Coco Milk White Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "350 ml; 12 oz",
+      "slug": "coco-milk-white-mug-a145",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A146",
+      "name": "Merry Gold Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "325 ml; 11 oz",
+      "slug": "merry-gold-mug-a146",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A147",
+      "name": "Rose Gold Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "275 ml; 10 oz",
+      "slug": "rose-gold-mug-a147",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A148",
+      "name": "Cork Base Mug",
+      "category": "Ceramic Mugs",
+      "sourcePage": 3,
+      "specification": "325 ml; 10.5 oz",
+      "slug": "cork-base-mug-a148",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 3,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "ceramic-mugs"
+    },
+    {
+      "code": "A015",
+      "name": "Frosted Glass Mug",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "325 ml; 11 oz",
+      "slug": "frosted-glass-mug-a015",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A016",
+      "name": "Clear Glass Mug",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "325 ml; 11 oz",
+      "slug": "clear-glass-mug-a016",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A120",
+      "name": "Color Glass Mug",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": null,
+      "slug": "color-glass-mug-a120",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A014",
+      "name": "Gradient Color Glass Mug (Frosted)",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "325 ml; 11 oz",
+      "slug": "gradient-color-glass-mug-frosted-a014",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A014C",
+      "name": "Full Color Glass Mug (Frosted)",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "325 ml; 11 oz",
+      "slug": "full-color-glass-mug-frosted-a014c",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A115",
+      "name": "Borosilicate Glass Mug, Clear Color Handle",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "360 ml; 12 oz",
+      "slug": "borosilicate-glass-mug-clear-color-handle-a115",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A116",
+      "name": "Borosilicate Glass Mug, Frosted Color Handle",
+      "category": "Glass Drinkware",
+      "sourcePage": 4,
+      "specification": "360 ml; 12 oz",
+      "slug": "borosilicate-glass-mug-frosted-color-handle-a116",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 4,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-mugs"
+    },
+    {
+      "code": "A018",
+      "name": "Frosted Beer Glass",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "770 ml; 16 oz",
+      "slug": "frosted-beer-glass-a018",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A019",
+      "name": "Clear Beer Glass",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "770 ml; 16 oz",
+      "slug": "clear-beer-glass-a019",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A118",
+      "name": "Color Beer Glass",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "770 ml; 16 oz",
+      "slug": "color-beer-glass-a118",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A022",
+      "name": "Shooter Glass",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "90 ml; 3 oz",
+      "slug": "shooter-glass-a022",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A023",
+      "name": "Shot Glass with Patch",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "45 ml; 1.5 oz",
+      "slug": "shot-glass-with-patch-a023",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A024",
+      "name": "Shot Glass, Gold Rim",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "45 ml; 1.5 oz",
+      "slug": "shot-glass-gold-rim-a024",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A025",
+      "name": "Shot Glass, Clear",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "45 ml; 1.5 oz",
+      "slug": "shot-glass-clear-a025",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A141",
+      "name": "Frosted Skinny Tumbler with Plastic Lid",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "590 ml; 20 oz",
+      "slug": "frosted-skinny-tumbler-with-plastic-lid-a141",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A121",
+      "name": "Gradient Color Glass Tumbler with Bamboo Lid",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "590 ml; 20 oz",
+      "slug": "gradient-color-glass-tumbler-with-bamboo-lid-a121",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A142",
+      "name": "Gradient Color Glass Tumbler with Bamboo Lid (Frosted)",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "590 ml; 20 oz",
+      "slug": "gradient-color-glass-tumbler-with-bamboo-lid-frosted-a142",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A020",
+      "name": "Frosted Mason Jar",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "475 ml",
+      "slug": "frosted-mason-jar-a020",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A021",
+      "name": "Clear Mason Jar with Lid",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "475 ml",
+      "slug": "clear-mason-jar-with-lid-a021",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A122",
+      "name": "Gradient Color Jar with Bamboo Lid",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "475 ml",
+      "slug": "gradient-color-jar-with-bamboo-lid-a122",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A119",
+      "name": "Gradient Color Jar (Clear)",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "475 ml",
+      "slug": "gradient-color-jar-clear-a119",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A117",
+      "name": "Mason Jar without Lid",
+      "category": "Glass Drinkware",
+      "sourcePage": 5,
+      "specification": "400 ml",
+      "slug": "mason-jar-without-lid-a117",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 5,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-drinkware"
+    },
+    {
+      "code": "A039",
+      "name": "Aluminium Water Bottle BB5 / BB6",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-water-bottle-bb5-bb6-a039",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A040",
+      "name": "Aluminium Water Bottle BB13",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-water-bottle-bb13-a040",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A042",
+      "name": "Aluminium Water Bottle BB7 / BB8",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-water-bottle-bb7-bb8-a042",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A043",
+      "name": "Aluminium Water Bottle BB09 / BB10",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-water-bottle-bb09-bb10-a043",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A124",
+      "name": "Aluminium Bottle BB12 / BB32",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-bottle-bb12-bb32-a124",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A150",
+      "name": "Aluminium Big Mouth Bottle BB28",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-big-mouth-bottle-bb28-a150",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A123",
+      "name": "Aluminium Bottle",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-bottle-a123",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A127",
+      "name": "Aluminium Bottle",
+      "category": "Aluminium Bottles",
+      "sourcePage": 6,
+      "specification": null,
+      "slug": "aluminium-bottle-a127",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 6,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "aluminium-bottles"
+    },
+    {
+      "code": "A130",
+      "name": "Stainless Steel Cap Vacuum Bottle BB30",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "600 ml",
+      "slug": "stainless-steel-cap-vacuum-bottle-bb30-a130",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A131",
+      "name": "Double Wall Stainless Steel Cap Vacuum Bottle BB27",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "500 ml",
+      "slug": "double-wall-stainless-steel-cap-vacuum-bottle-bb27-a131",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A132",
+      "name": "Stainless Steel Mug with Handle & Side Lid BB31",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "600 ml",
+      "slug": "stainless-steel-mug-with-handle-side-lid-bb31-a132",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A027",
+      "name": "Cola Bottle BB16",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "500 ml",
+      "slug": "cola-bottle-bb16-a027",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A109",
+      "name": "Pink Skinny Tumbler BB21",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "500 ml",
+      "slug": "pink-skinny-tumbler-bb21-a109",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A134",
+      "name": "Stainless Steel Tumbler BB29",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 7,
+      "specification": "600 ml",
+      "slug": "stainless-steel-tumbler-bb29-a134",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 7,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A029",
+      "name": "Big Mouth Tumbler BB15",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "450 ml",
+      "slug": "big-mouth-tumbler-bb15-a029",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A030",
+      "name": "Starbucks Tumbler BB12",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "600 ml",
+      "slug": "starbucks-tumbler-bb12-a030",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A031",
+      "name": "Tumbler with Lid & Straw BB14",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "450 ml",
+      "slug": "tumbler-with-lid-straw-bb14-a031",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A151",
+      "name": "Temperature Bottle BB19",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "350 ml",
+      "slug": "temperature-bottle-bb19-a151",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A033",
+      "name": "Double Wall Coke Can BB25",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "500 ml",
+      "slug": "double-wall-coke-can-bb25-a033",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A034",
+      "name": "Wine Cup BB18",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "500 ml",
+      "slug": "wine-cup-bb18-a034",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A035",
+      "name": "Bottle BB17",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "300 ml",
+      "slug": "bottle-bb17-a035",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A036",
+      "name": "Travel Mug BB20",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "350 ml",
+      "slug": "travel-mug-bb20-a036",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A037",
+      "name": "Skinny Tumbler BB21",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "600 ml",
+      "slug": "skinny-tumbler-bb21-a037",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A038",
+      "name": "Yeti Coffee Mug",
+      "category": "Stainless Steel Drinkware",
+      "sourcePage": 8,
+      "specification": "400 ml",
+      "slug": "yeti-coffee-mug-a038",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 8,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stainless-steel-bottles-drinkware"
+    },
+    {
+      "code": "A044",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a044",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A045",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a045",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A046",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a046",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A047",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a047",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A048",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a048",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A049",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a049",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A050",
+      "name": "MDF Keychain",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-keychain-a050",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A051",
+      "name": "MDF Sublimation Product",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "mdf-sublimation-product-a051",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "A052",
+      "name": "Sublimation Fridge Magnet",
+      "category": "MDF Products",
+      "sourcePage": 9,
+      "specification": null,
+      "slug": "sublimation-fridge-magnet-a052",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 9,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-products"
+    },
+    {
+      "code": "MDF-COLLAGE-01",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "12 × 8 in",
+      "slug": "mdf-collage-frame-01",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-02",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-02",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-03",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-03",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-04",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "20 × 20 in",
+      "slug": "mdf-collage-frame-04",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-05",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-05",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-06",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-06",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-07",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "12 × 8 in",
+      "slug": "mdf-collage-frame-07",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-08",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "18 × 12 in",
+      "slug": "mdf-collage-frame-08",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-09",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "16 × 12 in",
+      "slug": "mdf-collage-frame-09",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-10",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "12 × 16 in",
+      "slug": "mdf-collage-frame-10",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-11",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-11",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-12",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-12",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-13",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-13",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "MDF-COLLAGE-14",
+      "name": "MDF Collage Frame",
+      "category": "MDF Collage Frames",
+      "sourcePage": 10,
+      "specification": "15 × 15 in",
+      "slug": "mdf-collage-frame-14",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 10,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "mdf-collage-frames"
+    },
+    {
+      "code": "A067",
+      "name": "Fur Pillow, Square Red",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "fur-pillow-square-red-a067",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A068",
+      "name": "Long Fur Square Pillow, Red",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "long-fur-square-pillow-red-a068",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A069",
+      "name": "Fur Square Pillow, Pink",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "fur-square-pillow-pink-a069",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A070",
+      "name": "Fur Heart Pillow, Red",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "fur-heart-pillow-red-a070",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A071",
+      "name": "Fur Heart Pillow, Pink",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "fur-heart-pillow-pink-a071",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A072",
+      "name": "Long Fur Heart Pillow",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "long-fur-heart-pillow-a072",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A073",
+      "name": "LED Square Pillow",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "led-square-pillow-a073",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A074",
+      "name": "LED Heart Pillow",
+      "category": "Fur Pillows",
+      "sourcePage": 11,
+      "specification": null,
+      "slug": "led-heart-pillow-a074",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 11,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "fur-pillows"
+    },
+    {
+      "code": "A075",
+      "name": "Magic Square with White Back",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": "Red, blue, gold, white",
+      "slug": "magic-square-with-white-back-a075",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A076",
+      "name": "Magic Square with Color Back",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": "Red, blue, gold, white",
+      "slug": "magic-square-with-color-back-a076",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A077",
+      "name": "Square with Magic Patch (Heart Emboss)",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": null,
+      "slug": "square-with-magic-patch-heart-emboss-a077",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A078",
+      "name": "Square with Magic Patch (Love Emboss)",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": null,
+      "slug": "square-with-magic-patch-love-emboss-a078",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A079",
+      "name": "Magic Heart with White Back",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": "Red, blue, gold, white",
+      "slug": "magic-heart-with-white-back-a079",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A080",
+      "name": "Magic Heart with Color Back",
+      "category": "Flip Sequin",
+      "sourcePage": 12,
+      "specification": "Red, blue, gold, white",
+      "slug": "magic-heart-with-color-back-a080",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 12,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "flip-sequin"
+    },
+    {
+      "code": "A081",
+      "name": "Sublimation Mouse Pad",
+      "category": "Sublimation Products",
+      "sourcePage": 13,
+      "specification": null,
+      "slug": "sublimation-mouse-pad-a081",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "sublimation-accessories"
+    },
+    {
+      "code": "A082",
+      "name": "Pin Badge",
+      "category": "Sublimation Products",
+      "sourcePage": 13,
+      "specification": "44 mm / 58 mm",
+      "slug": "pin-badge-a082",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "sublimation-accessories"
+    },
+    {
+      "code": "A083",
+      "name": "Magnet 58 mm",
+      "category": "Sublimation Products",
+      "sourcePage": 13,
+      "specification": "58 mm",
+      "slug": "magnet-58-mm-a083",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 13,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "sublimation-accessories"
+    },
+    {
+      "code": "A084",
+      "name": "Hard Board Sublimation Product",
+      "category": "Hard Board",
+      "sourcePage": 14,
+      "specification": null,
+      "slug": "hard-board-sublimation-product-a084",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 14,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "hard-board-products"
+    },
+    {
+      "code": "APP-TSHIRT-BLACK-COTTON",
+      "name": "Black T-Shirt",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "Cotton; XS, S, M, L, XL, 2XL",
+      "slug": "black-t-shirt-app-tshirt-black-cotton",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "optionGroup": "apparel_size",
+      "material": "Cotton",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-t-shirts"
+    },
+    {
+      "code": "APP-TSHIRT-WHITE-COTTON",
+      "name": "White T-Shirt",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "Cotton; XS, S, M, L, XL, 2XL",
+      "slug": "white-t-shirt-app-tshirt-white-cotton",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "optionGroup": "apparel_size",
+      "material": "Cotton",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-t-shirts"
+    },
+    {
+      "code": "APP-TSHIRT-WHITE-POLYESTER",
+      "name": "White T-Shirt",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "Polyester",
+      "slug": "white-t-shirt-app-tshirt-white-polyester",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "material": "Polyester",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-t-shirts"
+    },
+    {
+      "code": "APP-TSHIRT-WHITE-COLLAR",
+      "name": "White Collar T-Shirt",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "Cotton; sizes as printed, OCR unclear",
+      "slug": "white-collar-t-shirt-app-tshirt-white-collar",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-polo-t-shirts"
+    },
+    {
+      "code": "APP-TSHIRT-BLACK-COLLAR",
+      "name": "Black Collar T-Shirt",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "Cotton; sizes as printed, OCR unclear",
+      "slug": "black-collar-t-shirt-app-tshirt-black-collar",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-polo-t-shirts"
+    },
+    {
+      "code": "APP-TOTE-BLENDED-PLUSH",
+      "name": "Blended Plush Tote Bag",
+      "category": "Apparel",
+      "sourcePage": 15,
+      "specification": "37 × 42 cm",
+      "slug": "blended-plush-tote-bag-app-tote-blended-plush",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "internal_provisional",
+      "imageSource": {
+        "pdfPage": 15,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "custom-tote-bags"
+    },
+    {
+      "code": "A090B",
+      "name": "Sublimation Glass Frame BL-01",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-01-a090b",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A091",
+      "name": "Sublimation Glass Frame BL-03",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-03-a091",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A092",
+      "name": "Sublimation Glass Frame BL-04",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-04-a092",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A093",
+      "name": "Sublimation Glass Frame BL-11",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-11-a093",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A094",
+      "name": "Sublimation Glass Frame BL-14",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-14-a094",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A095",
+      "name": "Sublimation Glass Frame BL-28",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-28-a095",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A096",
+      "name": "Sublimation Glass Frame BL-29",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-29-a096",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A097",
+      "name": "Sublimation Glass Frame BL-31",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-31-a097",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A098",
+      "name": "Sublimation Glass Frame BL-48",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-48-a098",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A099",
+      "name": "Sublimation Glass Frame BL-50",
+      "category": "Glass Frames",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "sublimation-glass-frame-bl-50-a099",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "glass-frames"
+    },
+    {
+      "code": "A135",
+      "name": "Kids Water Bottle",
+      "category": "Kids Water Bottles",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "kids-water-bottle-a135",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "kids-bottles"
+    },
+    {
+      "code": "A136",
+      "name": "Kids Water Bottle",
+      "category": "Kids Water Bottles",
+      "sourcePage": 16,
+      "specification": null,
+      "slug": "kids-water-bottle-a136",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "catalogue_printed",
+      "imageSource": {
+        "pdfPage": 16,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "kids-bottles"
+    },
+    {
+      "code": "SH-01",
+      "name": "Stone Frame, Semicircle",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "15 × 20 cm",
+      "slug": "stone-frame-semicircle-sh-01",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "provisional_sequence",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-02",
+      "name": "Stone Frame, Semicircle",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "15 × 15 cm",
+      "slug": "stone-frame-semicircle-sh-02",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "codeType": "provisional_sequence",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-03",
+      "name": "Stone Frame, Natural Edge",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "20 × 20 cm",
+      "slug": "stone-frame-natural-edge-sh-03",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-04",
+      "name": "Stone Frame, Natural Edge",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "20 × 20 cm",
+      "slug": "stone-frame-natural-edge-sh-04",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-05",
+      "name": "Stone Frame, Up Opening",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "20 × 30 cm",
+      "slug": "stone-frame-up-opening-sh-05",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-11",
+      "name": "Stone Frame, Right Open",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "15 × 15 cm",
+      "slug": "stone-frame-right-open-sh-11",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-19",
+      "name": "Stone Frame, Square",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "12 × 17 cm",
+      "slug": "stone-frame-square-sh-19",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-38",
+      "name": "Wooden Frame",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": "18 × 26 cm",
+      "slug": "wooden-frame-sh-38",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    },
+    {
+      "code": "SH-39",
+      "name": "Wooden Frame",
+      "category": "Stone Frames",
+      "sourcePage": 17,
+      "specification": null,
+      "slug": "wooden-frame-sh-39",
+      "pricePaise": null,
+      "image": null,
+      "status": "needs_review",
+      "imageSource": {
+        "pdfPage": 17,
+        "cropStatus": "not_cropped"
+      },
+      "collectionSlug": "stone-wooden-frames"
+    }
+  ],
+  "collectionTree": [
+    {
+      "name": "Mugs",
+      "slug": "mugs",
+      "children": [
+        {
+          "name": "Ceramic Mugs",
+          "slug": "ceramic-mugs",
+          "sourceCategories": [
+            "Ceramic Mugs"
+          ]
+        },
+        {
+          "name": "Glass Mugs",
+          "slug": "glass-mugs",
+          "sourceCategories": [
+            "Glass Drinkware"
+          ],
+          "match": "name contains mug"
+        }
+      ]
+    },
+    {
+      "name": "Drinkware",
+      "slug": "drinkware",
+      "children": [
+        {
+          "name": "Aluminium Bottles",
+          "slug": "aluminium-bottles",
+          "sourceCategories": [
+            "Aluminium Bottles"
+          ]
+        },
+        {
+          "name": "Stainless Steel Bottles & Drinkware",
+          "slug": "stainless-steel-bottles-drinkware",
+          "sourceCategories": [
+            "Stainless Steel Drinkware"
+          ]
+        },
+        {
+          "name": "Kids Bottles",
+          "slug": "kids-bottles",
+          "sourceCategories": [
+            "Kids Water Bottles"
+          ]
+        },
+        {
+          "name": "Glass Drinkware",
+          "slug": "glass-drinkware",
+          "sourceCategories": [
+            "Glass Drinkware"
+          ],
+          "match": "name does not contain mug"
+        }
+      ]
+    },
+    {
+      "name": "Clothing",
+      "slug": "clothing",
+      "children": [
+        {
+          "name": "Custom T-Shirts",
+          "slug": "custom-t-shirts",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "t-shirt and not collar"
+        },
+        {
+          "name": "Custom Polo T-Shirts",
+          "slug": "custom-polo-t-shirts",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "collar t-shirt"
+        }
+      ]
+    },
+    {
+      "name": "Bags",
+      "slug": "bags",
+      "children": [
+        {
+          "name": "Custom Bags",
+          "slug": "custom-bags",
+          "sourceCategories": []
+        },
+        {
+          "name": "Custom Tote Bags",
+          "slug": "custom-tote-bags",
+          "sourceCategories": [
+            "Apparel"
+          ],
+          "match": "tote bag"
+        }
+      ]
+    },
+    {
+      "name": "Home & Living",
+      "slug": "home-living",
+      "children": [
+        {
+          "name": "Fur Pillows",
+          "slug": "fur-pillows",
+          "sourceCategories": [
+            "Fur Pillows"
+          ]
+        },
+        {
+          "name": "Flip Sequin",
+          "slug": "flip-sequin",
+          "sourceCategories": [
+            "Flip Sequin"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gifts & Accessories",
+      "slug": "gifts-accessories",
+      "children": [
+        {
+          "name": "MDF Products",
+          "slug": "mdf-products",
+          "sourceCategories": [
+            "MDF Products"
+          ]
+        },
+        {
+          "name": "MDF Collage Frames",
+          "slug": "mdf-collage-frames",
+          "sourceCategories": [
+            "MDF Collage Frames"
+          ]
+        },
+        {
+          "name": "Glass Frames",
+          "slug": "glass-frames",
+          "sourceCategories": [
+            "Glass Frames"
+          ]
+        },
+        {
+          "name": "Stone & Wooden Frames",
+          "slug": "stone-wooden-frames",
+          "sourceCategories": [
+            "Stone Frames"
+          ]
+        },
+        {
+          "name": "Sublimation Accessories",
+          "slug": "sublimation-accessories",
+          "sourceCategories": [
+            "Sublimation Products"
+          ]
+        },
+        {
+          "name": "Hard Board Products",
+          "slug": "hard-board-products",
+          "sourceCategories": [
+            "Hard Board"
+          ]
+        }
+      ]
+    }
+  ]
+}
