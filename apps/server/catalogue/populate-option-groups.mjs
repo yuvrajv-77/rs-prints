@@ -33,7 +33,7 @@ if (process.env.CATALOGUE_TEST_DATABASE_CONFIRMATION !== 'I_CONFIRM_THIS_IS_THE_
 if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL in .env.test.');
 
 const endpoint = process.env.VENDURE_ADMIN_API_URL ||
-  \`http://localhost:\${process.env.VENDURE_SERVER_PORT || 3000}/admin-api\`;
+  `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
 if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: this script only permits a localhost Vendure Admin API.');
 }
@@ -75,7 +75,7 @@ async function request(query, variables = {}, token = '') {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(token ? { authorization: \`Bearer \${token}\` } : {}),
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ query, variables }),
   });
@@ -86,20 +86,20 @@ async function request(query, variables = {}, token = '') {
   return { data: body.data, headers: response.headers };
 }
 
-const login = await request(\`mutation Login($username: String!, $password: String!) {
+const login = await request(`mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
     ... on CurrentUser { id identifier }
     ... on ErrorResult { errorCode message }
   }
-}\`, {
+}`, {
   username: process.env.SUPERADMIN_USERNAME,
   password: process.env.SUPERADMIN_PASSWORD,
 });
-if (!login.data.login?.id) throw new Error(\`Vendure login failed: \${JSON.stringify(login.data.login)}\`);
+if (!login.data.login?.id) throw new Error(`Vendure login failed: ${JSON.stringify(login.data.login)}`);
 const token = login.headers.get('vendure-auth-token');
 if (!token) throw new Error('Vendure did not return an auth token.');
 
-const snapshot = await request(\`query OptionGroupPreflight {
+const snapshot = await request(`query OptionGroupPreflight {
   productOptionGroups(options: { take: 200 }) {
     items { id code name options { id code name } }
   }
@@ -109,21 +109,21 @@ const snapshot = await request(\`query OptionGroupPreflight {
   optionInput: __type(name: "CreateProductOptionInput") {
     inputFields { name type { kind name ofType { kind name ofType { kind name } } } }
   }
-}\`, {}, token);
+}`, {}, token);
 
 const groupFields = new Set((snapshot.data.groupInput?.inputFields || []).map(field => field.name));
 const optionFields = new Set((snapshot.data.optionInput?.inputFields || []).map(field => field.name));
 for (const field of ['code', 'translations', 'options']) {
-  if (!groupFields.has(field)) throw new Error(\`CreateProductOptionGroupInput.\${field} unavailable. No writes made.\`);
+  if (!groupFields.has(field)) throw new Error(`CreateProductOptionGroupInput.${field} unavailable. No writes made.`);
 }
 for (const field of ['productOptionGroupId', 'code', 'translations']) {
-  if (!optionFields.has(field)) throw new Error(\`CreateProductOptionInput.\${field} unavailable. No writes made.\`);
+  if (!optionFields.has(field)) throw new Error(`CreateProductOptionInput.${field} unavailable. No writes made.`);
 }
 
 const existing = snapshot.data.productOptionGroups.items || [];
 const byCode = new Map(existing.map(group => [group.code, group]));
 const duplicates = existing.map(group => group.code).filter((code, index, all) => all.indexOf(code) !== index);
-if (duplicates.length) throw new Error(\`Duplicate existing option group codes: \${[...new Set(duplicates)].join(', ')}. No writes made.\`);
+if (duplicates.length) throw new Error(`Duplicate existing option group codes: ${[...new Set(duplicates)].join(', ')}. No writes made.`);
 
 const missingGroups = [];
 const missingOptions = [];
@@ -171,9 +171,9 @@ if (missingGroups.length || missingOptions.length) {
   const variables = {};
 
   missingGroups.forEach((group, index) => {
-    const key = \`g\${index}\`;
-    declarations.push(\`$\${key}: CreateProductOptionGroupInput!\`);
-    selections.push(\`\${key}: createProductOptionGroup(input: $\${key}) { id code name options { id code name } }\`);
+    const key = `g${index}`;
+    declarations.push(`$${key}: CreateProductOptionGroupInput!`);
+    selections.push(`${key}: createProductOptionGroup(input: $${key}) { id code name options { id code name } }`);
     variables[key] = {
       code: group.code,
       translations: [{ languageCode, name: group.name }],
@@ -185,9 +185,9 @@ if (missingGroups.length || missingOptions.length) {
   });
 
   missingOptions.forEach((option, index) => {
-    const key = \`o\${index}\`;
-    declarations.push(\`$\${key}: CreateProductOptionInput!\`);
-    selections.push(\`\${key}: createProductOption(input: $\${key}) { id code name }\`);
+    const key = `o${index}`;
+    declarations.push(`$${key}: CreateProductOptionInput!`);
+    selections.push(`${key}: createProductOption(input: $${key}) { id code name }`);
     variables[key] = {
       productOptionGroupId: option.groupId,
       code: option.code,
@@ -195,15 +195,15 @@ if (missingGroups.length || missingOptions.length) {
     };
   });
 
-  const mutation = \`mutation EnsureSharedOptionGroups(\${declarations.join(', ')}) { \${selections.join(' ')} }\`;
+  const mutation = `mutation EnsureSharedOptionGroups(${declarations.join(', ')}) { ${selections.join(' ')} }`;
   await request(mutation, variables, token);
 }
 
-const verification = await request(\`query VerifyOptionGroups {
+const verification = await request(`query VerifyOptionGroups {
   productOptionGroups(options: { take: 200 }) {
     items { id code name options { id code name } }
   }
-}\`, {}, token);
+}`, {}, token);
 
 const finalGroups = verification.data.productOptionGroups.items || [];
 const finalByCode = new Map(finalGroups.map(group => [group.code, group]));
@@ -211,12 +211,12 @@ const problems = [];
 for (const definition of expected) {
   const group = finalByCode.get(definition.code);
   if (!group) {
-    problems.push(\`Missing group: \${definition.code}\`);
+    problems.push(`Missing group: ${definition.code}`);
     continue;
   }
   const actualOptions = new Set(group.options.map(option => option.code));
   for (const value of definition.values) {
-    if (!actualOptions.has(optionCode(value))) problems.push(\`Missing value: \${definition.name} / \${value}\`);
+    if (!actualOptions.has(optionCode(value))) problems.push(`Missing value: ${definition.name} / ${value}`);
   }
 }
 
