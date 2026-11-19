@@ -15,7 +15,8 @@
     "Keep uncertain mappings in review list.",
     "Keep existing Vendure collection hierarchy; do not recreate collections.",
     "A model with more than one option group must provide an explicit variantCombinations array before any variants are generated.",
-    "Do not assume all values across multiple option groups are mutually compatible."
+    "Do not assume all values across multiple option groups are mutually compatible.",
+    "Apparel sizes and physical diameters are separate option groups; never mix clothing sizes with measurements."
   ],
   "sourceItems": [
     {
@@ -1643,7 +1644,7 @@
           ]
         },
         {
-          "name": "Size",
+          "name": "Apparel Size",
           "values": [
             "XS",
             "S",
@@ -1773,7 +1774,7 @@
           ]
         },
         {
-          "name": "Size",
+          "name": "Apparel Size",
           "values": [
             "XS",
             "S",
@@ -1910,7 +1911,7 @@
       ],
       "optionGroups": [
         {
-          "name": "Size",
+          "name": "Badge Diameter",
           "values": [
             "44 mm",
             "58 mm"
