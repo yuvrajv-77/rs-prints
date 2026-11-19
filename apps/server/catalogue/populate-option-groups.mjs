@@ -10,6 +10,9 @@
  * Creates missing groups/options; never deletes or edits existing ones.
  * Does not create products, variants, facets, collections, prices, or stock.
  */
+import fs from 'node:fs';
+import path from 'node:path';
+
 if ((process.env.APP_ENV || 'development').toLowerCase() !== 'development') {
   throw new Error('Blocked: APP_ENV must be development in .env.');
 }
@@ -26,10 +29,6 @@ const endpoint = process.env.VENDURE_ADMIN_API_URL ||
 if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: this script only permits a localhost Vendure Admin API.');
 }
-if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
-  throw new Error('Missing superadmin credentials in .env.');
-}
-
 const planPath = path.resolve(process.cwd(), 'catalogue', 'normalized-catalogue-plan.json');
 const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
 const languageCode = 'en';
