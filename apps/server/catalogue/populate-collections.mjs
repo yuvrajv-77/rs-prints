@@ -1,11 +1,36 @@
 /**
  * Idempotently create the RS Prints Vendure collection hierarchy.
  * Run from apps/server:
- *   node --env-file=.env.test catalogue/populate-collections.mjs
+ *   node catalogue/populate-collections.mjs
  *
  * Localhost only. Creates missing collections; never deletes or edits existing
  * collections, products, variants, facets, assets, or option groups.
  */
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Automatically load .env.test or .env if environment variables are not already present
+const candidateEnvFiles = ['.env.test', '.env', '../.env.test', '../.env', 'apps/server/.env.test', 'apps/server/.env'];
+for (const relPath of candidateEnvFiles) {
+  const fullPath = path.resolve(process.cwd(), relPath);
+  if (fs.existsSync(fullPath)) {
+    const raw = fs.readFileSync(fullPath, 'utf8');
+    for (const line of raw.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const idx = trimmed.indexOf('=');
+      if (idx > 0) {
+        const key = trimmed.slice(0, idx).trim();
+        const val = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, '');
+        if (key && !process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+    break;
+  }
+}
+
 const endpoint = process.env.VENDURE_ADMIN_API_URL ||
   `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
 if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
@@ -76,8 +101,8 @@ const unsupported = required.filter(name => !['translations', 'filters'].include
 if (unsupported.length) throw new Error(`Unsupported required collection input fields: ${unsupported.join(', ')}. No collections created.`);
 if (!fieldNames.has('translations')) throw new Error('Collection translations input unavailable.');
 
-const makeInput = (name, slug, parentId) => {
-  const input = { translations: [{ languageCode: 'en', name, slug }] };
+const makeInput = (name, slug, parentId, description = '') => {
+  const input = { translations: [{ languageCode: 'en', name, slug, description: description || `${name} collection.` }] };
   if (fieldNames.has('filters')) input.filters = [];
   if (parentId) {
     if (!fieldNames.has('parentId')) throw new Error('parentId input unavailable; no child collections created.');
