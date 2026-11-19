@@ -5,32 +5,21 @@
  * Run from apps/server:
  *   node catalogue/populate-option-groups.mjs
  *
- * Loads ONLY .env.test. Talks to localhost Admin API only.
+ * Loads ONLY .env when invoked with Node's --env-file=.env flag.
+ * Talks to localhost Admin API only.
  * Creates missing groups/options; never deletes or edits existing ones.
  * Does not create products, variants, facets, collections, prices, or stock.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-
-const envPath = path.resolve(process.cwd(), '.env.test');
-if (!fs.existsSync(envPath)) throw new Error('Missing apps/server/.env.test. No API calls made.');
-for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
-  const trimmed = line.trim();
-  if (!trimmed || trimmed.startsWith('#')) continue;
-  const index = trimmed.indexOf('=');
-  if (index < 1) continue;
-  const key = trimmed.slice(0, index).trim();
-  const value = trimmed.slice(index + 1).trim().replace(/^["']|["']$/g, '');
-  if (key && process.env[key] === undefined) process.env[key] = value;
+if ((process.env.APP_ENV || 'development').toLowerCase() !== 'development') {
+  throw new Error('Blocked: APP_ENV must be development in .env.');
 }
-
-if ((process.env.CATALOGUE_IMPORT_ENV || '').toLowerCase() !== 'development') {
-  throw new Error('Blocked: .env.test must contain CATALOGUE_IMPORT_ENV=development.');
+if (process.env.CATALOGUE_IMPORT_ENV && process.env.CATALOGUE_IMPORT_ENV.toLowerCase() !== 'development') {
+  throw new Error('Blocked: CATALOGUE_IMPORT_ENV must be development.');
 }
-if (process.env.CATALOGUE_TEST_DATABASE_CONFIRMATION !== 'I_CONFIRM_THIS_IS_THE_RS_PRINTS_TEST_DATABASE') {
-  throw new Error('Blocked: .env.test must contain the explicit test database confirmation.');
+if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL. Run with node --env-file=.env.');
+if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
+  throw new Error('Missing Vendure superadmin credentials. Run with node --env-file=.env.');
 }
-if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL in .env.test.');
 
 const endpoint = process.env.VENDURE_ADMIN_API_URL ||
   `http://localhost:${process.env.VENDURE_SERVER_PORT || 3000}/admin-api`;
@@ -38,7 +27,7 @@ if (!/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(endpoint)) {
   throw new Error('Blocked: this script only permits a localhost Vendure Admin API.');
 }
 if (!process.env.SUPERADMIN_USERNAME || !process.env.SUPERADMIN_PASSWORD) {
-  throw new Error('Missing superadmin credentials in .env.test.');
+  throw new Error('Missing superadmin credentials in .env.');
 }
 
 const planPath = path.resolve(process.cwd(), 'catalogue', 'normalized-catalogue-plan.json');
