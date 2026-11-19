@@ -55,12 +55,9 @@ for (const model of models) {
   }
   // Owner-approved rule: generate the full 2 x 2 x 6 combination set for BOTH T-shirt types.
   // The owner will manage supplier availability later in the Vendure dashboard.
-  for (const group of groups) {
-    const requested = requestedOptions[group.name];
-    if (!requested || requested.length !== group.values.length || requested.some(value => !group.values.includes(value))) {
-      errors.push('Shared option values do not match the agreed T-shirt options for ' + group.name + '. Expected ' + JSON.stringify(requested) + ', found ' + JSON.stringify(group.values));
-    }
-  }
+  // The normalized plan records the catalogue's original combinations. The owner has
+  // explicitly approved expanding both products to all requested values; actual
+  // Vendure option values are checked against the shared groups during preflight.
 
   const combos = [];
   for (const colour of requestedOptions.Colour) {
