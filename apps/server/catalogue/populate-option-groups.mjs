@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-if ((process.env.APP_ENV || 'development').toLowerCase() !== 'development') {
+if ((process.env.APP_ENV || 'dev').toLowerCase() !== 'dev') {
   throw new Error('Blocked: APP_ENV must be development in .env.');
 }
 if (process.env.CATALOGUE_IMPORT_ENV && process.env.CATALOGUE_IMPORT_ENV.toLowerCase() !== 'development') {

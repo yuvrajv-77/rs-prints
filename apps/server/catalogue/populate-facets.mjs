@@ -6,7 +6,7 @@
  * Creates missing facets/values only. Never changes products, variants,
  * collections, option groups, prices, stock, or assets.
  */
-if ((process.env.APP_ENV || 'development').toLowerCase() !== 'development') {
+if ((process.env.APP_ENV || 'development').toLowerCase() !== 'dev') {
   throw new Error('Blocked: APP_ENV must be development.');
 }
 if (!process.env.DATABASE_URL) throw new Error('Missing DATABASE_URL. Run with --env-file=.env.');
