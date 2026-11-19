@@ -27,7 +27,7 @@ node --env-file=.env catalogue/populate-parent-products.mjs
 - Assigns product-level Material, Capacity and Dimensions facets only when supported by fixed catalogue information. Selectable choices remain option groups.
 - Writes 4-5 factual bullet points in each product description using the product name, category, RS Prints catalogue references, customization context, and available source specifications.
 - Configures the existing Vendure collections to include the correct products using Vendure's built-in product-ID collection filter. Parent collections include the products of their child collections.
-- Keeps products disabled.
+- Enables every created or reused parent product. Existing disabled products are switched on.
 
 ## What it does NOT do
 
@@ -39,4 +39,4 @@ node --env-file=.env catalogue/populate-parent-products.mjs
 
 The script checks the local Admin API, expected plan size, collection hierarchy, required option groups/values, facets, and built-in collection filter before creating products. If preflight fails, it stops before product writes.
 
-After it completes, check the product list and a few representative products in Vendure Admin. Then we will create variants as a separate step.
+Products will be enabled, but they will not yet be purchasable or have selectable choices until variants, prices and stock are added in the next step.
