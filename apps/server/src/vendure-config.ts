@@ -40,7 +40,14 @@ export const config: VendureConfig = {
         // "https://example.com,https://admin.example.com". An unset value blocks all
         // cross-origin browser requests, which is the safe default.
         cors: {
-            origin: IS_DEV ? true : (process.env.CORS_ORIGINS?.split(',').map(o => o.trim()).filter(Boolean) ?? []),
+            origin: IS_DEV
+                ? true
+                : (process.env.CORS_ORIGINS
+                    ? process.env.CORS_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
+                    : [
+                        'https://rs-prints.y74125.workers.dev',
+                        'https://rs-prints-api.duckdns.org',
+                    ]),
             credentials: true,
         },
         // The following options are useful in development mode,
@@ -60,6 +67,8 @@ export const config: VendureConfig = {
         },
         cookieOptions: {
             secret: process.env.COOKIE_SECRET,
+            sameSite: IS_DEV ? 'lax' : 'none',
+            secure: !IS_DEV,
         },
     },
     dbConnectionOptions: {

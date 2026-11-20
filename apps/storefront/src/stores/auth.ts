@@ -1,6 +1,7 @@
 import { atom } from "nanostores"
 import { getActiveCustomer } from "@/lib/vendure/queries/customers"
 import { logoutCustomer } from "@/lib/vendure/mutations/customers"
+import { clearAuthToken } from "@/lib/vendure/client"
 import type { GetActiveCustomerQuery } from "@/lib/vendure/generated/graphql"
 
 export type ActiveCustomer = NonNullable<GetActiveCustomerQuery["activeCustomer"]>
@@ -48,6 +49,7 @@ export async function signOut(): Promise<boolean> {
   } catch (error) {
     console.error("Failed to log out from Vendure:", error)
   } finally {
+    clearAuthToken()
     $currentUser.set({
       customer: null,
       loading: false,
@@ -56,3 +58,4 @@ export async function signOut(): Promise<boolean> {
   }
   return true
 }
+

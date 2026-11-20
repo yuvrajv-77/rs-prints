@@ -1244,19 +1244,7 @@ export default function Navbar() {
                                                 }
                                             />
                                         </li>
-                                        <li className="pt-2">
-                                            <NavigationMenuLink
-                                                render={
-                                                    <a
-                                                        href="/bulk-order"
-                                                        className="block select-none rounded-lg p-2 text-xs bg-muted/50 border border-border/50 hover:bg-muted"
-                                                    >
-                                                        <span className="font-semibold text-foreground block">Need Custom Bags in Bulk?</span>
-                                                        <span className="text-[11px] text-muted-foreground">Order 40+ units with logo print &rarr;</span>
-                                                    </a>
-                                                }
-                                            />
-                                        </li>
+                                       
                                     </ul>
                                 </div>
 
