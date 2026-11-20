@@ -1,8 +1,12 @@
 ---
-// Redirect /account directly to /account/profile or tab from query param
-const targetSection = Astro.url.searchParams.get("tab") || 
-                      Astro.url.searchParams.get("section") || 
-                      "profile"
+import { isAccountSectionEnabled } from "@/config/account"
+
+// Redirect /account directly to /account/profile or tab from query param (if enabled)
+const rawSection = Astro.url.searchParams.get("tab") || 
+                   Astro.url.searchParams.get("section") || 
+                   "profile"
+
+const targetSection = isAccountSectionEnabled(rawSection) ? rawSection : "profile"
 
 return Astro.redirect(`/account/${targetSection}`)
 ---

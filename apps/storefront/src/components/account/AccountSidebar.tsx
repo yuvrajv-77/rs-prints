@@ -12,6 +12,17 @@ import {
   Award,
   ChevronRight,
 } from "lucide-react"
+import {
+  HIDE_ACCOUNT_EXTRA_SECTIONS,
+  ACCOUNT_FEATURE_FLAGS,
+  isAccountSectionEnabled,
+} from "@/config/account"
+
+export {
+  HIDE_ACCOUNT_EXTRA_SECTIONS,
+  ACCOUNT_FEATURE_FLAGS,
+  isAccountSectionEnabled,
+}
 
 export interface NavItem {
   id: string
@@ -21,7 +32,7 @@ export interface NavItem {
   badge?: number | string
 }
 
-export const ACCOUNT_NAV_ITEMS: NavItem[] = [
+export const ALL_ACCOUNT_NAV_ITEMS: NavItem[] = [
   {
     id: "orders",
     label: "Order History",
@@ -72,6 +83,10 @@ export const ACCOUNT_NAV_ITEMS: NavItem[] = [
     icon: Award,
   },
 ]
+
+export const ACCOUNT_NAV_ITEMS: NavItem[] = ALL_ACCOUNT_NAV_ITEMS.filter((item) =>
+  isAccountSectionEnabled(item.id)
+)
 
 interface AccountSidebarProps {
   currentSection: string

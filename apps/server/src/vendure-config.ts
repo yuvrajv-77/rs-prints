@@ -10,8 +10,13 @@ import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@ven
 // import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import path from 'path';
+
+// Explicitly load .env from apps/server/.env regardless of where the command is executed
+dotenv.config({ path: process.env.ENV_FILE || path.join(__dirname, '../.env.test') });
+dotenv.config();
+
 import { AssetServerPlugin, configureS3AssetStorage } from '@vendure/asset-server-plugin';
 
 import { RazorpayPlugin } from './plugins/razorpay/razorpay.plugin';

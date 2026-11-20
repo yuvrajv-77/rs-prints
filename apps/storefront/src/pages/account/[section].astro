@@ -8,8 +8,14 @@ import ConnectedAccountsView from "@/components/account/ConnectedAccountsView"
 import ChangePasswordView from "@/components/account/ChangePasswordView"
 import AddressesView from "@/components/account/AddressesView"
 import RewardHistoryView from "@/components/account/RewardHistoryView"
+import { isAccountSectionEnabled } from "@/config/account"
 
 const { section = "profile" } = Astro.params
+
+// If a hidden section is requested directly, redirect to profile
+if (!isAccountSectionEnabled(section)) {
+  return Astro.redirect("/account/profile")
+}
 
 // Titles map
 const titles: Record<string, string> = {
@@ -35,10 +41,10 @@ const pageTitle = titles[section] || "My Account | RS Prints"
 <AccountLayout currentSection={section} title={pageTitle}>
   {section === "profile" && <ProfileView client:load />}
   {(section === "orders" || section === "order-history") && <OrdersView client:load />}
-  {(section === "creations" || section === "saved-creation") && <SavedCreationsView client:load />}
-  {(section === "coupons" || section === "saved-coupon") && <SavedCouponsView client:load />}
-  {section === "connected-accounts" && <ConnectedAccountsView client:load />}
+  {isAccountSectionEnabled("creations") && (section === "creations" || section === "saved-creation") && <SavedCreationsView client:load />}
+  {isAccountSectionEnabled("coupons") && (section === "coupons" || section === "saved-coupon") && <SavedCouponsView client:load />}
+  {isAccountSectionEnabled("connected-accounts") && section === "connected-accounts" && <ConnectedAccountsView client:load />}
   {(section === "change-password" || section === "password") && <ChangePasswordView client:load />}
   {(section === "addresses" || section === "address-book") && <AddressesView client:load />}
-  {(section === "rewards" || section === "reward-history") && <RewardHistoryView client:load />}
+  {isAccountSectionEnabled("rewards") && (section === "rewards" || section === "reward-history") && <RewardHistoryView client:load />}
 </AccountLayout>

@@ -21,7 +21,7 @@ services:
     #     environment:
     #         POSTGRES_DB: vendure
     #         POSTGRES_USER: vendure
-    #         POSTGRES_PASSWORD: v89gt6XIAlDX6P7vwKCrgg
+    #         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your shell or .env}
     #     labels:
     #         - "io.vendure.create.name=try-third-next"
 
@@ -30,10 +30,10 @@ services:
         volumes:
             - mysql_db_data:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: 'ROOT'
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in your shell or .env}
             MYSQL_DATABASE: vendure
             MYSQL_USER: vendure
-            MYSQL_PASSWORD: v89gt6XIAlDX6P7vwKCrgg
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in your shell or .env}
         ports:
             - "4306:3306"
         labels:
@@ -44,10 +44,10 @@ services:
         volumes:
             - mariadb_db_data:/var/lib/mysql
         environment:
-            MARIADB_ROOT_PASSWORD: 'ROOT'
+            MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?Set MARIADB_ROOT_PASSWORD in your shell or .env}
             MARIADB_DATABASE: vendure
             MARIADB_USER: vendure
-            MARIADB_PASSWORD: v89gt6XIAlDX6P7vwKCrgg
+            MARIADB_PASSWORD: ${MARIADB_PASSWORD:?Set MARIADB_PASSWORD in your shell or .env}
         ports:
             - "3306:3306"
         labels:
@@ -71,7 +71,7 @@ services:
     # To run the typesense container run "docker compose up -d typesense"
     typesense:
         image: typesense/typesense:27.0
-        command: [ '--data-dir', '/data', '--api-key', 'SuperSecret' ]
+        command: [ '--data-dir', '/data', '--api-key', '${TYPESENSE_API_KEY:?Set TYPESENSE_API_KEY in your shell or .env}' ]
         ports:
             - "8208:8108"
         volumes:
