@@ -212,12 +212,19 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
         const firstName = spaceIdx > -1 ? trimmedName.slice(0, spaceIdx) : trimmedName
         const lastName = spaceIdx > -1 ? trimmedName.slice(spaceIdx + 1).trim() : ""
 
+        const rawPhone = value.phone ? value.phone.replace(/\D/g, "") : ""
+        const cleanPhone =
+          rawPhone.length === 12 && rawPhone.startsWith("91")
+            ? rawPhone.slice(2)
+            : rawPhone
+        const formattedPhone = cleanPhone ? `+91 ${cleanPhone}` : undefined
+
         const data = await registerCustomer({
           emailAddress: value.email.trim().toLowerCase(),
           password: value.password,
           firstName,
           lastName: lastName || undefined,
-          phoneNumber: value.phone?.trim() || undefined,
+          phoneNumber: formattedPhone,
         })
 
         const result = data.registerCustomerAccount
@@ -929,22 +936,28 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
                 </signUpForm.Field>
 
                 {/* Continue to Step 2 Button */}
-                <Button
-                  type="button"
-                  size="lg"
-                  disabled={isCheckingEmail || !signUpForm.getFieldValue("agreeTerms")}
-                  onClick={handleStep1Continue}
-                  className="w-full h-10 mt-2 text-xs sm:text-sm font-semibold rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                <signUpForm.Subscribe
+                  selector={(state) => [state.values.agreeTerms]}
                 >
-                  {isCheckingEmail ? (
-                    <span className="inline-flex items-center gap-2">
-                      <Spinner className="size-4 text-primary-foreground" />
-                      <span>Checking email...</span>
-                    </span>
-                  ) : (
-                    "Continue"
+                  {([agreeTerms]) => (
+                    <Button
+                      type="button"
+                      size="lg"
+                      disabled={isCheckingEmail || !agreeTerms}
+                      onClick={handleStep1Continue}
+                      className="w-full h-10 mt-2 text-xs sm:text-sm font-semibold rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isCheckingEmail ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Spinner className="size-4 text-primary-foreground" />
+                          <span>Checking email...</span>
+                        </span>
+                      ) : (
+                        "Continue"
+                      )}
+                    </Button>
                   )}
-                </Button>
+                </signUpForm.Subscribe>
               </div>
             )}
 
@@ -1004,9 +1017,13 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
                   name="phone"
                   validators={{
                     onChange: ({ value }) => {
-                      if (!value.trim()) return "Phone number is required."
-                      if (!/^[0-9+-\s()]{7,20}$/.test(value.trim())) {
-                        return "Please enter a valid phone number (e.g. +91 98765 43210)."
+                      const digits = (value || "").replace(/\D/g, "")
+                      if (!digits) return "Phone number is required."
+                      if (digits.length !== 10) {
+                        return "Please enter a valid 10-digit mobile number."
+                      }
+                      if (!/^[6-9]\d{9}$/.test(digits)) {
+                        return "Please enter a valid Indian mobile number starting with 6, 7, 8, or 9."
                       }
                       return undefined
                     },
@@ -1020,20 +1037,34 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
                           Phone Number
                         </Label>
                         <InputGroup className="h-10 rounded-xl bg-input/40 border border-border/80">
-                          <InputGroupAddon align="inline-start">
+                          <InputGroupAddon
+                            align="inline-start"
+                            className="px-3 border-r border-border/60 bg-muted/20 flex items-center gap-1.5"
+                          >
                             <Phone className="size-4 text-muted-foreground" />
+                            <span className="text-xs font-semibold text-muted-foreground select-none">
+                              +91
+                            </span>
                           </InputGroupAddon>
                           <InputGroupInput
                             id="signup-phone"
                             name={field.name}
                             type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            placeholder="+91 98765 43210"
-                            autoComplete="tel"
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/\D/g, "")
+                              if (val.length === 12 && val.startsWith("91")) {
+                                val = val.slice(2)
+                              }
+                              field.handleChange(val.slice(0, 10))
+                            }}
+                            placeholder="98765 43210"
+                            autoComplete="tel-national"
                             aria-invalid={!!error}
-                            className="text-xs sm:text-sm"
+                            className="text-xs sm:text-sm pl-3"
                           />
                         </InputGroup>
                         {error && (

@@ -37,6 +37,7 @@ import {
   InputGroupInput,
   InputGroupButton,
 } from "../ui/input-group"
+import { isAccountSectionEnabled } from "@/config/account"
 
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
@@ -139,12 +140,14 @@ export default function MobileNav() {
                         <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                       </a>
 
-                      <a
-                        href="/account/creations"
-                        className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
-                      >
-                        My Favorites
-                      </a>
+                      {isAccountSectionEnabled("creations") && (
+                        <a
+                          href="/account/creations"
+                          className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
+                        >
+                          My Favorites
+                        </a>
+                      )}
 
                       <a
                         href="/account/orders"

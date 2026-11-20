@@ -43,14 +43,23 @@ export default function ProfileView() {
   }, [initialized])
 
   // Parse phone and names from customer
+  const sanitizePhone = (phone?: string | null) => {
+    if (!phone) return ""
+    let raw = phone.trim()
+    if (raw.startsWith("+91")) {
+      raw = raw.slice(3).trim()
+    }
+    const digits = raw.replace(/\D/g, "")
+    if (digits.length === 12 && digits.startsWith("91")) {
+      return digits.slice(2)
+    }
+    return digits.slice(0, 10)
+  }
+
   const initialFirstName = customer?.firstName || ""
   const initialLastName = customer?.lastName || ""
   const initialEmail = customer?.emailAddress || ""
-  const initialPhone = customer?.phoneNumber
-    ? customer.phoneNumber.startsWith("+91")
-      ? customer.phoneNumber.replace("+91", "").trim()
-      : customer.phoneNumber
-    : ""
+  const initialPhone = sanitizePhone(customer?.phoneNumber)
 
   const form = useForm({
     defaultValues: {
@@ -62,11 +71,12 @@ export default function ProfileView() {
     onSubmit: async ({ value }) => {
       setIsSaving(true)
       try {
-        const formattedPhone = value.phoneNumber.trim()
-          ? value.phoneNumber.trim().startsWith("+")
-            ? value.phoneNumber.trim()
-            : `+91 ${value.phoneNumber.trim()}`
-          : undefined
+        const rawDigits = value.phoneNumber ? value.phoneNumber.replace(/\D/g, "") : ""
+        const cleanDigits =
+          rawDigits.length === 12 && rawDigits.startsWith("91")
+            ? rawDigits.slice(2)
+            : rawDigits.slice(0, 10)
+        const formattedPhone = cleanDigits ? `+91 ${cleanDigits}` : undefined
 
         const res = await updateCustomerProfile({
           firstName: value.firstName.trim(),
@@ -109,10 +119,7 @@ export default function ProfileView() {
   // Synchronize form when customer data loads or changes
   useEffect(() => {
     if (customer) {
-      let rawPhone = customer.phoneNumber || ""
-      if (rawPhone.startsWith("+91")) {
-        rawPhone = rawPhone.replace("+91", "").trim()
-      }
+      const rawPhone = sanitizePhone(customer.phoneNumber)
 
       let fName = customer.firstName || ""
       let lName = customer.lastName || ""
@@ -281,8 +288,13 @@ export default function ProfileView() {
                   name="phoneNumber"
                   validators={{
                     onChange: ({ value }) => {
-                      if (value && !/^[0-9\s-]{7,15}$/.test(value)) {
-                        return "Please enter a valid phone number (digits only)."
+                      if (!value?.trim()) return undefined
+                      const digits = value.replace(/\D/g, "")
+                      if (digits.length !== 10) {
+                        return "Please enter a valid 10-digit mobile number."
+                      }
+                      if (!/^[6-9]\d{9}$/.test(digits)) {
+                        return "Please enter a valid Indian mobile number starting with 6, 7, 8, or 9."
                       }
                       return undefined
                     },
@@ -313,11 +325,17 @@ export default function ProfileView() {
                             id={field.name}
                             name={field.name}
                             type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(e) =>
-                              field.handleChange(e.target.value)
-                            }
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/\D/g, "")
+                              if (val.length === 12 && val.startsWith("91")) {
+                                val = val.slice(2)
+                              }
+                              field.handleChange(val.slice(0, 10))
+                            }}
                             placeholder="Enter 10-digit number"
                             aria-invalid={!!error}
                             className="text-xs sm:text-sm pl-3"
