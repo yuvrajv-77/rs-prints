@@ -1,6 +1,14 @@
 ---
 import Layout from "@/layouts/main.astro"
 import CartView from "@/components/cart/CartView"
+import { setPrivateNoCache } from "@/lib/cache"
+
+// ============================================================================
+// PRIVATE NO-CACHE
+// Shopping cart contains user-specific order state and active session lines.
+// Must never be cached on shared CDN edges.
+// ============================================================================
+setPrivateNoCache(Astro.response)
 ---
 
 <Layout

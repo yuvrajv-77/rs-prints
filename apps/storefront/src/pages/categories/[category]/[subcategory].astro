@@ -1,0 +1,110 @@
+---
+import Layout from "@/layouts/main.astro"
+import { getSubcategoryBySlug } from "@/lib/catalog"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
+import MinimalProductCard from "@/components/product/MinimalProductCard.astro"
+
+// ============================================================================
+// CLOUDFLARE EDGE CACHING
+// - s-maxage=300 (5 min): Caches subcategory page at Cloudflare edge nodes.
+// ============================================================================
+setEdgeCache(Astro.response, CACHE_PRESETS.CATALOG)
+import CategoryHeader from "@/components/category/CategoryHeader.astro"
+import SiblingSubcategoryPills from "@/components/category/SiblingSubcategoryPills.astro"
+import CategoryProductSort from "@/components/category/CategoryProductSort.astro"
+import { ShieldCheck, Clock, Sparkles } from "lucide-react"
+
+const { category: parentSlug, subcategory: subSlug } = Astro.params
+
+const result = await getSubcategoryBySlug(parentSlug!, subSlug!)
+if (!result) {
+  return Astro.redirect("/404")
+}
+
+const { parentCategory, subcategory, siblingSubcategories } = result
+
+const breadcrumbs = [
+  { title: "Home", href: "/" },
+  { title: "Categories", href: "/categories" },
+  { title: parentCategory.title, href: `/categories/${parentCategory.id}` },
+  { title: subcategory.title },
+]
+
+const parentBacktrack = {
+  title: parentCategory.title,
+  href: `/categories/${parentCategory.id}`,
+  count: parentCategory.totalCount,
+}
+---
+
+<Layout
+  title={`${subcategory.title} - ${parentCategory.title} Custom Prints - RS Prints`}
+  description={subcategory.description || `Browse custom ${subcategory.title.toLowerCase()} from RS Prints. High-definition personalized prints with doorstep delivery across India.`}
+  canonicalUrl={`/categories/${parentCategory.id}/${subcategory.id}`}
+  currentActive="categories"
+>
+  <!-- Category Header with Breadcrumbs & Parent Backtrack -->
+  <CategoryHeader
+    title={subcategory.title}
+    description={subcategory.description}
+    totalCount={subcategory.count}
+    breadcrumbs={breadcrumbs}
+    parentBacktrack={parentBacktrack}
+  />
+
+  <div class="container mx-auto px-4 py-6 md:py-8 space-y-6">
+    <!-- Sticky Sibling Navigation Pills (Single Clean Pill Selector) -->
+    <SiblingSubcategoryPills
+      parentSlug={parentCategory.id}
+      parentTitle={parentCategory.title}
+      parentCount={parentCategory.totalCount}
+      subcategories={siblingSubcategories}
+      currentActiveSlug={subcategory.id}
+    />
+
+    <!-- Interactive Sort Bar -->
+    <CategoryProductSort
+      totalCount={subcategory.count}
+      gridContainerId="subcategory-products-container"
+    />
+
+    <!-- Full-Width Responsive Products Grid -->
+    <div
+      id="subcategory-products-container"
+      class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-5"
+    >
+      {subcategory.products.map((item) => (
+        <MinimalProductCard
+          product={item}
+          parentCategorySlug={parentCategory.id}
+          categorySlug={subcategory.id}
+        />
+      ))}
+    </div>
+
+    <!-- Trust Badges & Production Guarantees -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 border-t border-border/60">
+      <div class="flex items-center gap-3 p-3.5 rounded-xl border border-border/60 bg-card">
+        <Sparkles className="size-5 text-primary shrink-0" />
+        <div>
+          <h4 class="text-xs font-bold text-foreground">HD Photo Clarity</h4>
+          <p class="text-[11px] text-muted-foreground">Fade-resistant prints</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 p-3.5 rounded-xl border border-border/60 bg-card">
+        <Clock className="size-5 text-primary shrink-0" />
+        <div>
+          <h4 class="text-xs font-bold text-foreground">Fast Dispatch</h4>
+          <p class="text-[11px] text-muted-foreground">Dispatched in 24–48 hours</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 p-3.5 rounded-xl border border-border/60 bg-card">
+        <ShieldCheck className="size-5 text-primary shrink-0" />
+        <div>
+          <h4 class="text-xs font-bold text-foreground">Safe Packaging</h4>
+          <p class="text-[11px] text-muted-foreground">Triple-layer transit box</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

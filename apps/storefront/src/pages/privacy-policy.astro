@@ -1,212 +1,348 @@
 ---
 import Layout from "@/layouts/main.astro";
+import brandConfig from "@/data/brandConfig.json";
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache";
+
+// CLOUDFLARE EDGE CACHING: Legal privacy policy cached at edge for 1 hour
+setEdgeCache(Astro.response, CACHE_PRESETS.MARKETING);
+
+const { brand, contact } = brandConfig;
 ---
 
 <Layout 
-  title="Privacy Policy (Draft) - RS Prints"
-  description="Privacy policy, user data collection rules, cookie usage, GDPR/CCPA rights, and data protection terms."
+  title={`Privacy Policy - ${brand.name}`}
+  description={`Official Privacy Policy for ${brand.name}. Learn how we protect personal information, custom print artwork, payment security, and consumer data rights under the Digital Personal Data Protection Act (DPDP Act, 2023) and Indian IT Laws.`}
   canonicalUrl="/privacy-policy"
   currentActive="privacy"
 >
   <main class="container mx-auto px-4 py-8 md:py-12 max-w-4xl flex-1 flex flex-col gap-8">
     <!-- Header Section -->
     <div class="border-b border-border pb-6">
-      <div class="flex flex-wrap items-center gap-2 mb-3">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          Dummy / Placeholder Document
-        </span>
-        <span class="text-xs text-muted-foreground font-mono">
-          Last updated: February 13, 2026 (Draft)
-        </span>
-      </div>
-
       <h1 class="text-2xl md:text-4xl font-heading font-bold tracking-tight text-foreground">
-        Privacy Policy
+        Privacy Policy & Data Protection
       </h1>
-      <p class="text-sm text-muted-foreground mt-2 leading-relaxed">
-        Learn how we handle, collect, safeguard, and process your personal data and protect your privacy rights.
+      <p class="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed text-justify">
+        {brand.name} ({brand.legalName}) is committed to safeguarding your personal data, custom print designs, and digital privacy in strict compliance with the Digital Personal Data Protection Act (DPDP Act, 2023), the Information Technology Act, 2000, and Indian E-Commerce Regulations.
       </p>
     </div>
 
-    <!-- Dummy Flag / Draft Notice Banner -->
-    <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 dark:bg-amber-950/20 p-4 md:p-5 flex gap-4 text-amber-950 dark:text-amber-200">
-      <div class="shrink-0 mt-0.5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-      </div>
-      <div class="space-y-1 text-xs md:text-sm leading-relaxed">
-        <p class="font-semibold text-foreground">
-          Notice: Placeholder / Sample Document (Pending Formal Execution)
-        </p>
-        <p class="text-muted-foreground">
-          This Privacy Policy is an illustrative draft template prepared for staging, demonstration, and layout purposes. All original third-party brand names, domains, and entity identifiers have been sanitized and replaced with standardized placeholders (e.g., <code class="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-foreground">[Company Name]</code>, <code class="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-foreground">[https://yourwebsite.com]</code>). This draft is subject to formal customization and legal validation prior to final adoption.
-        </p>
-      </div>
-    </div>
-
     <!-- Privacy Policy Content -->
-    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-8 font-sans">
+    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-9 font-sans text-justify">
       
-      <!-- Introduction & Scope -->
+      <!-- Section 1: Introduction & Data Fiduciary Details -->
       <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>1.</span> Introduction & Data Fiduciary Details
+        </h2>
         <p>
-          At <span class="font-medium text-foreground">[Company Name]</span>, accessible from <span class="text-primary font-medium">[https://yourwebsite.com]</span>, one of our main priorities is the privacy of our visitors. This Privacy Policy document outlines the categories of information that are collected and recorded by <span class="font-medium text-foreground">[Company Name]</span> and explains how we handle, process, and protect it.
+          This Privacy Policy governs the collection, processing, storage, and protection of personal data by 
+          <strong class="text-foreground">{brand.legalName}</strong> (operating under the brand name 
+          <strong class="text-foreground">{brand.name}</strong>, hereinafter referred to as "we", "us", "our", or "RS Prints"), 
+          having its principal facility and office at {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India.
         </p>
         <p>
-          This Privacy Policy applies solely to our online activities and is valid for visitors to our website with respect to the information that they share and/or collect on <span class="font-medium text-foreground">[https://yourwebsite.com]</span>. This policy is not applicable to any information collected offline or via channels other than this website.
+          Under the provisions of the <em>Digital Personal Data Protection Act, 2023</em> ("DPDP Act") and the 
+          <em>Information Technology Act, 2000</em> read with the <em>Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011</em> ("SPDI Rules"), 
+          RS Prints functions as a <strong>Data Fiduciary</strong> in relation to the personal data you entrust to us when visiting our website, creating an account, ordering custom apparel or merchandise, or interacting with our customer care representatives.
         </p>
         <p>
-          If you have additional questions or require further information regarding our privacy practices, please contact us at <a href="mailto:privacy@yourdomain.com" class="text-primary hover:underline font-mono">[privacy@yourdomain.com]</a>.
+          By accessing <a href={brand.siteUrl} class="text-primary hover:underline font-mono">{brand.siteUrl}</a> (the "Platform"), initiating orders, or uploading digital print assets, you acknowledge that you have read, understood, and consented to the data practices described in this Policy.
         </p>
       </section>
 
-      <!-- Section 1: Consent -->
+      <!-- Section 2: Statutory Compliance & Legal Framework -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>1.</span> Consent
+          <span>2.</span> Statutory Legal Framework
         </h2>
         <p>
-          By accessing and using our website, you hereby consent to our Privacy Policy and agree to the collection and handling of your data in accordance with its terms.
-        </p>
-      </section>
-
-      <!-- Section 2: Information We Collect -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>2.</span> Information We Collect
-        </h2>
-        <p>
-          The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point of request:
+          This policy is formulated in adherence to Indian legal and regulatory mandates, including without limitation:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
-          <li>
-            <strong class="text-foreground">Direct Inquiries & Customer Support:</strong> If you contact us directly via email, contact forms, or phone, we may receive additional information about you such as your name, email address, phone number, delivery address, the contents of your message, any design file attachments or images you provide, and any other details you choose to share.
-          </li>
-          <li>
-            <strong class="text-foreground">Account Registration & Ordering:</strong> When you register for an Account or place a customized print order, we may collect your contact and billing details, including your full name, business or entity name, shipping address, billing address, phone number, and email address.
-          </li>
-          <li>
-            <strong class="text-foreground">Custom Artwork & Uploaded Graphics:</strong> Photos, graphics, logos, and custom printing specifications provided by you to fulfill personalized print merchandise orders.
-          </li>
+          <li>The <strong>Digital Personal Data Protection Act, 2023 (DPDP Act, 2023)</strong>;</li>
+          <li>The <strong>Information Technology Act, 2000</strong> (IT Act) and applicable amendments;</li>
+          <li>The <strong>Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011</strong>;</li>
+          <li>The <strong>Consumer Protection Act, 2019</strong> and the <strong>Consumer Protection (E-Commerce) Rules, 2020</strong>;</li>
+          <li>Applicable directives issued by the <strong>Reserve Bank of India (RBI)</strong> regarding digital payments and online card data tokenization.</li>
         </ul>
       </section>
 
-      <!-- Section 3: How We Use Your Information -->
+      <!-- Section 3: Categories of Data We Collect -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>3.</span> How We Use Your Information
+          <span>3.</span> Categories of Personal Data We Collect
         </h2>
         <p>
-          We utilize the information collected for various legitimate business purposes, including to:
+          We collect only such information as is reasonably necessary to provide our customized print and merchandise services:
         </p>
-        <ul class="list-disc pl-5 space-y-1.5">
-          <li>Provide, operate, manufacture, and maintain our products and website;</li>
-          <li>Process customer transactions, custom merchandise printing, and manage shipments;</li>
-          <li>Improve, personalize, optimize, and expand our website user experience;</li>
-          <li>Understand and analyze how visitors interact with our website and product catalogs;</li>
-          <li>Develop new customized print offerings, services, features, and site capabilities;</li>
-          <li>Communicate with you directly or through our authorized customer service partners to provide order updates, delivery tracking, and transactional notices;</li>
-          <li>Send administrative notices, order confirmation emails, and optional marketing promotions (subject to your opt-out preferences);</li>
-          <li>Detect, mitigate, and prevent fraudulent transactions, spam, and security incidents.</li>
-        </ul>
-      </section>
-
-      <!-- Section 4: Log Files -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>4.</span> Log Files & Analytics
-        </h2>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span> follows a standard procedure of utilizing server log files. These files log visitors when they access websites. All hosting providers perform this as part of standard infrastructure hosting analytics.
-        </p>
-        <p>
-          Information collected by log files includes internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamps, referring/exit pages, and click counts. This data is not linked to any personally identifiable information and is used exclusively for evaluating visitor trends, administering the site, tracking aggregate movements, and gathering demographic statistics.
-        </p>
-      </section>
-
-      <!-- Section 5: Third-Party Privacy Policies & Cookies -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>5.</span> Third-Party Privacy Policies & Cookies
-        </h2>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span>’s Privacy Policy does not apply to external advertisers, payment gateways, logistics partners, or linked websites. We strongly advise consulting the respective privacy policies of these third-party services for comprehensive information regarding their data practices and opt-out procedures.
-        </p>
-        <p>
-          You have the ability to disable or manage cookies via your individual browser settings. Detailed guidance on cookie management across specific web browsers can be reviewed at your browser's official support documentation.
-        </p>
-      </section>
-
-      <!-- Section 6: CCPA Privacy Rights -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>6.</span> CCPA Privacy Rights (Do Not Sell My Personal Information)
-        </h2>
-        <p>
-          Under the California Consumer Privacy Act (CCPA) and equivalent privacy frameworks, consumers have specific statutory protections, including:
-        </p>
-        <ul class="list-disc pl-5 space-y-1.5">
-          <li>The right to request that a business disclose the categories and specific pieces of personal data collected about consumers;</li>
-          <li>The right to request that a business delete any personal data collected about the consumer;</li>
-          <li>The right to request that a business that sells a consumer's personal data does not sell that consumer's personal data (we do not sell user personal data).</li>
-        </ul>
-        <p>
-          If you submit a verifiable request, we will respond within one (1) month. To exercise any of these statutory rights, please reach out to us at our designated privacy contact.
-        </p>
-      </section>
-
-      <!-- Section 7: GDPR Data Protection Rights -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>7.</span> GDPR Data Protection Rights
-        </h2>
-        <p>
-          We are committed to ensuring you are fully cognizant of all your data protection entitlements. Every qualifying user is entitled to:
-        </p>
-        <ul class="list-disc pl-5 space-y-1.5">
-          <li><strong class="text-foreground">The right to access:</strong> You have the right to request copies of your personal data records.</li>
-          <li><strong class="text-foreground">The right to rectification:</strong> You have the right to request correction of inaccurate data or completion of incomplete information.</li>
-          <li><strong class="text-foreground">The right to erasure:</strong> You have the right to request deletion of your personal data, subject to statutory record-keeping constraints.</li>
-          <li><strong class="text-foreground">The right to restrict processing:</strong> You have the right to request restriction on how your personal data is processed under qualifying conditions.</li>
-          <li><strong class="text-foreground">The right to object to processing:</strong> You have the right to object to our processing of your personal data under certain conditions.</li>
-          <li><strong class="text-foreground">The right to data portability:</strong> You have the right to request the transfer of your collected data to another organization or directly to you in a structured format.</li>
-        </ul>
-        <p>
-          Upon receiving a request, we have thirty (30) days to furnish a response. If you wish to exercise any of these rights, please contact our privacy compliance desk.
-        </p>
-      </section>
-
-      <!-- Section 8: Children's Information -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>8.</span> Protection of Children's Information
-        </h2>
-        <p>
-          Protecting minors while using the internet is a fundamental priority. We encourage parents and guardians to monitor, participate in, and guide their children's online browsing.
-        </p>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span> does not knowingly collect any personally identifiable information from children under the age of 13. If you believe that your child has inadvertently provided personal information on our website, we urge you to contact us immediately, and we will take expeditious measures to promptly purge such data from our records.
-        </p>
-      </section>
-
-      <!-- Section 9: Privacy Contact & Grievances -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>9.</span> Privacy Contact & Inquiries
-        </h2>
-        <div class="p-4 rounded-xl border border-border bg-card/60 space-y-1.5 text-xs md:text-sm">
-          <p><span class="font-semibold text-foreground">Data Privacy Desk:</span> [Privacy & Compliance Team]</p>
-          <p><span class="font-semibold text-foreground">Email:</span> <a href="mailto:privacy@yourdomain.com" class="text-primary hover:underline font-mono">[privacy@yourdomain.com]</a></p>
-          <p><span class="font-semibold text-foreground">Mailing Address:</span> [Registered Office Address, City, State, PIN Code, Country]</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div class="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2">
+            <h3 class="font-semibold text-foreground text-sm flex items-center gap-2">
+              <span class="size-2 rounded-full bg-primary inline-block"></span>
+              A. Contact & Identity Information
+            </h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">
+              Full name, shipping address, billing address, postal PIN code, contact phone number, WhatsApp contact handle, and email address (<code class="text-xs bg-muted px-1 py-0.5 rounded font-mono text-foreground">{contact.email.support}</code>).
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2">
+            <h3 class="font-semibold text-foreground text-sm flex items-center gap-2">
+              <span class="size-2 rounded-full bg-primary inline-block"></span>
+              B. Custom Artwork & Digital Assets
+            </h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">
+              Photographs, vector artwork, logos, graphic design files, custom slogans, print dimensions, apparel sizing, and color specifications uploaded to fulfill personalized merchandise orders.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2">
+            <h3 class="font-semibold text-foreground text-sm flex items-center gap-2">
+              <span class="size-2 rounded-full bg-primary inline-block"></span>
+              C. Transaction & Invoicing Data
+            </h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">
+              Order history, transaction reference IDs, date and time of order, invoice copies, and Goods and Services Tax Identification Number (GSTIN) when requested for business tax invoicing.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2">
+            <h3 class="font-semibold text-foreground text-sm flex items-center gap-2">
+              <span class="size-2 rounded-full bg-primary inline-block"></span>
+              D. Technical & Device Metadata
+            </h3>
+            <p class="text-xs text-muted-foreground leading-relaxed">
+              Internet Protocol (IP) addresses, browser type, device operating system, referring URLs, screen resolution, and session cookies required to manage your shopping cart state.
+            </p>
+          </div>
         </div>
+      </section>
+
+      <!-- Section 4: Customer Artwork & Intellectual Property Protection -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>4.</span> Protection of Uploaded Artwork, Graphics & Photographs
+        </h2>
+        <p>
+          Because {brand.name} specializes in custom printing, photo gifts, and corporate apparel, we maintain stringent confidentiality standards regarding customer files:
+        </p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong class="text-foreground">Strict Purpose Limitation:</strong> Any photos, corporate logos, text, or artwork uploaded to our systems are used solely for proof review, pre-flight inspection, manufacturing, and quality-control inspection of your ordered items.
+          </li>
+          <li>
+            <strong class="text-foreground">No Resale or Public Exploitation:</strong> We will <em>never</em> sell, license, publicly display, or distribute your private photos, personal family portraits, or proprietary corporate graphics to third parties or marketing platforms without your prior explicit written authorization.
+          </li>
+          <li>
+            <strong class="text-foreground">Customer Responsibility & Warranties:</strong> By submitting or uploading artwork, images, or logos, you warrant that you are the lawful owner or authorized licensee of the intellectual property and that the material does not infringe third-party copyrights, registered trademarks, or applicable Indian laws.
+          </li>
+          <li>
+            <strong class="text-foreground">Retention & File Purging:</strong> Print-ready files are retained temporarily in encrypted production queues to facilitate potential reprints, defect reviews, or customer-requested re-orders, after which they are routinely archived and securely purged.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Exclusion of Sensitive Financial Data (Payment Security) -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>5.</span> Payment Security & Non-Storage of Financial Data
+        </h2>
+        <div class="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-2 text-foreground">
+          <p class="font-semibold text-sm flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            RBI & PCI-DSS Compliant Payment Infrastructure
+          </p>
+          <p class="text-xs text-muted-foreground leading-relaxed">
+            {brand.name} does <strong>not</strong> collect, process, or store your debit/credit card numbers, CVV codes, net-banking passwords, or UPI PINs on its servers. All payments are handled directly through Reserve Bank of India (RBI) authorized payment aggregators operating under PCI-DSS Level 1 certification. Tokenization guidelines mandated by the RBI are strictly followed by our integrated payment partners.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 6: Purpose of Processing -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>6.</span> Purpose of Data Processing (Lawful Grounds)
+        </h2>
+        <p>
+          Under Section 4 and Section 6 of the DPDP Act, 2023, RS Prints processes your personal data strictly for lawful purposes under explicit consent or legitimate uses:
+        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li><strong>Order Execution & Manufacturing:</strong> Creating mockups, printing physical merchandise, sizing validation, and custom apparel stitching;</li>
+          <li><strong>Fulfillment & Logistics:</strong> Sharing shipping labels, consignee names, and contact phone numbers with authorized courier partners for doorstep delivery;</li>
+          <li><strong>Order Communications:</strong> Dispatching real-time order confirmation, invoices, production proofs, and tracking links via email or WhatsApp;</li>
+          <li><strong>Statutory & Tax Accounting:</strong> Generating GST tax invoices, maintaining financial records, and filing statutory tax returns as required under Indian taxation statutes;</li>
+          <li><strong>Customer Support:</strong> Resolving pre-sales inquiries, artwork approval questions, order status checks, and return or replacement claims;</li>
+          <li><strong>Platform Integrity:</strong> Protecting against identity theft, malicious attacks, fraudulent payments, and violations of our Terms of Service.</li>
+        </ul>
+      </section>
+
+      <!-- Section 7: Third-Party Data Disclosures -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>7.</span> Third-Party Disclosures & Data Sharing
+        </h2>
+        <p>
+          We share personal information strictly on a need-to-know basis with trusted service partners under contractual confidentiality obligations:
+        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li><strong>Logistics & Courier Aggregators:</strong> Established logistics carriers (e.g., Delhivery, BlueDart, Shiprocket, DTDC, India Post) receive your name, address, and mobile number exclusively to effect physical delivery;</li>
+          <li><strong>Payment Processors:</strong> RBI-licensed payment gateways for transaction authorization, fraud screening, and processing customer refunds;</li>
+          <li><strong>Cloud & Hosting Infrastructure:</strong> Cloud hosting, encrypted database providers, and automated transactional email servers for reliable platform availability;</li>
+          <li><strong>Legal & Regulatory Authorities:</strong> We may disclose data if mandated by a judicial order, court summons, or governmental law enforcement agency acting under statutory powers under Indian law.</li>
+        </ul>
+        <p class="pt-1 font-medium text-foreground">
+          We do not sell, rent, lease, or barter your personal information to any third-party marketing companies, advertisers, or lead brokers.
+        </p>
+      </section>
+
+      <!-- Section 8: Data Retention -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>8.</span> Data Storage, Retention & Deletion
+        </h2>
+        <p>
+          In accordance with the DPDP Act, 2023, personal data is retained only for as long as necessary to fulfill the specific operational purpose for which it was gathered:
+        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li><strong>Transaction & Order Logs:</strong> Maintained for a minimum of eight (8) years to comply with Indian GST laws, Companies Act mandates, and financial auditing guidelines;</li>
+          <li><strong>Uploaded Artwork Files:</strong> Held temporarily in active production storage to permit re-prints, defect remediation, and quality control, then securely purged;</li>
+          <li><strong>Account Information:</strong> Maintained while your customer account remains active or until you submit a verifiable request for account closure and data erasure.</li>
+        </ul>
+      </section>
+
+      <!-- Section 9: Data Principal Rights under DPDP Act 2023 -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>9.</span> Your Rights as a Data Principal (DPDP Act, 2023)
+        </h2>
+        <p>
+          As an Indian citizen and Data Principal under the DPDP Act, 2023, you are entitled to exercise the following statutory rights:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div class="p-3.5 rounded-xl border border-border bg-card/60 space-y-1">
+            <h3 class="font-semibold text-foreground text-xs md:text-sm">1. Right to Access Information</h3>
+            <p class="text-xs text-muted-foreground">Request a summary of your personal data processed by us and the identities of data processors with whom it was shared.</p>
+          </div>
+          <div class="p-3.5 rounded-xl border border-border bg-card/60 space-y-1">
+            <h3 class="font-semibold text-foreground text-xs md:text-sm">2. Right to Correction & Erasure</h3>
+            <p class="text-xs text-muted-foreground">Request the correction of inaccurate data, completion of incomplete records, or erasure of personal data that is no longer necessary.</p>
+          </div>
+          <div class="p-3.5 rounded-xl border border-border bg-card/60 space-y-1">
+            <h3 class="font-semibold text-foreground text-xs md:text-sm">3. Right of Grievance Redressal</h3>
+            <p class="text-xs text-muted-foreground">Lodge a grievance with our designated Grievance Officer regarding any act or omission regarding your data privacy rights.</p>
+          </div>
+          <div class="p-3.5 rounded-xl border border-border bg-card/60 space-y-1">
+            <h3 class="font-semibold text-foreground text-xs md:text-sm">4. Right to Nominate</h3>
+            <p class="text-xs text-muted-foreground">Nominate another individual to exercise your data rights in the event of death or incapacity, in accordance with DPDP rules.</p>
+          </div>
+        </div>
+        <p class="text-xs text-muted-foreground pt-1">
+          To exercise any of these rights, send a written request from your registered email address to 
+          <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono">{contact.email.support}</a>. 
+          We will review and respond to verifiable requests within thirty (30) days.
+        </p>
+      </section>
+
+      <!-- Section 10: Children's Data & Minors -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>10.</span> Protection of Children & Minors
+        </h2>
+        <p>
+          In strict compliance with Section 9 of the DPDP Act, 2023, RS Prints does not knowingly collect, process, or track personal data of individuals under eighteen (18) years of age without verifiable parental or lawful guardian consent. We do not engage in targeted behavioral advertising, psychological profiling, or any processing activities that could cause a detrimental effect on the well-being of a child.
+        </p>
+        <p>
+          If you believe a minor has provided personal details on our platform without parental authorization, please contact us immediately at <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono">{contact.email.support}</a>, and we will take prompt steps to purge such records.
+        </p>
+      </section>
+
+      <!-- Section 11: Security Practices -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>11.</span> Reasonable Security Practices & Safeguards
+        </h2>
+        <p>
+          Under Section 43A of the Information Technology Act, 2000 and the SPDI Rules, 2011, RS Prints implements comprehensive administrative, technical, and physical safeguards designed to prevent unauthorized access, accidental alteration, disclosure, or destruction of personal data:
+        </p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>End-to-end transport layer encryption (TLS/HTTPS) across all web pages and checkout sessions;</li>
+          <li>Restricted, role-based internal access permissions for production personnel handling print files;</li>
+          <li>Isolated, firewall-protected database infrastructure;</li>
+          <li>Routine vulnerability assessments and system patch maintenance.</li>
+        </ul>
+      </section>
+
+      <!-- Section 12: Statutory Grievance Redressal Officer -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>12.</span> Statutory Grievance Redressal Officer
+        </h2>
+        <p>
+          In compliance with Rule 3(2) of the <em>Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021</em>, 
+          the <em>Consumer Protection (E-Commerce) Rules, 2020</em>, and the <em>DPDP Act, 2023</em>, the contact particulars of our designated Grievance Officer are set forth below:
+        </p>
+        
+        <div class="p-5 md:p-6 rounded-2xl border border-border bg-card/80 space-y-3 text-xs md:text-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Designation</span>
+              <span class="font-medium text-foreground">Grievance & Privacy Compliance Officer</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Entity Name</span>
+              <span class="font-medium text-foreground">{brand.legalName} ({brand.name})</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Registered Office Address</span>
+              <span class="font-medium text-foreground">
+                {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India
+              </span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Email Contact</span>
+              <a href={`mailto:${contact.email.support}?subject=Grievance%20Officer%20-%20Privacy%20Inquiry`} class="text-primary hover:underline font-mono font-medium">
+                {contact.email.support}
+              </a>
+              <span class="text-[11px] text-muted-foreground block mt-0.5">(Subject: "Attn: Grievance Officer - Privacy")</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Telephone / WhatsApp</span>
+              <span class="font-medium text-foreground font-mono">{contact.phone.display}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Support Hours</span>
+              <span class="font-medium text-foreground">{contact.hours.display}</span>
+            </div>
+          </div>
+          
+          <div class="pt-3 border-t border-border/60 text-xs text-muted-foreground space-y-1">
+            <p>
+              <strong class="text-foreground">Statutory Redressal Timelines:</strong> In accordance with Indian Law, our Grievance Officer will acknowledge receipt of your complaint within <strong>forty-eight (48) hours</strong> of submission and work towards resolving it expeditiously within <strong>fifteen (15) to thirty (30) days</strong>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 13: Governing Law & Jurisdiction -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>13.</span> Governing Law & Jurisdiction
+        </h2>
+        <p>
+          This Privacy Policy and any disputes or claims arising out of the collection or processing of your personal information shall be governed by, and construed in accordance with, the laws of the Republic of India.
+        </p>
+        <p>
+          Subject to the statutory grievance escalation mechanisms provided under the Digital Personal Data Protection Act, 2023, the competent courts situated in <strong>{contact.address.city}, India</strong> shall have exclusive jurisdiction over all matters and disputes arising under or in connection with this Policy.
+        </p>
+      </section>
+
+      <!-- Section 14: Updates to this Policy -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
+          <span>14.</span> Updates & Amendments
+        </h2>
+        <p>
+          We reserve the right to amend, update, or revise this Privacy Policy from time to time to reflect operational, legal, or regulatory changes. The date of the most recent revision will be posted at the top of this document. Continued use of the platform after any modifications constitutes acceptance of the updated policy terms.
+        </p>
       </section>
 
     </div>

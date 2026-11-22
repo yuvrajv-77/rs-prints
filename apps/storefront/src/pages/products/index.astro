@@ -4,8 +4,17 @@
 import ProductsLayout from "@/layouts/ProductsLayout.astro"
 import MinimalProductCard from "@/components/product/MinimalProductCard.astro"
 import { getVendureGroupedSections } from "@/lib/vendure/queries/products"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 import { Badge } from "@/components/ui/badge"
 import { Filter, Tag } from "lucide-react"
+
+// ============================================================================
+// CLOUDFLARE EDGE CACHING
+// - s-maxage=300 (5 min): Caches main catalog HTML at Cloudflare edge nodes.
+//   Cuts redundant database queries for full collections & facets across visitors.
+// - stale-while-revalidate=86400: Serves cached copy instantly while revalidating in background.
+// ============================================================================
+setEdgeCache(Astro.response, CACHE_PRESETS.CATALOG)
 
 // Fetch live products, collections, and facets directly from Vendure database
 let groupedSections: any[] = []

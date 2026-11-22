@@ -1,6 +1,14 @@
 ---
 import Layout from "@/layouts/auth.astro"
 import AuthTabs from "@/components/auth/AuthTabs"
+import { setPrivateNoCache } from "@/lib/cache"
+
+// ============================================================================
+// PRIVATE NO-CACHE
+// Authentication endpoints must NEVER be cached on CDN edge nodes.
+// Protects sensitive credentials, session tokens, and CSRF security.
+// ============================================================================
+setPrivateNoCache(Astro.response)
 
 // Determine initial tab from URL during SSR
 const tabParam =

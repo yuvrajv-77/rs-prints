@@ -1,13 +1,26 @@
 ---
 import Layout from "@/layouts/main.astro"
 import MinimalProductCard from "@/components/product/MinimalProductCard.astro"
+import HeroBannerSlider from "@/components/HeroBannerSlider"
+import CategoryCarousel from "@/components/CategoryCarousel"
+import CustomerFavoritesCarousel from "@/components/product/CustomerFavoritesCarousel"
+import ProductCarousel from "@/components/product/ProductCarousel"
 import { getProductBySlug } from "@/data/products"
 import { getVendureGroupedSections } from "@/lib/vendure/queries/products"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 import brandConfig from "@/data/brandConfig.json"
+
+// ============================================================================
+// CLOUDFLARE EDGE CACHING
+// - s-maxage=300 (5 min): Cloudflare Edge CDN caches rendered HTML.
+//   Thousands of visitors will receive this page in ~15ms with 0 database queries to Neon.
+// - max-age=60 (1 min): Browser-level cache for snappy back/forward navigation.
+// - stale-while-revalidate=86400 (24h): Background revalidation eliminates cold starts.
+// ============================================================================
+setEdgeCache(Astro.response, CACHE_PRESETS.CATALOG)
 import {
   Sparkles,
   ArrowRight,
-  ArrowUpRight,
   Layers,
   Clock,
   Package,
@@ -17,59 +30,10 @@ import {
   Palette,
   Truck,
   MessageCircle,
+  ThumbsUp,
+  Award,
+  Sparkle,
 } from "lucide-react"
-
-// Curated popular categories for direct discovery
-const popularCategories = [
-  {
-    title: "Ceramic & Glass Mugs",
-    subtitle: "Classic white mugs, patch cups, frosted glass & heart handles",
-    price: "From ₹149",
-    href: "/products#mugs",
-    image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
-    badge: "Most Popular",
-  },
-  {
-    title: "Drinkware & Bottles",
-    subtitle: "Double-wall stainless steel vacuum flasks & sports sippers",
-    price: "From ₹199",
-    href: "/products#drinkware",
-    image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80",
-    badge: "Trending",
-  },
-  {
-    title: "Photo Frames & Rocks",
-    subtitle: "Natural slate stone plaques, wooden collage & beveled glass",
-    price: "From ₹199",
-    href: "/products#photo-frames",
-    image: "https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?auto=format&fit=crop&w=800&q=80",
-    badge: "Gift Ready",
-  },
-  {
-    title: "Pillows & Cushions",
-    subtitle: "Interactive reversible magic sequins & ultra-soft plush fur",
-    price: "From ₹249",
-    href: "/products#pillows-cushions",
-    image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80",
-    badge: "Unique",
-  },
-  {
-    title: "Custom Apparel & Tees",
-    subtitle: "100% bio-washed cotton round-neck & oversized custom tees",
-    price: "From ₹299",
-    href: "/products#clothing",
-    image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
-    badge: "Premium",
-  },
-  {
-    title: "MDF Gifts & Keepsakes",
-    subtitle: "Laser-cut wooden keychains, desk plaques & custom mouse pads",
-    price: "From ₹49",
-    href: "/products#mdf-gifts",
-    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
-    badge: "Affordable",
-  },
-]
 
 // Trust and value proposition badges
 const valueHighlights = [
@@ -117,6 +81,25 @@ const howItWorks = [
   },
 ]
 
+// Quality guarantees / Studio hallmarks
+const qualityGuarantees = [
+  {
+    icon: ShieldCheck,
+    title: "100% Print Guarantee",
+    desc: "Crisp vector and photo reproduction with zero bleed",
+  },
+  {
+    icon: Award,
+    title: "Food & Skin Safe",
+    desc: "Microwave & dishwasher-safe mugs; bio-washed cotton apparel",
+  },
+  {
+    icon: ThumbsUp,
+    title: "Damage-Free Delivery",
+    desc: "Triple-layer shockproof packaging for safe pan-India transit",
+  },
+]
+
 // Curated best seller products
 const defaultFeaturedItems = [
   { slug: "white-mug-a001", categorySlug: "ceramic-mug" },
@@ -156,6 +139,27 @@ if (featuredProducts.length === 0) {
     })
     .filter((x): x is { product: any; categorySlug: string } => Boolean(x))
 }
+
+// Curated gift items for dedicated gift carousel section
+const defaultGiftSlugs = [
+  { slug: "heart-mdf-keychain-a046", categorySlug: "mdf-products" },
+  { slug: "sweet-heart-collage-frame-a053", categorySlug: "mdf-collage-frame" },
+  { slug: "magic-square-with-white-back-a075", categorySlug: "flip-sequin-pillow-cover" },
+  { slug: "semicircle-stone-frame-sh-01", categorySlug: "stone-frame" },
+  { slug: "round-mdf-keychain-a045", categorySlug: "mdf-products" },
+  { slug: "sublimation-fridge-magnet-a052", categorySlug: "mdf-products" },
+  { slug: "family-collage-frame-a054", categorySlug: "mdf-collage-frame" },
+  { slug: "love-collage-frame-a055", categorySlug: "mdf-collage-frame" },
+  { slug: "sublimation-tea-coaster-a051", categorySlug: "mdf-products" },
+  { slug: "rectangular-mdf-keychain-a044", categorySlug: "mdf-products" },
+]
+
+const giftProducts = defaultGiftSlugs
+  .map((item) => {
+    const prod = getProductBySlug(item.slug)
+    return prod ? { product: prod, categorySlug: item.categorySlug } : null
+  })
+  .filter((x): x is { product: any; categorySlug: string } => Boolean(x))
 ---
 
 <Layout
@@ -164,252 +168,43 @@ if (featuredProducts.length === 0) {
   canonicalUrl="/"
   currentActive="home"
 >
-  <div class="space-y-16 sm:space-y-20 pb-16">
-    <!-- 1. Hero Section -->
-    <section class="container mx-auto px-4 pt-6 sm:pt-10">
-      <div class="flex flex-col items-center text-center max-w-3xl mx-auto space-y-5">
-        <!-- Eyebrow Pill -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary/20 text-foreground border border-primary/40 shadow-2xs">
-          <Sparkles class="size-3.5 text-primary" />
-          <span>Custom Print Studio & Merchandise</span>
-        </div>
-
-        <!-- Headline -->
-        <h1 class="font-heading text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-[1.12]">
-          Turn Your Ideas & Memories Into{" "}
-          <span class="bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-            Custom Prints
-          </span>
-        </h1>
-
-        <!-- Subheading -->
-        <p class="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
-          High-definition personalized mugs, apparel, custom drinkware, photo rocks, and corporate merchandise. Handcrafted with care, vivid precision, and fast dispatch across India.
-        </p>
-
-        <!-- CTA Action Buttons -->
-        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <a
-            href="/products"
-            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:brightness-105 active:scale-[0.98] transition-all"
-          >
-            Explore Catalogue
-            <ArrowRight class="size-4" />
-          </a>
-          <a
-            href="/bulk-order"
-            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-border bg-card hover:bg-muted/70 text-foreground font-semibold text-sm transition-all active:scale-[0.98]"
-          >
-            <Layers class="size-4 text-muted-foreground" />
-            Bulk Orders (Up to 45% Off)
-          </a>
-          <a
-            href={brandConfig.contact.whatsapp.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-medium text-sm transition-all"
-            aria-label="Direct WhatsApp Enquiry"
-          >
-            <MessageCircle class="size-4 text-emerald-600" />
-            <span class="hidden sm:inline">WhatsApp Enquiry</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Hero Visual Banner Card -->
-      <div class="mt-8 sm:mt-12">
-        <a
-          href="/products"
-          class="group relative block overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/50"
-          aria-label="Shop all custom printed products"
-        >
-          <img
-            src="/shop-all-banner2.png"
-            alt="RS Prints Bulk Custom Printing & Corporate Solutions"
-            class="h-auto w-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-[1.01]"
-            draggable="false"
-            width="2170"
-            height="409"
-            loading="eager"
-            decoding="async"
-          />
-        </a>
-      </div>
+  <div class="space-y-12 sm:space-y-16 pb-16">
+    <!-- 1. Hero Section (Dynamic Promotions & Merchandise Banner Slider) -->
+    <section class="container mx-auto px-4 pt-4 sm:pt-6">
+      <HeroBannerSlider client:load />
     </section>
 
-    <!-- 2. Value Highlights / Trust Badges -->
-    <section class="container mx-auto px-4">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        {valueHighlights.map((item) => (
-          <div class="flex items-start gap-3 p-4 sm:p-5 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-xs transition-colors hover:border-border">
-            <div class="p-2.5 rounded-xl bg-primary/15 text-primary shrink-0 mt-0.5">
-              <item.icon class="size-4 sm:size-5" />
-            </div>
-            <div class="space-y-0.5 min-w-0">
-              <h3 class="text-xs sm:text-sm font-semibold text-foreground leading-tight">
-                {item.title}
-              </h3>
-              <p class="text-[11px] sm:text-xs text-muted-foreground leading-snug">
-                {item.desc}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+    <!-- 2. Shop by Category Carousel (Immediately Below Hero) -->
+    <div class="-mt-2 sm:-mt-4">
+      <CategoryCarousel client:load />
+    </div>
 
-    <!-- 3. Popular Categories Grid -->
-    <section class="container mx-auto px-4 space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-border/40 pb-4">
-        <div class="space-y-1">
-          <span class="text-[11px] font-mono uppercase tracking-wider text-primary font-bold">
-            Browse Catalogue
-          </span>
-          <h2 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-foreground tracking-tight">
-            Popular Categories
-          </h2>
-          <p class="text-xs sm:text-sm text-muted-foreground">
-            Explore customer-favorite categories handcrafted with premium finishes.
-          </p>
-        </div>
-        <a
-          href="/products"
-          class="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary hover:underline group"
-        >
-          View all categories
-          <ChevronRight class="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </a>
-      </div>
+    <!-- 4. Customer Favorites / Featured Best Sellers Carousel -->
+    <div class="space-y-4">
+      <CustomerFavoritesCarousel items={featuredProducts} client:load />
+    </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-5">
-        {popularCategories.map((cat) => (
-          <a
-            href={cat.href}
-            class="group relative flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-md"
-          >
-            <!-- Category Image -->
-            <div class="relative aspect-4/3 w-full overflow-hidden bg-muted/40">
-              <img
-                src={cat.image}
-                alt={cat.title}
-                class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-106"
-                loading="lazy"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+    <!-- 5. Gift Items Carousel Section -->
+    <div class="space-y-4">
+      <ProductCarousel
+        items={giftProducts}
+        title="Gift Items"
+        client:load
+      />
 
-              <!-- Category Badge -->
-              <div class="absolute top-2.5 left-2.5">
-                <span class="rounded-md bg-card/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-semibold text-foreground border border-border/60 shadow-2xs">
-                  {cat.badge}
-                </span>
-              </div>
-
-              <!-- Price Tag -->
-              <div class="absolute bottom-2.5 right-2.5">
-                <span class="rounded-md bg-background/90 backdrop-blur-md px-2 py-0.5 text-[11px] font-mono font-semibold text-foreground border border-border/60 shadow-2xs">
-                  {cat.price}
-                </span>
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="p-3.5 sm:p-4 space-y-1">
-              <div class="flex items-center justify-between">
-                <h3 class="font-heading text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                  {cat.title}
-                </h3>
-                <ArrowUpRight class="size-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-              </div>
-              <p class="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">
-                {cat.subtitle}
-              </p>
-            </div>
-          </a>
-        ))}
-      </div>
-    </section>
-
-    <!-- 4. Customer Favorites / Featured Best Sellers -->
-    <section class="container mx-auto px-4 space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-border/40 pb-4">
-        <div class="space-y-1">
-          <span class="text-[11px] font-mono uppercase tracking-wider text-primary font-bold">
-            Curated Picks
-          </span>
-          <h2 class="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-foreground tracking-tight">
-            Customer Favorites
-          </h2>
-          <p class="text-xs sm:text-sm text-muted-foreground">
-            Top-rated personalized products ready for your photos and custom text.
-          </p>
-        </div>
-        <a
-          href="/products"
-          class="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary hover:underline group"
-        >
-          Shop all 240+ products
-          <ChevronRight class="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </a>
-      </div>
-
-      <!-- Minimal Product Cards Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4.5">
-        {featuredProducts.map((item) => (
-          <MinimalProductCard
-            product={item.product}
-            categorySlug={item.categorySlug}
-          />
-        ))}
-      </div>
-
-      <div class="pt-4 text-center">
+      <div class="pt-2 text-center">
         <a
           href="/products"
           class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-border bg-card hover:bg-muted/70 text-foreground text-sm font-semibold transition-all hover:scale-[1.01] active:scale-[0.99] shadow-2xs"
         >
-          View Full Catalogue
+          View Full 240+ Item Catalogue
           <ArrowRight class="size-4" />
         </a>
       </div>
-    </section>
+    </div>
 
-    <!-- 5. How Custom Printing Works (3 Simple Steps) -->
-    <section class="container mx-auto px-4">
-      <div class="rounded-3xl border border-border/80 bg-card/60 p-6 sm:p-10 space-y-8">
-        <div class="text-center max-w-xl mx-auto space-y-2">
-          <span class="text-[11px] font-mono uppercase tracking-wider text-primary font-bold">
-            Easy Process
-          </span>
-          <h2 class="text-xl sm:text-3xl font-heading font-bold text-foreground tracking-tight">
-            How Custom Printing Works
-          </h2>
-          <p class="text-xs sm:text-sm text-muted-foreground">
-            Turn your idea into a physical handcrafted keepsake in 3 straightforward steps.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          {howItWorks.map((step) => (
-            <div class="relative flex flex-col items-center text-center p-5 rounded-2xl border border-border/50 bg-background/50 space-y-3">
-              <div class="flex items-center justify-center size-12 rounded-2xl bg-primary/15 text-primary">
-                <step.icon class="size-6" />
-              </div>
-              <span class="text-xs font-mono font-bold text-muted-foreground uppercase">
-                Step {step.step}
-              </span>
-              <h3 class="text-base font-heading font-semibold text-foreground">
-                {step.title}
-              </h3>
-              <p class="text-xs text-muted-foreground leading-relaxed">
-                {step.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. Bulk & Corporate Orders Highlight Banner Card -->
+   
+    <!-- 7. Bulk & Corporate Orders Highlight Banner Card -->
     <section class="container mx-auto px-4">
       <div class="relative rounded-3xl border border-primary/30 bg-gradient-to-br from-card via-card to-primary/5 p-6 sm:p-10 md:p-12 shadow-xs overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
         <!-- Subtle Glow Backdrop -->

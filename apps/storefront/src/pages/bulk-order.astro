@@ -1,6 +1,10 @@
 ---
 import Layout from "@/layouts/main.astro"
 import BulkOrderForm from "@/components/bulk-order/BulkOrderForm"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
+
+// CLOUDFLARE EDGE CACHING: Bulk order landing page cached at edge for 1 hour
+setEdgeCache(Astro.response, CACHE_PRESETS.MARKETING)
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {

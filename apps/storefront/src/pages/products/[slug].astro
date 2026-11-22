@@ -12,6 +12,15 @@ import ProductDetailsLayout from "@/layouts/ProductDetailsLayout.astro"
 import type { Product } from "@/types/product"
 import { getProductBySlug } from "@/lib/vendure/queries/products"
 import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
+
+// ============================================================================
+// CLOUDFLARE EDGE CACHING
+// - s-maxage=600 (10 min): Product detail HTML is cached at the edge.
+// - Client-side React islands (<ProductConfigurator client:load />) handle
+//   live variant selection, instant option switches, and cart mutations.
+// ============================================================================
+setEdgeCache(Astro.response, CACHE_PRESETS.PRODUCT_DETAIL)
 
 const { slug } = Astro.params
 

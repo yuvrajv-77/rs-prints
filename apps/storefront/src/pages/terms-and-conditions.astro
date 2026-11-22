@@ -1,328 +1,311 @@
 ---
 import Layout from "@/layouts/main.astro";
+import brandConfig from "@/data/brandConfig.json";
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache";
+
+// CLOUDFLARE EDGE CACHING: Legal terms cached at edge for 1 hour
+setEdgeCache(Astro.response, CACHE_PRESETS.MARKETING);
+
+const { brand, contact } = brandConfig;
 ---
 
 <Layout 
-  title="Terms & Conditions (Draft) - RS Prints"
-  description="General terms, conditions of service, ordering policies, returns, and disclaimers."
+  title={`Terms & Conditions - ${brand.name}`}
+  description={`Official Terms and Conditions for ${brand.name} (${brand.legalName}). Read our ordering guidelines, custom printing terms, GST compliance, delivery rules, and dispute resolution under Indian Law.`}
   canonicalUrl="/terms-and-conditions"
   currentActive="terms"
 >
   <main class="container mx-auto px-4 py-8 md:py-12 max-w-4xl flex-1 flex flex-col gap-8">
     <!-- Header Section -->
     <div class="border-b border-border pb-6">
-      <div class="flex flex-wrap items-center gap-2 mb-3">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          Dummy / Placeholder Document
-        </span>
-        <span class="text-xs text-muted-foreground font-mono">
-          Last updated: February 13, 2026 (Draft)
-        </span>
-      </div>
-
       <h1 class="text-2xl md:text-4xl font-heading font-bold tracking-tight text-foreground">
-        General Terms & Conditions
+        Terms & Conditions of Service
       </h1>
-      <p class="text-sm text-muted-foreground mt-2 leading-relaxed">
-        Please read these terms and conditions carefully before accessing, using, or placing orders through this platform.
+      <p class="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed text-justify">
+        Please read these General Terms and Conditions carefully before accessing our website, uploading custom artwork, or placing orders with {brand.name} ({brand.legalName}).
       </p>
     </div>
 
-    <!-- Dummy Flag / Draft Notice Banner -->
-    <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 dark:bg-amber-950/20 p-4 md:p-5 flex gap-4 text-amber-950 dark:text-amber-200">
-      <div class="shrink-0 mt-0.5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-      </div>
-      <div class="space-y-1 text-xs md:text-sm leading-relaxed">
-        <p class="font-semibold text-foreground">
-          Notice: Placeholder / Sample Document (Pending Formal Execution)
-        </p>
-        <p class="text-muted-foreground">
-          This document is an illustrative draft template prepared for staging and preview purposes. All original third-party and external business entity names, addresses, and individual contact handles have been sanitized and replaced with generalized placeholders (e.g., <code class="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-foreground">[Company / Registered Entity Name]</code>). This template does not yet constitute an executed or binding legal document until finalized by our legal counsel.
-        </p>
-      </div>
-    </div>
-
     <!-- Content Sections -->
-    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-8 font-sans">
+    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-8 font-sans text-justify">
       
       <!-- Section 1 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>1.</span> Acceptance of General Terms & Conditions
+          <span>1.</span> Acceptance of Terms & Entity Information
         </h2>
         <p>
-          Thank you for visiting <span class="text-primary font-medium">[https://yourwebsite.com]</span> (“Site”). Please read these General Terms and Conditions (“Terms”) carefully. In these Terms, the term "you", “your” refers to the user or viewer of the Site and the terms “[Company Name]”, “our”, “us”, “we” refers to <span class="font-medium text-foreground">[Company / Registered Entity Name]</span>, a company incorporated under the relevant applicable laws, and includes its authorized affiliates. These Terms govern your access and use of this Site, which is hosted and operated by <span class="font-medium text-foreground">[Company / Registered Entity Name]</span>, having its registered office at <span class="font-medium text-foreground">[Registered Office Address, City, State, PIN Code, Country]</span>.
+          Welcome to <a href={brand.siteUrl} class="text-primary hover:underline font-mono">{brand.siteUrl}</a> (the “Platform” or “Site”). 
+          These General Terms and Conditions (“Terms”) constitute a legally binding electronic agreement between you (“User”, “Customer”, “you”, or “your”) and 
+          <strong class="text-foreground">{brand.legalName}</strong> (operating under the commercial brand name <strong class="text-foreground">{brand.name}</strong>, hereinafter referred to as “we”, “us”, “our”, or “RS Prints”), 
+          having its principal facility and registered office situated at {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India.
         </p>
         <p>
-          By accessing and/or using this Site, you confirm that you are competent to contract under the relevant local laws and that you agree to be bound by these Terms and to any additional guidelines, restrictions, or rules that may be posted in connection with specific sections or services of this Site. All such additional posted guidelines, restrictions, or rules are hereby incorporated by reference into these Terms. <span class="font-medium text-foreground">[Company Name]</span> reserves the right to make changes to the Site and/or update these Terms at its discretion at any time without prior notice. Any change or modification to the Terms will be effective from the date of such update on the Site. Your continued use of the Site following the modifications to the Terms constitutes your acceptance of the modified Terms.
+          By visiting, browsing, registering an account, uploading digital artwork, or purchasing custom apparel, photo gifts, or merchandise on this Platform, you acknowledge that you have read, understood, and agreed to be bound by these Terms, together with our <a href="/privacy-policy" class="text-primary hover:underline">Privacy Policy</a> and <a href="/shipping-and-refund-policy" class="text-primary hover:underline">Shipping & Refund Policy</a>, which are incorporated herein by reference.
         </p>
         <p>
-          You further agree that we may provide all legal communications and notices to you electronically by posting them on our Site or, at our election, by sending an e-mail to the e-mail address provided by you when you registered on our Site. You may withdraw your consent to receive communications electronically by contacting our customer care. However, if you withdraw your consent to receive communications electronically, you must discontinue your use of your account.
+          We reserve the right to amend, modify, or replace any portion of these Terms at our discretion without prior personal notice. The date of the most recent revision will be reflected on this page. Your continued use of the Site following any modifications constitutes full acceptance of the updated Terms.
         </p>
       </section>
 
       <!-- Section 2 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>2.</span> Eligibility to Use
+          <span>2.</span> User Eligibility & Capacity to Contract
         </h2>
         <p>
-          Use of the Site is available only to such persons who can legally contract under applicable contract laws (including the Indian Contract Act, 1872 or equivalent local statutes). Persons who are "incompetent to contract", including minors or un-discharged insolvents, shall not be eligible to use the Site independently.
+          Use of the Platform is governed by the <strong>Indian Contract Act, 1872</strong>. Only individuals who are legally competent to enter into enforceable contracts may transact on this Platform:
         </p>
-        <p>
-          Any minor desirous to use or transact on the Site is required to conduct such transaction only through their legal guardian or parents.
-        </p>
-        <p>
-          By accepting the Terms or using or transacting on the Site, you irrevocably declare and undertake that you are of legal age (i.e., 18 years or older), of sound mind, and capable of entering into a binding contract. Such usage shall be deemed to form a binding contract between the Site and the User to the extent permissible under applicable laws.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>You represent and warrant that you are at least eighteen (18) years of age, of sound mind, and not disqualified by any court of law from contracting;</li>
+          <li>If you are under eighteen (18) years of age, you may only access the Platform and purchase merchandise under the direct supervision and active consent of a parent or legal guardian who agrees to be bound by these Terms;</li>
+          <li>If you are ordering on behalf of a corporate entity, educational institution, or firm, you warrant that you possess requisite legal authority to bind that entity to these Terms.</li>
+        </ul>
       </section>
 
       <!-- Section 3 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>3.</span> Intellectual Property Rights
+          <span>3.</span> Custom Artwork, Copyrights & Content Guidelines
         </h2>
         <p>
-          This Site contains graphics, photographs, images, document layouts, artwork, text, fonts, video, audio, software tools, stock assets, and other information (referred to herein as “[Platform Content]”). This Site and all [Platform Content] are the intellectual property of <span class="font-medium text-foreground">[Company Name]</span> and/or its licensors. All rights in this Site and [Platform Content] are reserved worldwide. It is strictly prohibited to sell, license, rent, modify, retain, copy, reproduce, distribute, publish, or use any portion of the [Platform Content] except to the extent expressly allowed in these Terms.
+          Because {brand.name} specializes in personalized print manufacturing, on-demand merchandise, and customized apparel, the following terms govern all customer-uploaded graphics, photos, and assets:
         </p>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span> reserves the right to add to, delete from, or modify any part of [Platform Content] at any time without prior notice. You acknowledge that such modification may result in you losing access to any [Platform Content] saved or accessible by you by virtue of being registered on the Site, including any content uploaded by you for creating any Product to be ordered. Any modifications to [Platform Content] remain the property of <span class="font-medium text-foreground">[Company Name]</span> and/or its licensors.
-        </p>
-        <p>
-          Except as otherwise provided for in the specific Product offer itself, any design tools, templates, and services provided on this Site employ a limited number of elements, including icons, fonts, colour schemes, and design effects. <span class="font-medium text-foreground">[Company Name]</span> reserves the right to use all such elements and make them available for use by other parties in the future. You agree to access and use the Site, [Platform Content], and design tools strictly in accordance with these Terms.
-        </p>
-        <p>
-          You acknowledge that by creating an account or using the design tools, you do not obtain any exclusive right or trademark claim to any individual design elements or template designs available on the Site. Other customers may use the same design tools and template designs to create designs, logos, or merchandise having similar or identical combinations of elements. <span class="font-medium text-foreground">[Company Name]</span> provides no warranty of any kind that designs created using our tools will not infringe, or be subject to a claim of infringing, any trademark or other intellectual property rights of another party. It is solely your responsibility to obtain independent legal advice regarding whether your design is legally available for your use.
-        </p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong class="text-foreground">Intellectual Property Ownership Warranty:</strong> You represent, warrant, and affirm that you are the sole creator and owner of, or possess all necessary commercial licenses, trademark permissions, and legal rights to reproduce all graphics, typography, corporate logos, and photographs you submit for custom printing.
+          </li>
+          <li>
+            <strong class="text-foreground">Strict Indemnification for Infringement:</strong> You agree to fully indemnify, hold harmless, and defend RS Prints and its partners against any claims, statutory damages, legal fees, or lawsuits arising from third-party copyright, trademark, design patent, or publicity rights infringements resulting from artwork uploaded or commissioned by you.
+          </li>
+          <li>
+            <strong class="text-foreground">Prohibited & Unlawful Content:</strong> We strictly prohibit and refuse to manufacture, print, or distribute any User Content that:
+            <ul class="list-circle pl-5 pt-1 space-y-1 text-xs">
+              <li>Violates the <em>Emblems and Names (Prevention of Improper Use) Act, 1950</em> or unauthorized national emblems;</li>
+              <li>Falsely depicts any individual as an authorized government official or candidate under the <em>Representation of the People Act, 1951</em>;</li>
+              <li>Is defamatory, obscene, pornographic, promoting hate speech, inciting communal disharmony, or violating public order under the <em>Information Technology Act, 2000</em>;</li>
+              <li>Contains counterfeit currency graphics, fraudulent identification documents, or unlawful trade marks.</li>
+            </ul>
+          </li>
+          <li>
+            <strong class="text-foreground">Right of Refusal & Order Rejection:</strong> RS Prints reserves the absolute right, without liability or explanation, to cancel and refund any custom print order containing content that violates our policies or applicable Indian laws.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 4 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>4.</span> Use of Site & User Content
+          <span>4.</span> Customer Proofing, Print Tolerance & Color Disclaimers
         </h2>
         <p>
-          Before placing an order online or accessing certain services or features on this Site, you may need a user account. You are granted permission to access and use this Site and [Platform Content] solely for the purpose of preparing, creating, designing, evaluating, and ordering products or services directly through <span class="font-medium text-foreground">[Company Name]</span> (referred to herein as “Products”). No other download, retention, publication, or commercial distribution of any portion of [Platform Content] is authorized or permitted.
+          Custom merchandise printing involves physical dyes, direct-to-garment (DTG), sublimation, screen printing, and paper substrates. Please review the following production realities:
         </p>
-        <p>
-          You represent, warrant, and confirm that where the Products contain any text, image, design, trademark, service mark, or copyrighted work of any third party, you have obtained appropriate permission, consent, no-objection, or authorization from such third party for such use prior to ordering, and shall provide proof of authorization to <span class="font-medium text-foreground">[Company Name]</span> upon request.
-        </p>
-        <p>
-          You further represent and warrant that Products ordered by you do not infringe upon any third-party rights, including copyright, trademark, trade name, or privacy, and will not libel, defame, harass, stalk, threaten, or violate the legal rights of any party. You agree not to submit, upload, or request printing of any content or design associated with government bodies, public authorities, financial institutions, or regulated entities without verifiable official authorization.
-        </p>
-        <p>
-          You agree not to upload or order any Product displaying content which is:
-        </p>
-        <ul class="list-disc pl-5 space-y-1">
-          <li>In violation of the Emblems and Names (Prevention of Improper Use) Act, 1950 or relevant national heraldic emblems regulations;</li>
-          <li>Falsely depicting any person as an official representative of a constituency under The Representation of the People Act, 1951 or equivalent election statutes;</li>
-          <li>Offensive, unlawful, harassing, defamatory, obscene, indecent, malicious, or abusive.</li>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>
+            <strong class="text-foreground">Customer Proofing Responsibility:</strong> RS Prints does not spell-check, proofread, or grammar-check customer-submitted text. You are solely responsible for verifying names, dates, spelling, and placement before confirming your order.
+          </li>
+          <li>
+            <strong class="text-foreground">RGB Screen to CMYK Print Variances:</strong> Digital screens display colors using RGB light spectrums, whereas physical commercial printers output in CMYK ink palettes. A standard industry tolerance of approximately 5% to 10% in color tonal shift, saturation, and fabric absorption is customary and shall not be classified as a manufacturing defect.
+          </li>
+          <li>
+            <strong class="text-foreground">Resolution & File Quality:</strong> We strongly advise providing vector files (AI, PDF, EPS) or high-resolution raster images (minimum 300 DPI). We cannot be held liable for pixelation, blurriness, or low fidelity resulting from low-resolution source files uploaded by the customer.
+          </li>
+          <li>
+            <strong class="text-foreground">Apparel Sizing Tolerances:</strong> Finished garment dimensions may exhibit a standard commercial stitching tolerance of up to &plusmn;0.5 to 1 inch as per industry manufacturing norms.
+          </li>
         </ul>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span> reserves the right in its sole discretion, without prior notice, to refuse to accept, print, or maintain any images, artwork, text, or content uploaded by you (“User Content”), or to cancel any order without assigning any reason. Where unlawful activity is suspected, we reserve the right to report such incidents to appropriate law enforcement authorities.
-        </p>
       </section>
 
       <!-- Section 5 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>5.</span> Taxes & GST
+          <span>5.</span> Pricing, Goods and Services Tax (GST) & Invoicing
         </h2>
         <p>
-          You agree to pay Goods and Services Tax (GST) or other applicable taxes, whether international, national, state, or local, levied or imposed with respect to any Product ordered by you on the Site.
+          All pricing displayed on the Platform is listed in Indian Rupees (INR, ₹) and is subject to change without prior notice:
         </p>
-        <p>
-          Where applicable, you agree to mention your valid GST registration number and Entity Name during checkout. You must ensure that the GST registration number and Entity Name match the billing address provided, as modifications to these details cannot be processed once the order has been submitted.
-        </p>
-        <p>
-          <span class="font-medium text-foreground">[Company Name]</span> is not responsible for independent verification of your GST registration details. Any tax liability or forfeiture of input tax credit resulting from incorrect details shall be borne entirely by you. In the event you fail to provide a GST number at checkout, the transaction will be treated as an unregistered consumer order. In all circumstances, our liability under GST shall be strictly limited to the amount of tax collected on the invoice.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>
+            <strong class="text-foreground">Taxes & GST:</strong> Prices are subject to applicable Goods and Services Tax (GST) under Indian statutory regulations. Tax amounts are transparently calculated and itemized during checkout and on your official tax invoice.
+          </li>
+          <li>
+            <strong class="text-foreground">B2B GST Invoicing:</strong> Registered business entities requiring Input Tax Credit (ITC) must provide their legal registered entity name and valid GSTIN during checkout. Because tax invoices are generated automatically upon order confirmation, GSTIN details cannot be added or altered retroactively once an invoice has been generated.
+          </li>
+          <li>
+            <strong class="text-foreground">Pricing Corrections:</strong> While we endeavor to ensure price accuracy, typographical or system errors may occasionally occur. If a product is listed at an incorrect price due to technical error, RS Prints reserves the right to cancel the order and provide a full refund of any amount paid.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 6 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>6.</span> Shipping and Delivery
+          <span>6.</span> Payment Terms & Modes
         </h2>
         <p>
-          All Products purchased from the Site shall be delivered to you by our appointed third-party logistics partners.
+          We offer secure payment channels through RBI-licensed payment gateways and aggregators:
         </p>
-        <p>
-          We endeavor to make our best efforts to ensure timely delivery on the Estimated Arrival Date indicated during order placement. However, Estimated Arrival Dates are purely indicative. <span class="font-medium text-foreground">[Company Name]</span> cannot accept liability or be held financially responsible for delays caused by adverse weather, flight schedules, carrier strikes, geopolitical occurrences, regional entry restrictions, or other force majeure circumstances.
-        </p>
-        <p>
-          You undertake to provide an accurate and complete postal address, PIN code, and contact number. We cannot be held liable for misdirected, delayed, or lost shipments resulting from incomplete or inaccurate address information provided during checkout.
-        </p>
-        <p>
-          In the event you are unavailable for delivery or refuse acceptance upon repeated delivery attempts within a 7-day period, <span class="font-medium text-foreground">[Company Name]</span> shall be entitled to return or dispose of the customized products, without liability for refund or post-disposal claims.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>
+            <strong class="text-foreground">Accepted Methods:</strong> UPI (Google Pay, PhonePe, Paytm, BHIM), Net Banking, RuPay/Visa/MasterCard/Amex credit and debit cards, and authorized digital wallets.
+          </li>
+          <li>
+            <strong class="text-foreground">Cash on Delivery (COD):</strong> Where COD is enabled for specific PIN codes, payment must be handed over in full prior to unpacking the parcel. Repeated refusal to accept COD orders without valid justification may result in permanent suspension of COD privileges.
+          </li>
+          <li>
+            <strong class="text-foreground">Payment Security:</strong> All financial transactions are processed over encrypted 256-bit SSL connections directly with PCI-DSS compliant banking gateways. RS Prints does not hold or store card PINs, CVVs, or internet banking passwords.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 7 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>7.</span> Cash on Delivery (COD)
+          <span>7.</span> Shipping, Logistics & Delivery Rules
         </h2>
         <p>
-          Cash on delivery may be offered for select eligible PIN codes and order categories. The facility is confirmed only if your postal area is serviceable by our logistics partners.
+          Products are dispatched across India through reputable third-party logistics carriers (e.g., Delhivery, BlueDart, Shiprocket, DTDC, India Post):
         </p>
-        <p>
-          Payment under COD must be tendered in cash or by accepted card upon delivery. By selecting COD, you commit to pay the specified invoice amount on delivery. In cases of split shipments or excess collection confirmed by our logistics partner, refunds of excess cash will be credited to the verified bank account provided by you.
-        </p>
-        <p>
-          We reserve the right to suspend accounts, refuse future COD privileges, or initiate appropriate recovery remedies against users who place orders and unjustifiably refuse delivery.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>
+            <strong class="text-foreground">Indicative Delivery Timelines:</strong> Estimated delivery dates shown during checkout reflect production time plus standard courier transit times. While we make every endeavor to meet these timelines, delivery dates are indicative and not guaranteed deadlines.
+          </li>
+          <li>
+            <strong class="text-foreground">Force Majeure:</strong> RS Prints shall not be held liable for transit delays caused by natural disasters, extreme weather, state borders, road closures, strikes, public holidays, or unforeseen carrier disruptions.
+          </li>
+          <li>
+            <strong class="text-foreground">Accurate Address Undertaking:</strong> The customer must furnish complete delivery coordinates including house/plot number, street, city, landmark, correct 6-digit PIN code, and an active mobile number. We cannot be held liable for delivery failures resulting from incorrect address inputs.
+          </li>
+          <li>
+            <strong class="text-foreground">Return to Origin (RTO) for Custom Goods:</strong> Because custom-printed items are made exclusively for you and cannot be re-stocked or sold to other customers, packages returned due to non-availability, wrong address, or customer refusal can only be re-dispatched upon payment of secondary courier freight charges.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 8 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>8.</span> Pricing Policy
+          <span>8.</span> Cancellations, Replacements & Refund Policy
         </h2>
         <p>
-          All prices, fees, discounts, and promotional offers posted on the Site are subject to change without notice and are not guaranteed indefinitely. Placing a Product in your cart does not reserve or freeze the price shown at that moment. The price charged will be the price in effect at the time the order is formally confirmed.
+          Our policy regarding order cancellations and defect claims is designed to be fair and transparent:
         </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>
+            <strong class="text-foreground">Custom Order Cancellations:</strong> Orders for customized apparel, bespoke gifts, and personalized merchandise can only be cancelled before our production department initiates proofing or physical printing (typically within 2 hours of placement). Once printing has commenced, custom orders cannot be cancelled or refunded.
+          </li>
+          <li>
+            <strong class="text-foreground">Transit Damage & Defect Claims:</strong> If your order arrives physically damaged, has a verified manufacturing defect, or received an incorrect item, you must notify our customer support team at <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono">{contact.email.support}</a> within <strong>seven (7) calendar days</strong> of delivery, providing clear unboxing photographs or video documentation.
+          </li>
+          <li>
+            <strong class="text-foreground">Remedy:</strong> Upon verification of an authentic manufacturing flaw or transit damage, RS Prints will expedite a complimentary reprint and replacement or issue an approved refund.
+          </li>
+          <li>
+            <strong class="text-foreground">Refund Processing:</strong> Approved refunds are credited back to the original source payment method (bank account, card, or UPI) within <strong>7 to 10 business days</strong>.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 9 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>9.</span> Refunds, Payments & Store Credits
+          <span>9.</span> Intellectual Property of RS Prints
         </h2>
         <p>
-          Refunds, where approved, shall normally be processed back to the original source payment method (bank account, credit/debit card, UPI, or digital wallet). For Cash on Delivery transactions, refunds may be remitted to your bank account via NEFT upon provision of valid bank account details.
+          All content appearing on this Platform—including software algorithms, website design layouts, text descriptions, product photographs, digital mockups, brand logos, graphics, and trade dress—is the exclusive intellectual property of {brand.legalName} or its technology licensors, protected under the <em>Indian Copyright Act, 1957</em> and the <em>Trade Marks Act, 1999</em>.
         </p>
         <p>
-          Refunds may take up to 7 to 15 business days to reflect depending on your banking institution. Upon request, we will provide the Acquirer Reference Number (ARN) or Unique Transaction Reference (UTR) for refund tracking.
-        </p>
-        <p>
-          If you elect to receive Merchant Store Credit in lieu of a bank refund, such credit will remain valid for forty-five (45) days from the date of issuance, after which any unutilized credit balance shall lapse.
+          You are granted a limited, revocable, non-exclusive license to access and browse the Platform solely to place orders. You are strictly prohibited from scraping, copying, reverse-engineering, republishing, or commercially exploiting our website code, catalogue assets, or user interface without explicit written consent.
         </p>
       </section>
 
       <!-- Section 10 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>10.</span> Product Issues & Claims Timeline
+          <span>10.</span> Limitation of Liability
         </h2>
         <p>
-          Any manufacturing defects, printing errors, or transit damages must be reported to our customer support within <span class="font-semibold text-foreground">15 calendar days</span> of receiving your order, accompanied by clear photographic or video evidence. Claims reported beyond this period cannot be entertained.
+          To the maximum extent permitted by applicable Indian law, {brand.name}, its partners, directors, employees, or logistics agents shall not be liable for any indirect, incidental, punitive, special, or consequential damages (including loss of business, revenue, profits, goodwill, or data) arising from or relating to your use of the Platform or products ordered.
+        </p>
+        <p>
+          In all events, the maximum cumulative financial liability of RS Prints to you for any and all claims, whether in contract, tort (including negligence), warranty, or otherwise, shall be strictly capped at the <strong>actual amount paid by you for the specific product or order</strong> giving rise to the claim.
         </p>
       </section>
 
       <!-- Section 11 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>11.</span> Return Pickup
+          <span>11.</span> Grievance Redressal Mechanism & Officer Particulars
         </h2>
         <p>
-          Where a physical return is requested to process an approved claim, our logistics partner will make up to three (3) pickup attempts at your registered address. If the parcel is not handed over within these three attempts, the pickup request will be marked as failed and closed.
+          In accordance with the <em>Consumer Protection (E-Commerce) Rules, 2020</em> and Rule 3(2) of the <em>Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021</em>, the particulars of our designated Grievance Officer are set forth below:
         </p>
-        <p>
-          Returned items undergo standard quality verification upon arrival at our warehouse before refunds or reprint orders are released.
-        </p>
+        
+        <div class="p-5 md:p-6 rounded-2xl border border-border bg-card/80 space-y-3 text-xs md:text-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Designation</span>
+              <span class="font-medium text-foreground">Grievance & Customer Redressal Officer</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Entity Name</span>
+              <span class="font-medium text-foreground">{brand.legalName} ({brand.name})</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Registered Office Address</span>
+              <span class="font-medium text-foreground">
+                {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India
+              </span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Email Contact</span>
+              <a href={`mailto:${contact.email.support}?subject=Grievance%20Officer%20-%20Terms%20Inquiry`} class="text-primary hover:underline font-mono font-medium">
+                {contact.email.support}
+              </a>
+              <span class="text-[11px] text-muted-foreground block mt-0.5">(Subject: "Attn: Grievance Officer - Terms")</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Helpline & WhatsApp</span>
+              <span class="font-medium text-foreground font-mono">{contact.phone.display}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Operational Hours</span>
+              <span class="font-medium text-foreground">{contact.hours.display}</span>
+            </div>
+          </div>
+          
+          <div class="pt-3 border-t border-border/60 text-xs text-muted-foreground">
+            <p>
+              <strong class="text-foreground">Redressal Timelines:</strong> Our Grievance Officer shall acknowledge your formal complaint within <strong>forty-eight (48) hours</strong> of receipt and endeavor to resolve the grievance expeditiously within <strong>fifteen (15) to thirty (30) business days</strong>.
+            </p>
+          </div>
+        </div>
       </section>
 
       <!-- Section 12 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>12.</span> Transfer of Title
+          <span>12.</span> Governing Law & Exclusive Jurisdiction
         </h2>
         <p>
-          Risk of loss and title for any physical printed Product pass to you upon delivery of the consignment to our carrier. For any digital deliverables or electronic formats, delivery is deemed completed at the time the digital file or download link is transmitted to your registered email address or account dashboard.
+          These Terms and Conditions, your relationship with RS Prints, and any dispute or claim arising out of or in connection with the purchase of products or use of this Platform shall be governed by and construed in accordance with the substantive laws of the <strong>Republic of India</strong>, without regard to conflict of law principles.
+        </p>
+        <p>
+          The parties agree that subject to initial good-faith amicable dispute resolution efforts, the competent courts situated at <strong>{contact.address.city}, India</strong> shall have exclusive territorial jurisdiction over any disputes, lawsuits, or legal proceedings arising from or connected with these Terms.
         </p>
       </section>
 
       <!-- Section 13 -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>13.</span> Indemnification
+          <span>13.</span> Severability & Entire Agreement
         </h2>
         <p>
-          You agree to indemnify, defend, and hold harmless <span class="font-medium text-foreground">[Company Name]</span>, its directors, officers, employees, suppliers, and partners from and against all claims, liabilities, losses, expenses, damages, and legal costs arising out of: (i) your breach of these Terms; (ii) any infringement of intellectual property, copyright, trademark, or privacy rights arising from artwork, photos, or text uploaded or commissioned by you; or (iii) any unlawful use of the ordered merchandise.
-        </p>
-      </section>
-
-      <!-- Section 14 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>14.</span> Disclaimer of Warranty & Customer Proofing
-        </h2>
-        <p class="uppercase font-mono text-[11px] border border-border/80 p-3.5 bg-secondary/10 rounded-lg text-foreground leading-normal">
-          THE SITE AND ALL PLATFORM CONTENT ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+          If any provision of these Terms is determined by a court of competent jurisdiction to be invalid, void, or unenforceable, such provision shall be severed to the minimum extent necessary, and the remaining provisions shall continue in full force and effect.
         </p>
         <p>
-          Please note that <span class="font-medium text-foreground">[Company Name]</span> does not proofread or manually edit customer documents before production. You are solely responsible for reviewing and proofing your designs prior to placing an order. We cannot be held liable for:
-        </p>
-        <ul class="list-disc pl-5 space-y-1">
-          <li>Spelling, grammatical, typographical, or punctuation mistakes made by the customer;</li>
-          <li>Low resolution, blurry, or pixilated graphics submitted by the customer;</li>
-          <li>Layout errors, bleed oversights, or margin discrepancies introduced during creation;</li>
-          <li>Customer-selected options such as paper finish, sizing, or quantity choices;</li>
-          <li>Damage resulting from improper handling after final delivery.</li>
-        </ul>
-      </section>
-
-      <!-- Section 15 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>15.</span> Limitation of Liability
-        </h2>
-        <p>
-          Under no circumstances shall <span class="font-medium text-foreground">[Company Name]</span>, its directors, employees, or suppliers be liable for any indirect, incidental, special, or consequential damages, loss of business, data, or anticipated profits arising out of or in connection with the use of the Site or our manufactured products, even if advised of the possibility of such damages. In all events, our total cumulative liability shall not exceed the actual purchase price paid by you for the specific Product giving rise to the claim.
-        </p>
-      </section>
-
-      <!-- Section 16 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>16.</span> Site Feedback
-        </h2>
-        <p>
-          Any suggestions, feedback, reviews, or ideas submitted regarding our website or service shall be deemed non-confidential and will become the sole property of <span class="font-medium text-foreground">[Company Name]</span> without entitlement to compensation or attribution.
-        </p>
-      </section>
-
-      <!-- Section 17 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>17.</span> Grievance & Nodal Officer Details
-        </h2>
-        <div class="p-4 rounded-xl border border-border bg-card/60 space-y-1.5 text-xs md:text-sm">
-          <p><span class="font-semibold text-foreground">Officer Name / Designation:</span> [Grievance / Nodal Officer Name]</p>
-          <p><span class="font-semibold text-foreground">Email:</span> <a href="mailto:grievance@yourdomain.com" class="text-primary hover:underline font-mono">[grievance@yourdomain.com]</a></p>
-          <p><span class="font-semibold text-foreground">Customer Support Contact:</span> <span class="font-mono">[+91 XXXXX XXXXX]</span> (Mon-Sat, 9:30 AM - 6:30 PM IST)</p>
-          <p><span class="font-semibold text-foreground">Help Center / Portal:</span> <a href="#" class="text-primary hover:underline font-mono">[https://yourwebsite.com/help-centre]</a></p>
-        </div>
-      </section>
-
-      <!-- Section 18 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>18.</span> Dispute Resolution
-        </h2>
-        <p>
-          In the event of any query, grievance, or dispute arising out of or in connection with these Terms, the parties shall first make genuine, reasonable efforts to resolve the dispute amicably. The attempt to reach an amicable resolution shall be treated as having concluded if the dispute remains unsettled after thirty (30) days from the date of written notice served by either party.
-        </p>
-      </section>
-
-      <!-- Section 19 -->
-      <section class="space-y-3">
-        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>19.</span> Governing Law & Jurisdiction
-        </h2>
-        <p>
-          These Terms and all matters arising out of or related to your use of this Site or transactions conducted herein shall be governed by and construed in accordance with the laws of <span class="font-medium text-foreground">[State / Country, e.g., India]</span>. Subject to amicable resolution, the courts situated at <span class="font-medium text-foreground">[Designated City / Jurisdiction]</span> shall possess exclusive jurisdiction over any legal proceedings arising from these Terms.
+          These Terms, along with our Privacy Policy and Shipping & Refund Policy, constitute the entire agreement between you and {brand.name} with respect to your access to and use of the Platform and purchase of merchandise.
         </p>
       </section>
 

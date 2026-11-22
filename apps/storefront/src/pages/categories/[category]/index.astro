@@ -1,0 +1,76 @@
+---
+import Layout from "@/layouts/main.astro"
+import { getCategoryBySlug } from "@/lib/catalog"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
+import MinimalProductCard from "@/components/product/MinimalProductCard.astro"
+
+// ============================================================================
+// CLOUDFLARE EDGE CACHING
+// - s-maxage=300 (5 min): Caches category page at Cloudflare edge nodes.
+// ============================================================================
+setEdgeCache(Astro.response, CACHE_PRESETS.CATALOG)
+import CategoryHeader from "@/components/category/CategoryHeader.astro"
+import SiblingSubcategoryPills from "@/components/category/SiblingSubcategoryPills.astro"
+import CategoryProductSort from "@/components/category/CategoryProductSort.astro"
+
+const { category: categorySlug } = Astro.params
+
+const result = await getCategoryBySlug(categorySlug!)
+if (!result) {
+  return Astro.redirect("/404")
+}
+
+const { category } = result
+
+const breadcrumbs = [
+  { title: "Home", href: "/" },
+  { title: "Categories", href: "/categories" },
+  { title: category.title },
+]
+---
+
+<Layout
+  title={`${category.title} - Custom Printing & Bulk Merchandise - RS Prints`}
+  description={category.description}
+  canonicalUrl={`/categories/${category.id}`}
+  currentActive="categories"
+>
+  <!-- Category Header with Breadcrumbs -->
+  <CategoryHeader
+    title={category.title}
+    description={category.description}
+    totalCount={category.totalCount}
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="container mx-auto px-4 py-6 md:py-8 space-y-6">
+    <!-- Sticky Subcategory Navigation Pills (Single Clean Pill Selector) -->
+    <SiblingSubcategoryPills
+      parentSlug={category.id}
+      parentTitle={category.title}
+      parentCount={category.totalCount}
+      subcategories={category.subcategories}
+      currentActiveSlug="all"
+    />
+
+    <!-- Interactive Sort Bar -->
+    <CategoryProductSort
+      totalCount={category.totalCount}
+      gridContainerId="category-products-container"
+    />
+
+    <!-- Full-Width Responsive Products Grid -->
+    <div
+      id="category-products-container"
+      class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3.5 sm:gap-5"
+    >
+      {category.products.map((item) => (
+        <MinimalProductCard
+          product={item}
+          parentCategorySlug={category.id}
+          categorySlug={item.category ? item.category.toLowerCase().replace(/\s+/g, "-") : category.id}
+        />
+      ))}
+    </div>
+  </div>
+</Layout>

@@ -1,97 +1,162 @@
 ---
 import Layout from "@/layouts/main.astro";
+import brandConfig from "@/data/brandConfig.json";
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache";
+
+// CLOUDFLARE EDGE CACHING: Static brand/company info cached at edge for 1 hour
+setEdgeCache(Astro.response, CACHE_PRESETS.MARKETING);
+
+const { brand, contact } = brandConfig;
 ---
 
 <Layout 
-  title="About Us - DevJSON Sandbox"
-  description="Learn about DevJSON Sandbox, our mission to build secure, 100% local-first developer utilities, and why visual editing tools shouldn't compromise your privacy."
+  title={`About Us - ${brand.name}`}
+  description={`Learn about ${brand.name} (${brand.legalName}). In-house custom apparel, DTF printing, corporate merchandise, and photo gifts manufactured with precision in New Delhi, India.`}
   canonicalUrl="/about"
+  currentActive="about"
 >
-  <div class="container mx-auto px-4 py-12 max-w-4xl flex-1 flex flex-col gap-10">
-    <!-- Hero Banner with Gradient Title -->
-    <div class="text-center space-y-4 py-6">
-      <h1 class="text-3xl md:text-5xl font-heading font-extrabold tracking-tight text-foreground bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">
-        Privacy-First Developer Utilities
+  <main class="container mx-auto px-4 py-8 md:py-12 max-w-4xl flex-1 flex flex-col gap-10">
+    <!-- Header Section -->
+    <div class="border-b border-border pb-6 space-y-2">
+      <h1 class="text-2xl md:text-4xl font-heading font-bold tracking-tight text-foreground">
+        About {brand.name}
       </h1>
-      <p class="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-        DevJSON Sandbox was born out of a simple conviction: developers shouldn't have to choose between convenience and security when formatting sensitive data.
+      <p class="text-sm md:text-base text-muted-foreground leading-relaxed">
+        {brand.tagline} — engineered for precision printing, durable textile quality, and reliable pan-India delivery.
       </p>
     </div>
 
-    <!-- Core Pillars Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Pillar 1 -->
-      <div class="p-6 border border-border bg-card/30 backdrop-blur-sm space-y-4 hover:border-primary/40 transition-colors duration-300">
-        <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-lg">
-          🔒
-        </div>
-        <h3 class="text-base font-heading font-semibold text-foreground">
-          100% Client-Side
-        </h3>
-        <p class="text-xs md:text-sm text-muted-foreground leading-relaxed">
-          Formatting, minification, tree exploration, and conversion are handled entirely in your web browser. No data ever traverses the web to our servers.
-        </p>
-      </div>
-
-      <!-- Pillar 2 -->
-      <div class="p-6 border border-border bg-card/30 backdrop-blur-sm space-y-4 hover:border-primary/40 transition-colors duration-300">
-        <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-lg">
-          ⚡
-        </div>
-        <h3 class="text-base font-heading font-semibold text-foreground">
-          Zero Latency
-        </h3>
-        <p class="text-xs md:text-sm text-muted-foreground leading-relaxed">
-          Because calculations happen inside the browser engine, tasks compile instantaneously. No waiting on API gateways or server-side loops.
-        </p>
-      </div>
-
-      <!-- Pillar 3 -->
-      <div class="p-6 border border-border bg-card/30 backdrop-blur-sm space-y-4 hover:border-primary/40 transition-colors duration-300">
-        <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-lg">
-          🎨
-        </div>
-        <h3 class="text-base font-heading font-semibold text-foreground">
-          Rich Ergonomics
-        </h3>
-        <p class="text-xs md:text-sm text-muted-foreground leading-relaxed">
-          We combine JSON formatting and syntax diagnostics with a visual tree, breadcrumbs path copying, and dynamic file converters.
-        </p>
-      </div>
-    </div>
-
-    <!-- Mission statement & deep dive -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-t border-border/60 pt-10">
-      <div class="space-y-4">
-        <h2 class="text-xl md:text-2xl font-heading font-bold text-foreground">
-          The Problem with Standard Formatters
+    <!-- Editorial Content -->
+    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-9 font-sans text-justify">
+      
+      <!-- Section 1: Overview -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide text-left">
+          Who We Are
         </h2>
-        <p class="text-xs md:text-sm text-muted-foreground leading-relaxed">
-          Most online formatters run on remote server infrastructure. When you paste API response logs, credentials, configuration profiles, or sensitive customer databases, that text is sent over public HTTP networks and processed on external hardware.
+        <p>
+          <strong class="text-foreground">{brand.name}</strong> (registered legally as <strong class="text-foreground">{brand.legalName}</strong>) is a dedicated print manufacturing and customization studio based in New Delhi, India. We design, print, and finish high-definition custom apparel, corporate merchandise, and personalized gifts for individuals, independent creators, growing startups, and established enterprises.
         </p>
-        <p class="text-xs md:text-sm text-muted-foreground leading-relaxed">
-          In corporate environments or highly regulated industries, this transmission represents a direct security violation. DevJSON Sandbox guarantees privacy by executing 100% offline-first logic. If you disconnect your internet, our formatter keeps working perfectly.
+        <p>
+          Unlike middleman platforms that outsource production to unverified third parties, our print operations are managed directly from our facility in Okhla Industrial Area. This hands-on approach allows us to enforce strict quality control at every stage—from digital artwork pre-flight checks and color calibration to curing, stitching, and packaging.
         </p>
+      </section>
+
+      <!-- Section 2: What We Print -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide text-left">
+          Our Print Technologies & Craftsmanship
+        </h2>
+        <p>
+          Every substrate requires specific ink chemistry and heat curing to achieve long-lasting results. We deploy commercial-grade printing techniques matched to each product category:
+        </p>
+        <div class="space-y-4 pt-1">
+          <div class="border-l-2 border-primary pl-4 space-y-1">
+            <h3 class="font-semibold text-foreground text-sm text-left">Direct-to-Film (DTF) & High-Definition Digital Printing</h3>
+            <p>
+              Delivers photo-sharp detail, vibrant gradients, and rich saturation on 100% cotton, polyester, and blended fabrics. Uses flexible polyurethane inks that stretch with the garment without cracking, peeling, or fading through repeated wash cycles.
+            </p>
+          </div>
+
+          <div class="border-l-2 border-primary pl-4 space-y-1">
+            <h3 class="font-semibold text-foreground text-sm text-left">Industrial Screen Printing</h3>
+            <p>
+              The industry benchmark for bulk apparel runs, corporate uniforms, and promotional merchandise. Yields deep, opaque ink deposits and maximum durability with high cost-efficiency for orders of 25 to 10,000+ units.
+            </p>
+          </div>
+
+          <div class="border-l-2 border-primary pl-4 space-y-1">
+            <h3 class="font-semibold text-foreground text-sm text-left">Sublimation & Hard-Surface Printing</h3>
+            <p>
+              Infuses dye directly into coated polymer substrates at high temperatures for ceramic mugs, stainless steel bottles, and desk accessories, ensuring scratch-resistant, dishwasher-safe finishes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Material Quality -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide text-left">
+          Fabric Standards & Sourcing
+        </h2>
+        <p>
+          A great print is only as good as the garment underneath. We source pre-shrunk, bio-washed cotton fabrics ranging from everyday 180 GSM t-shirts to heavyweight 380 GSM fleece hoodies. Our garments feature reinforced collar ribbing, double-needle hem stitching, and combed yarns for soft hand-feel and long wear life.
+        </p>
+        <p>
+          All inks used in our studio are skin-safe, OEKO-TEX compliant, and free from hazardous heavy metals, making our merchandise safe for daily wear and sensitive skin.
+        </p>
+      </section>
+
+      <!-- Section 4: Scale & Bulk Solutions -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide text-left">
+          Corporate Gifting & Bulk Orders
+        </h2>
+        <p>
+          Beyond one-off custom gifts, RS Prints operates a dedicated corporate desk handling bulk apparel, onboarding kits, college fest merchandise, and event giveaways. We offer tiered volume pricing, pre-production digital proofs, custom neck-tag relabeling, and formal GST tax invoices with Input Tax Credit (ITC) compliance.
+        </p>
+      </section>
+
+      <!-- Section 5: Studio & Contact Particulars -->
+      <section class="space-y-3">
+        <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide text-left">
+          Facility & Operations
+        </h2>
+        <p>
+          We operate Monday through Saturday and ship to every serviceable PIN code across India through express air and surface logistics partners.
+        </p>
+        
+        <div class="p-5 md:p-6 rounded-2xl border border-border bg-card/80 space-y-3 text-xs md:text-sm text-left">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Registered Entity</span>
+              <span class="font-medium text-foreground">{brand.legalName}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Support Email</span>
+              <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono font-medium">
+                {contact.email.support}
+              </a>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Hotline & WhatsApp</span>
+              <span class="font-medium text-foreground font-mono">{contact.phone.display}</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Working Hours</span>
+              <span class="font-medium text-foreground">{contact.hours.display}</span>
+            </div>
+            <div class="sm:col-span-2">
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Studio & Production Facility</span>
+              <span class="font-medium text-foreground">
+                {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action Row -->
+      <div class="pt-4 border-t border-border flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <p class="text-xs text-muted-foreground text-left">
+          Ready to customize your design or need a volume quotation?
+        </p>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <a
+            href="/products"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border bg-background hover:bg-muted text-sm font-medium text-foreground transition-colors"
+          >
+            Explore Catalogue
+          </a>
+          <a
+            href="/bulk-order"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-primary text-primary-foreground hover:brightness-105 text-sm font-medium shadow-xs transition-all"
+          >
+            Bulk Inquiries
+          </a>
+        </div>
       </div>
-      <div class="p-6 border border-border bg-secondary/15 rounded-xl space-y-4">
-        <h4 class="font-heading font-bold text-foreground text-sm uppercase tracking-wider text-primary">
-          Core Principles
-        </h4>
-        <ul class="space-y-3 text-xs md:text-sm text-muted-foreground">
-          <li class="flex items-start gap-2.5">
-            <span class="text-primary mt-0.5">✓</span>
-            <span><strong>No Tracking:</strong> We do not log inputs or parse parameters.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <span class="text-primary mt-0.5">✓</span>
-            <span><strong>Open Standards:</strong> Clean formats that respect ECMA specifications.</span>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <span class="text-primary mt-0.5">✓</span>
-            <span><strong>Developer-First UI:</strong> Dark modes, text sizing options, and responsive blocks out of the box.</span>
-          </li>
-        </ul>
-      </div>
+
     </div>
-  </div>
+  </main>
 </Layout>

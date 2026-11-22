@@ -9,6 +9,14 @@ import ChangePasswordView from "@/components/account/ChangePasswordView"
 import AddressesView from "@/components/account/AddressesView"
 import RewardHistoryView from "@/components/account/RewardHistoryView"
 import { isAccountSectionEnabled } from "@/config/account"
+import { setPrivateNoCache } from "@/lib/cache"
+
+// ============================================================================
+// PRIVATE NO-CACHE
+// Customer account dashboard and sections contain personal customer details.
+// Must never be cached on shared CDN edges.
+// ============================================================================
+setPrivateNoCache(Astro.response)
 
 const { section = "profile" } = Astro.params
 

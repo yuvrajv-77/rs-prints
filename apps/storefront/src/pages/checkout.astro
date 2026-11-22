@@ -1,6 +1,14 @@
 ---
 import Layout from "@/layouts/main.astro"
 import CheckoutView from "@/components/checkout/CheckoutView"
+import { setPrivateNoCache } from "@/lib/cache"
+
+// ============================================================================
+// PRIVATE NO-CACHE
+// Checkout contains active order details, customer addresses, and payment sessions.
+// Must never be cached on shared CDN edges.
+// ============================================================================
+setPrivateNoCache(Astro.response)
 ---
 
 <Layout

@@ -1,77 +1,51 @@
 ---
 import Layout from "@/layouts/main.astro";
+import brandConfig from "@/data/brandConfig.json";
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache";
+
+// CLOUDFLARE EDGE CACHING: Shipping & refund policies cached at edge for 1 hour
+setEdgeCache(Astro.response, CACHE_PRESETS.MARKETING);
+
+const { brand, contact } = brandConfig;
 ---
 
 <Layout 
-  title="Shipping & Refund Policy (Draft) - RS Prints"
-  description="Shipping timelines, delivery procedures, return conditions, replacement guidelines, and refund policies for customized merchandise."
+  title={`Shipping & Refund Policy - ${brand.name}`}
+  description={`Official Shipping and Refund Policy for ${brand.name} (${brand.legalName}). Production timelines, pan-India delivery estimates, return eligibility, reprint guarantees, and refund processing for custom apparel and merchandise.`}
   canonicalUrl="/shipping-and-refund-policy"
   currentActive="shipping"
 >
   <main class="container mx-auto px-4 py-8 md:py-12 max-w-4xl flex-1 flex flex-col gap-8">
     <!-- Header Section -->
     <div class="border-b border-border pb-6">
-      <div class="flex flex-wrap items-center gap-2 mb-3">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          Dummy / Placeholder Document
-        </span>
-        <span class="text-xs text-muted-foreground font-mono">
-          Last updated: February 13, 2026 (Draft)
-        </span>
-      </div>
-
       <h1 class="text-2xl md:text-4xl font-heading font-bold tracking-tight text-foreground">
         Shipping & Refund Policy
       </h1>
-      <p class="text-sm text-muted-foreground mt-2 leading-relaxed">
-        Important details regarding production lead times, shipping estimates, return pickups, replacements, and refund processing.
+      <p class="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed text-justify">
+        Clear guidelines regarding manufacturing lead times, pan-India shipping, delivery estimates, return conditions, and replacement policies for custom merchandise manufactured by {brand.name} ({brand.legalName}).
       </p>
     </div>
 
-    <!-- Dummy Flag / Draft Notice Banner -->
-    <div class="rounded-xl border border-amber-500/40 bg-amber-500/10 dark:bg-amber-950/20 p-4 md:p-5 flex gap-4 text-amber-950 dark:text-amber-200">
-      <div class="shrink-0 mt-0.5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-      </div>
-      <div class="space-y-1 text-xs md:text-sm leading-relaxed">
-        <p class="font-semibold text-foreground">
-          Notice: Placeholder / Sample Document (Pending Formal Execution)
-        </p>
-        <p class="text-muted-foreground">
-          This Shipping & Refund Policy is an illustrative draft template prepared for staging and preview purposes. All brand names, trade entities, and specific contact channels have been substituted with standard generic placeholders (e.g., <code class="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-foreground">[Company Name]</code>). This template is pending final review and formal sign-off by our operations and legal teams.
-        </p>
-      </div>
-    </div>
-
     <!-- Policy Content Sections -->
-    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-8 font-sans">
+    <div class="text-xs md:text-sm leading-relaxed text-muted-foreground space-y-8 font-sans text-justify">
       
       <!-- Section 1: Custom Production & Dispatch Timelines -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>1.</span> Production Lead Times & Order Processing
+          <span>1.</span> Custom Production Lead Times & Processing
         </h2>
         <p>
-          Because our products are custom-printed and manufactured to order, each product undergoes design pre-flight checks, high-definition printing, fabrication, and quality assurance before dispatch.
+          Because every item ordered from <strong class="text-foreground">{brand.name}</strong> is custom-manufactured, customized apparel and bespoke photo gifts undergo graphic pre-flight checks, physical printing, curing, and rigorous quality inspection prior to packaging:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
           <li>
-            <strong class="text-foreground">Standard Production Time:</strong> Typically requires <span class="font-semibold text-foreground">2 to 4 business days</span> from the time payment is confirmed and high-resolution print files are verified.
+            <strong class="text-foreground">Standard Custom Production:</strong> Requires <span class="font-semibold text-foreground">2 to 4 business days</span> from the time payment is verified and print-ready artwork is approved.
           </li>
           <li>
-            <strong class="text-foreground">Bulk or Corporate Orders:</strong> May require additional processing days, which will be communicated in advance by our corporate sales team.
+            <strong class="text-foreground">Bulk & Corporate Orders:</strong> Production timelines for large volume orders (50+ units) depend on batch quantity and will be confirmed upfront by our corporate printing desk.
           </li>
           <li>
-            <strong class="text-foreground">Dispatch Notification:</strong> Once your order is packaged and handed over to our logistics partner, an automated confirmation email and SMS containing your consignment tracking link will be dispatched.
+            <strong class="text-foreground">Dispatch Notification:</strong> Once your order clears inspection and is handed over to our logistics partner, automated confirmation notifications with live tracking links are dispatched to your registered email and phone number.
           </li>
         </ul>
       </section>
@@ -79,58 +53,58 @@ import Layout from "@/layouts/main.astro";
       <!-- Section 2: Shipping Estimates & Logistics Partners -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>2.</span> Shipping Estimates & Coverage
+          <span>2.</span> Shipping Estimates & Pan-India Coverage
         </h2>
         <p>
-          We partner with recognized express logistics carriers to deliver orders across eligible PIN codes.
+          We deliver across serviceable PIN codes in India in collaboration with recognized domestic logistics carriers (e.g., Delhivery, BlueDart, Shiprocket, DTDC, India Post). Transit times begin after order dispatch:
         </p>
         <div class="overflow-x-auto rounded-xl border border-border mt-2">
           <table class="w-full text-left text-xs md:text-sm">
             <thead class="bg-muted/60 text-foreground font-semibold border-b border-border">
               <tr>
                 <th class="p-3">Delivery Zone</th>
-                <th class="p-3">Estimated Transit Time</th>
-                <th class="p-3">Typical Delivery Window</th>
+                <th class="p-3">Estimated Transit Window</th>
+                <th class="p-3">Service Type</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border">
               <tr>
-                <td class="p-3 font-medium text-foreground">Tier-1 Metro Cities</td>
+                <td class="p-3 font-medium text-foreground">Tier-1 Metro Cities (Delhi NCR, Mumbai, Bengaluru, Chennai, Kolkata, Hyderabad)</td>
                 <td class="p-3">2 – 4 Business Days</td>
-                <td class="p-3">Standard Express</td>
+                <td class="p-3">Express Air / Surface</td>
               </tr>
               <tr>
-                <td class="p-3 font-medium text-foreground">Tier-2 & Tier-3 Cities</td>
+                <td class="p-3 font-medium text-foreground">Tier-2 & Tier-3 Regional Cities</td>
                 <td class="p-3">4 – 7 Business Days</td>
-                <td class="p-3">Standard Road/Air</td>
+                <td class="p-3">Standard Surface / Air</td>
               </tr>
               <tr>
-                <td class="p-3 font-medium text-foreground">Remote / Special Territories</td>
+                <td class="p-3 font-medium text-foreground">North-East, Jammu & Kashmir, Rural & Remote Territories</td>
                 <td class="p-3">7 – 10 Business Days</td>
-                <td class="p-3">Regional Network</td>
+                <td class="p-3">National Network / Speed Post</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p class="text-xs text-muted-foreground italic mt-1">
-          *Note: Transit times represent business days following dispatch. Estimated arrival dates are indicative and may be subject to delays caused by severe weather, regional road restrictions, or holiday courier backlogs.
+          *Note: Delivery timelines are estimates and exclude Sundays and national public holidays. Delivery speeds may be impacted by extreme weather, regional transport restrictions, or festive courier surges.
         </p>
       </section>
 
       <!-- Section 3: Shipping Charges & Order Tracking -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>3.</span> Shipping Charges & Live Tracking
+          <span>3.</span> Shipping Charges & Live Consignment Tracking
         </h2>
         <p>
-          Shipping charges are dynamically calculated at checkout based on the total consignment weight, volumetric dimensions, destination PIN code, and selected delivery speed.
+          Shipping charges are calculated transparently during checkout based on volumetric package weight, destination PIN code, and courier rate cards:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
           <li>
-            <strong class="text-foreground">Free Shipping Promotions:</strong> May be offered on orders surpassing specified cart thresholds as advertised on the Site.
+            <strong class="text-foreground">Free Shipping Promotions:</strong> Free standard shipping may apply on qualified orders meeting cart thresholds as advertised on our store.
           </li>
           <li>
-            <strong class="text-foreground">Consignment Tracking:</strong> You can track your parcel's progress in real-time via the tracking portal link sent to your registered contact address upon dispatch.
+            <strong class="text-foreground">Live Tracking:</strong> As soon as the consignment is scanned by the courier, you will receive a tracking link via email and WhatsApp allowing real-time tracking from our Delhi studio to your doorstep.
           </li>
         </ul>
       </section>
@@ -141,11 +115,13 @@ import Layout from "@/layouts/main.astro";
           <span>4.</span> Cash on Delivery (COD) Terms
         </h2>
         <p>
-          Where Cash on Delivery is enabled for your PIN code, orders are confirmed subject to automated or telephonic validation. 
+          Where Cash on Delivery is enabled for eligible PIN codes and product categories:
         </p>
-        <p>
-          The total invoice value printed on the courier label must be paid in full (in cash or via courier-accepted UPI/card terminal) upon delivery. Split shipments may occasionally arrive in separate packages with proportional invoices. Non-acceptance of valid COD packages without cause may result in forfeiture of future COD privileges.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>Orders placed under COD may be verified via telephone or automated OTP before production is queued.</li>
+          <li>Payment must be tendered in full (via cash or courier-supported UPI QR terminal) prior to receiving the package. Couriers do not permit opening parcels prior to payment.</li>
+          <li>Unwarranted rejection of custom-printed COD shipments upon delivery may lead to permanent deactivation of COD privileges on your account.</li>
+        </ul>
       </section>
 
       <!-- Section 5: Delivery Attempts & Undeliverable Shipments -->
@@ -154,48 +130,52 @@ import Layout from "@/layouts/main.astro";
           <span>5.</span> Delivery Attempts & Return to Origin (RTO)
         </h2>
         <p>
-          Our delivery partners make up to <span class="font-semibold text-foreground">three (3) delivery attempts</span> at the address furnished during checkout. Please ensure your shipping address, landmarks, and phone numbers are accurate and reachable.
+          Our courier partners make up to <strong class="text-foreground">three (3) delivery attempts</strong> at the shipping address supplied during checkout:
         </p>
-        <p>
-          If a delivery fails after three attempts due to customer unavailability, incorrect contact details, or refusal to accept, the parcel will be marked as Return to Origin (RTO). Because customized print merchandise cannot be restocked or resold to other customers, re-dispatching an RTO package will incur actual re-shipping and handling fees.
-        </p>
+        <ul class="list-disc pl-5 space-y-1.5">
+          <li>Ensure your address contains complete details (house/flat number, building, street, landmark, and valid 6-digit PIN code) along with an active mobile contact number.</li>
+          <li>If delivery fails following three attempts due to customer unavailability, incorrect contact details, or refusal, the consignment is returned to our facility as <strong>Return to Origin (RTO)</strong>.</li>
+          <li>
+            <strong class="text-foreground">Important:</strong> Because personalized custom apparel and customized merchandise are printed uniquely for you and cannot be restocked or sold to another buyer, RTO orders cannot be refunded. Consignments will be held for fourteen (14) days and can be re-shipped upon settlement of secondary courier charges.
+          </li>
+        </ul>
       </section>
 
       <!-- Section 6: Cancellation Policy -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>6.</span> Order Modification & Cancellation Window
+          <span>6.</span> Cancellation Window for Custom Orders
         </h2>
         <p>
-          Because our automated manufacturing workflows begin promptly after order receipt, cancellation requests can only be accepted within a strict window:
+          Because our custom printing workflow starts promptly upon receiving your order:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
           <li>
-            <strong class="text-foreground">Cancellation Window:</strong> You may request cancellation within <span class="font-semibold text-foreground">2 hours</span> of order placement by contacting our support desk.
+            <strong class="text-foreground">Grace Cancellation Window:</strong> You may request an order cancellation within <strong class="text-foreground">two (2) hours</strong> of placement by sending an urgent request to <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono">{contact.email.support}</a> or messaging our WhatsApp hotline with your Order ID.
           </li>
           <li>
-            <strong class="text-foreground">Post-Production Ineligibility:</strong> Once an order status advances to "In Production", "Plate Making", or "Printing", cancellations or design file replacements can no longer be accommodated.
+            <strong class="text-foreground">Post-Production Ineligibility:</strong> Once raw materials are allocated, screen/digital plates prepared, or printing has commenced, custom orders cannot be cancelled, modified, or refunded.
           </li>
         </ul>
       </section>
 
-      <!-- Section 7: Defective Items & 15-Day Claim Window -->
+      <!-- Section 7: Defective Items & 7-Day Quality Claim Window -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>7.</span> Quality Guarantee & 15-Day Claims Window
+          <span>7.</span> Quality Guarantee & Defect Claims Procedure
         </h2>
         <p>
-          We take immense pride in our craftsmanship and want you to be delighted with your finished products. If you receive merchandise that suffers from a printing defect, physical manufacturing flaw, or transit damage:
+          {brand.name} stands behind the quality of its craftsmanship. If your delivered items suffer from an authentic manufacturing defect, physical transit damage, or incorrect product dispatch:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
           <li>
-            <strong class="text-foreground">Reporting Window:</strong> You must notify customer service within <span class="font-semibold text-foreground">15 calendar days</span> of delivery.
+            <strong class="text-foreground">Reporting Window:</strong> You must report the issue within <strong class="text-foreground">seven (7) calendar days</strong> of parcel delivery.
           </li>
           <li>
-            <strong class="text-foreground">Required Evidence:</strong> Please share clear photographs or an unboxing video showing the packaging label, outer box condition, and the specific defect on the item.
+            <strong class="text-foreground">Required Evidence:</strong> Send an email to <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono">{contact.email.support}</a> containing your Order ID, a clear photo of the shipping label on the package, and clear photographs or an unboxing video highlighting the specific defect or damage.
           </li>
           <li>
-            <strong class="text-foreground">Resolution:</strong> Upon verification, <span class="font-medium text-foreground">[Company Name]</span> will either offer an expedited free reprint/replacement or issue a full refund.
+            <strong class="text-foreground">Expedited Resolution:</strong> Upon verification by our quality control team, we will manufacture and dispatch an immediate <strong>free reprint and replacement</strong> at no additional cost to you. If a replacement cannot be fulfilled, a full refund will be processed.
           </li>
         </ul>
       </section>
@@ -203,72 +183,96 @@ import Layout from "@/layouts/main.astro";
       <!-- Section 8: Non-Returnable Scenarios (Customer Proofing) -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>8.</span> Non-Returnable Scenarios
+          <span>8.</span> Non-Returnable Scenarios (Customer Responsibility)
         </h2>
         <p>
-          As personalized custom goods cannot be resold, we cannot accept returns or provide refunds for errors that are outside our production control, including:
+          Because customized merchandise cannot be re-sold, we cannot accept returns, replacements, or issue refunds for issues stemming from customer input:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
-          <li>Spelling, grammatical, or typographical errors in text submitted by the user;</li>
-          <li>Low resolution, blurry, or pixilated graphics supplied by the customer;</li>
-          <li>Customer choice of incorrect sizing, garment color, or phone model casing;</li>
-          <li>Normal color variations between on-screen RGB displays and physical CMYK print outputs;</li>
-          <li>General buyer's remorse or change of mind after production has begun.</li>
+          <li>Spelling, grammatical, typographical, or naming errors in text supplied by the customer;</li>
+          <li>Pixelation or blurriness resulting from low-resolution images or compressed graphics uploaded by the customer;</li>
+          <li>Customer ordering an incorrect garment size (accurate measurements and size charts are provided on every product page);</li>
+          <li>Standard industry color variance (5% to 10%) between on-screen RGB digital displays and physical CMYK garment/paper prints;</li>
+          <li>Change of mind, buyer’s remorse, or personal preference after custom production has taken place.</li>
         </ul>
       </section>
 
-      <!-- Section 9: Return Pickups & Warehouse QA -->
+      <!-- Section 9: Return Pickup Procedure -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>9.</span> Return Pickup Procedure
+          <span>9.</span> Return Pickup & Inspection
         </h2>
         <p>
-          If our support team authorizes a return for diagnostic inspection:
+          Where our customer support team authorizes a physical return for evaluation:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
-          <li>We will schedule a reverse pickup via our logistics partners (up to three pickup attempts).</li>
-          <li>Items must be repacked securely in original packaging where feasible.</li>
-          <li>Upon receipt at our fulfillment facility, items undergo a standard verification check within 48 hours.</li>
+          <li>We will schedule a reverse pickup via our logistics partner at your registered address (up to 3 pickup attempts);</li>
+          <li>The item must be packed securely in original packaging along with all accompanying tags and invoices;</li>
+          <li>Upon receipt at our New Delhi facility, our quality team inspects the article within <strong>forty-eight (48) hours</strong> to release the replacement or approve the refund.</li>
         </ul>
       </section>
 
       <!-- Section 10: Refund Settlement & Timelines -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>10.</span> Refund Processing & Timelines
+          <span>10.</span> Refund Processing Timelines
         </h2>
         <p>
-          Once a refund is approved by our billing team:
+          Once a refund is approved by our operations desk:
         </p>
         <ul class="list-disc pl-5 space-y-1.5">
           <li>
-            <strong class="text-foreground">Prepaid Orders (Cards/UPI/Net Banking):</strong> Funds are credited back to the original source account within <span class="font-semibold text-foreground">7 to 10 business days</span>, depending on your bank’s processing cycles.
+            <strong class="text-foreground">Prepaid Transactions (UPI, Credit/Debit Cards, Net Banking):</strong> The refund is credited back to the original source account within <strong class="text-foreground">7 to 10 business days</strong>, subject to your bank’s clearing cycle.
           </li>
           <li>
-            <strong class="text-foreground">Cash on Delivery Orders:</strong> Refunds are processed via NEFT / IMPS transfer directly to the verified bank account provided by the customer.
+            <strong class="text-foreground">Cash on Delivery Orders:</strong> Refunds are remitted directly to the customer’s verified bank account via NEFT / IMPS within 7 business days following receipt of bank account details.
           </li>
           <li>
-            <strong class="text-foreground">Store Credit Option:</strong> Customers may choose instant store credits, valid for forty-five (45) calendar days from issuance.
+            <strong class="text-foreground">Store Credit Option:</strong> Customers may opt for instant Store Credit coupon codes, valid for forty-five (45) days for any future purchase.
           </li>
           <li>
-            <strong class="text-foreground">UTR Tracking:</strong> Bank reference numbers (UTR / ARN) are provided upon request to assist with bank tracking.
+            <strong class="text-foreground">Bank Reference (UTR):</strong> A Unique Transaction Reference (UTR) or Acquirer Reference Number (ARN) will be provided for tracking upon completion of the refund transfer.
           </li>
         </ul>
       </section>
 
-      <!-- Section 11: Support & Inquiries -->
+      <!-- Section 11: Support & Customer Inquiries -->
       <section class="space-y-3">
         <h2 class="text-base md:text-lg font-heading font-semibold text-foreground tracking-wide flex items-center gap-2">
-          <span>11.</span> Need Help with an Order?
+          <span>11.</span> Customer Support & Helpdesk
         </h2>
         <p>
-          Our customer care desk is ready to assist you with order status checks, transit queries, and replacement claims:
+          For any questions concerning shipment status, artwork proofs, transit queries, or defect claims, please reach our customer support team:
         </p>
-        <div class="p-4 rounded-xl border border-border bg-card/60 space-y-1.5 text-xs md:text-sm">
-          <p><span class="font-semibold text-foreground">Customer Support Desk:</span> [Operations & Support Team]</p>
-          <p><span class="font-semibold text-foreground">Email:</span> <a href="mailto:support@yourdomain.com" class="text-primary hover:underline font-mono">[support@yourdomain.com]</a></p>
-          <p><span class="font-semibold text-foreground">Helpline:</span> <span class="font-mono">[+91 XXXXX XXXXX]</span> (Monday – Saturday, 9:30 AM – 6:30 PM IST)</p>
-          <p><span class="font-semibold text-foreground">Support Portal:</span> <a href="#" class="text-primary hover:underline font-mono">[https://yourwebsite.com/help-centre]</a></p>
+        <div class="p-5 md:p-6 rounded-2xl border border-border bg-card/80 space-y-3 text-xs md:text-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Entity</span>
+              <span class="font-medium text-foreground">{brand.legalName} ({brand.name})</span>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Support Email</span>
+              <a href={`mailto:${contact.email.support}`} class="text-primary hover:underline font-mono font-medium">
+                {contact.email.support}
+              </a>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Hotline & WhatsApp</span>
+              <a href={`tel:${contact.phone.raw}`} class="text-foreground hover:text-primary font-mono font-medium block">
+                {contact.phone.display}
+              </a>
+            </div>
+            <div>
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Working Hours</span>
+              <span class="font-medium text-foreground">{contact.hours.display}</span>
+            </div>
+            <div class="sm:col-span-2">
+              <span class="text-muted-foreground block text-xs uppercase tracking-wider font-semibold">Facility & Returns Address</span>
+              <span class="font-medium text-foreground">
+                {contact.address.line1}, {contact.address.line2}, {contact.address.city}, {contact.address.state} - {contact.address.postalCode}, India
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
