@@ -117,6 +117,65 @@ export async function getProductBySlug(slug: string) {
 }
 
 /**
+ * Lightweight featured products query for the homepage carousel.
+ * Limits database queries with `options: { take: $take }`, preventing full-catalog over-fetching
+ * and saving Neon database network egress.
+ */
+export const GET_FEATURED_PRODUCTS_QUERY = `
+  query GetFeaturedProducts($take: Int) {
+    products(options: { take: $take }) {
+      items {
+        id
+        name
+        slug
+        description
+        featuredAsset {
+          id
+          preview
+        }
+        variants {
+          id
+          name
+          price
+          priceWithTax
+        }
+        collections {
+          id
+          slug
+        }
+      }
+    }
+  }
+`;
+
+export async function getFeaturedProducts(take = 8) {
+  try {
+    const data = await vendureClient.request<{
+      products: {
+        items: Array<{
+          id: string;
+          name: string;
+          slug: string;
+          description: string;
+          featuredAsset: { id: string; preview: string } | null;
+          variants: Array<{ id: string; name: string; price: number; priceWithTax: number }>;
+          collections: Array<{ id: string; slug: string }>;
+        }>;
+      };
+    }>(GET_FEATURED_PRODUCTS_QUERY, { take });
+
+    const { mapVendureProductToStorefrontProduct } = await import("../mappers");
+    return (data.products?.items || []).map((p) => ({
+      product: mapVendureProductToStorefrontProduct(p),
+      categorySlug: p.collections?.[0]?.slug || "products",
+    }));
+  } catch (error) {
+    console.warn("Could not fetch featured products from Vendure:", error);
+    return [];
+  }
+}
+
+/**
  * GraphQL Query: Complete catalog snapshot.
  * Fetches all collections (hierarchical categories), products, and facet filters
  * in a single round-trip to build categorized shop pages.

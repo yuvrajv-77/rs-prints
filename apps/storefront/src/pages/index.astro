@@ -6,7 +6,7 @@ import CategoryCarousel from "@/components/CategoryCarousel"
 import CustomerFavoritesCarousel from "@/components/product/CustomerFavoritesCarousel"
 import ProductCarousel from "@/components/product/ProductCarousel"
 import { getProductBySlug } from "@/data/products"
-import { getVendureGroupedSections } from "@/lib/vendure/queries/products"
+import { getFeaturedProducts } from "@/lib/vendure/queries/products"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 import brandConfig from "@/data/brandConfig.json"
 
@@ -39,7 +39,7 @@ import {
 const valueHighlights = [
   {
     icon: Clock,
-    title: "24–48h Fast Dispatch",
+    title: "Fast Dispatch",
     desc: "Speedy production & prompt shipping across India",
   },
   {
@@ -112,24 +112,8 @@ const defaultFeaturedItems = [
   { slug: "blended-plush-tote-bag-a090", categorySlug: "tote-bag" },
 ]
 
-let featuredProducts: { product: any; categorySlug: string }[] = []
-
-try {
-  const result = await getVendureGroupedSections()
-  if (result && result.groupedSections && result.groupedSections.length > 0) {
-    const allVendure = result.groupedSections.flatMap((s: any) =>
-      s.products.map((p: any) => ({
-        product: p,
-        categorySlug: s.id,
-      }))
-    )
-    if (allVendure.length > 0) {
-      featuredProducts = allVendure.slice(0, 8)
-    }
-  }
-} catch {
-  // Fall back to catalogue mock
-}
+// Fetch ONLY 8 lightweight featured products from Vendure instead of downloading the entire catalog
+let featuredProducts = await getFeaturedProducts(8)
 
 if (featuredProducts.length === 0) {
   featuredProducts = defaultFeaturedItems
