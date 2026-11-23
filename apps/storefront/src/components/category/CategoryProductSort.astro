@@ -1,0 +1,72 @@
+---
+import { ArrowUpDown } from "lucide-react"
+
+interface Props {
+  totalCount: number
+  gridContainerId?: string
+}
+
+const { totalCount, gridContainerId = "category-product-grid" } = Astro.props
+---
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 border-b border-border/60">
+  <div class="text-xs sm:text-sm text-muted-foreground font-mono">
+    Showing <span class="font-semibold text-foreground" id="sort-total-count">{totalCount}</span> {totalCount === 1 ? "product" : "products"}
+  </div>
+
+  <div class="flex items-center gap-2 self-end sm:self-auto">
+    <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <ArrowUpDown className="size-3.5" />
+      <span>Sort by:</span>
+    </div>
+
+    <select
+      id="product-sort-select"
+      class="text-xs font-semibold bg-card border border-border/80 rounded-lg px-2.5 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
+    >
+      <option value="featured">Featured / Default</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="rating">Highest Rated</option>
+      <option value="name">Product Name: A to Z</option>
+    </select>
+  </div>
+</div>
+
+<script is:inline define:vars={{ gridContainerId }}>
+  ;(function () {
+    const select = document.getElementById("product-sort-select")
+    const container = document.getElementById(gridContainerId)
+    if (!select || !container) return
+
+    // Save initial DOM order as "featured"
+    const originalChildren = Array.from(container.children)
+
+    select.addEventListener("change", function (e) {
+      const mode = e.target.value
+      const items = Array.from(container.children)
+
+      if (mode === "featured") {
+        originalChildren.forEach((child) => container.appendChild(child))
+        return
+      }
+
+      items.sort((a, b) => {
+        const priceA = parseFloat(a.getAttribute("data-product-price") || "0")
+        const priceB = parseFloat(b.getAttribute("data-product-price") || "0")
+        const ratingA = parseFloat(a.getAttribute("data-product-rating") || "0")
+        const ratingB = parseFloat(b.getAttribute("data-product-rating") || "0")
+        const titleA = (a.getAttribute("data-product-title") || "").toLowerCase()
+        const titleB = (b.getAttribute("data-product-title") || "").toLowerCase()
+
+        if (mode === "price-asc") return priceA - priceB
+        if (mode === "price-desc") return priceB - priceA
+        if (mode === "rating") return ratingB - ratingA
+        if (mode === "name") return titleA.localeCompare(titleB)
+        return 0
+      })
+
+      items.forEach((item) => container.appendChild(item))
+    })
+  })()
+</script>

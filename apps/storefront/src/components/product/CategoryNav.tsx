@@ -43,7 +43,7 @@ export default function CategoryNav({ categories, totalProductsCount }: Category
     <nav className="flex flex-col gap-1">
       {/* All Products Option */}
       <a
-        href="/products"
+        href="/categories"
         data-filter-slug="all"
         className="aside-filter-link group flex items-center justify-between px-3 py-2 rounded-xl text-[15px] font-bold text-foreground hover:bg-muted transition-colors w-full border border-transparent hover:border-border/60"
       >

@@ -8,14 +8,12 @@ import {
   fetchActiveOrder,
   updateLineQuantity,
   removeLineItem,
-  applyCoupon,
-  removeCoupon,
   type ActiveOrderLine,
 } from "@/stores/cart";
+import { $currentUser, fetchCurrentUser } from "@/stores/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -47,6 +45,9 @@ import {
   CheckCircle2,
   HelpCircle,
   Package,
+  Truck,
+  UserPlus,
+  User,
 } from "lucide-react";
 
 /**
@@ -61,16 +62,21 @@ function formatRupees(amountInPaise: number | unknown): string {
 export default function CartView() {
   const cartState = useStore($cart);
   const cartCount = useStore($cartCount);
+  const { customer, initialized: authInitialized } = useStore($currentUser);
 
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null);
-  const [promoCode, setPromoCode] = useState("");
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   useEffect(() => {
     if (!cartState.initialized) {
       fetchActiveOrder();
     }
   }, [cartState.initialized]);
+
+  useEffect(() => {
+    if (!authInitialized) {
+      fetchCurrentUser();
+    }
+  }, [authInitialized]);
 
   const handleUpdateQty = async (lineId: string, currentQty: number, delta: number) => {
     const newQty = currentQty + delta;
@@ -89,25 +95,6 @@ export default function CartView() {
     } finally {
       setUpdatingLineId(null);
     }
-  };
-
-  const handleApplyCoupon = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!promoCode.trim()) return;
-
-    setIsApplyingPromo(true);
-    try {
-      const success = await applyCoupon(promoCode);
-      if (success) {
-        setPromoCode("");
-      }
-    } finally {
-      setIsApplyingPromo(false);
-    }
-  };
-
-  const handleRemoveCoupon = async (code: string) => {
-    await removeCoupon(code);
   };
 
   // 1. Initial Loading Skeleton
@@ -159,7 +146,7 @@ export default function CartView() {
   // 2. Empty Cart State
   if (!order || cartCount === 0 || lines.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-16 max-w-3xl text-center">
+      <div className="container mx-auto px-4 py-16 max-w-4xl text-center">
         {/* Breadcrumb Navigation */}
         <div className="flex justify-center mb-8">
           <Breadcrumb>
@@ -175,7 +162,7 @@ export default function CartView() {
           </Breadcrumb>
         </div>
 
-        <div className="flex flex-col items-center justify-center p-8 sm:p-12 rounded-3xl border border-dashed border-border/70 bg-card/50 shadow-xs max-w-lg mx-auto">
+        <div className="flex flex-col items-center justify-center p-8 sm:p-12 rounded-3xl border border-dashed border-border/70 bg-card/50 shadow-xs  mx-auto">
           <div className="size-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary mb-6 shadow-inner">
             <ShoppingBag className="size-9" />
           </div>
@@ -188,38 +175,44 @@ export default function CartView() {
             You haven't added any customized printed merchandise to your bag yet. Explore our curated collections to start personalizing.
           </p>
 
-          <a href="/products">
-            <Button size="lg" className="h-12 px-8 gap-2.5 font-semibold shadow-md shadow-primary/20">
-              <span>Explore Products</span>
-              <ArrowRight className="size-4" />
-            </Button>
-          </a>
+          {/* Action Buttons: Explore Products, Track Package, Sign Up */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full mb-6">
+            <a href="/categories" className="flex-1">
+              <Button size="lg" className="w-full h-11 sm:h-12 px-5 gap-2 font-semibold shadow-md shadow-primary/20 hover:shadow-lg transition-all">
+                <ShoppingBag className="size-4 shrink-0" />
+                <span>Explore Categories</span>
+                <ArrowRight className="size-4 shrink-0" />
+              </Button>
+            </a>
+
+            <a href="/account/orders" className="flex-1">
+              <Button size="lg" variant="outline" className="w-full h-11 sm:h-12 px-4 gap-2 font-semibold border-border/80 hover:bg-muted/70 hover:border-primary/40 transition-all">
+                <Truck className="size-4 text-primary shrink-0" />
+                <span>Track Package</span>
+              </Button>
+            </a>
+
+            {customer ? (
+              <a href="/account/profile" className="flex-1 sm:flex-none">
+                <Button size="lg" variant="outline" className="w-full h-11 sm:h-12 px-4 gap-2 font-semibold border-border/80 hover:bg-muted/70 hover:border-primary/40 transition-all">
+                  <User className="size-4 text-primary shrink-0" />
+                  <span>My Account</span>
+                </Button>
+              </a>
+            ) : (
+              <a href="/auth?tab=signup" className="flex-1 sm:flex-none">
+                <Button size="lg" variant="outline" className="w-full h-11 sm:h-12 px-4 gap-2 font-semibold border-border/80 hover:bg-muted/70 hover:border-primary/40 transition-all">
+                  <UserPlus className="size-4 text-primary shrink-0" />
+                  <span>Sign Up</span>
+                </Button>
+              </a>
+            )}
+          </div>
+
+      
         </div>
 
-        {/* Value Proposition Pills */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-2xl mx-auto text-left">
-          <div className="flex items-start gap-3 p-4 rounded-xl border bg-card/30">
-            <ShieldCheck className="size-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-xs font-bold text-foreground">Verified Print Quality</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">High definition vibrant sublimation & DTF printing</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-4 rounded-xl border bg-card/30">
-            <Package className="size-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-xs font-bold text-foreground">Secure Packaging</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Dispatched in tamper-proof bubble protection</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-4 rounded-xl border bg-card/30">
-            <FileText className="size-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-xs font-bold text-foreground">GST Invoicing</h4>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Available for input tax credit claims</p>
-            </div>
-          </div>
-        </div>
+    
 
         <Toaster />
       </div>
@@ -257,7 +250,7 @@ export default function CartView() {
           </div>
 
           <a
-            href="/products"
+            href="/categories"
             className="text-xs font-semibold text-primary hover:underline flex items-center gap-1.5"
           >
             <span>Continue Shopping</span>
@@ -272,6 +265,7 @@ export default function CartView() {
             {lines.map((line) => {
               const variant = line.productVariant;
               const product = variant.product;
+              const productUrl = product?.slug ? `/products/${product.slug}` : "/products";
               const isLineUpdating = updatingLineId === line.id;
               const imageUrl =
                 line.featuredAsset?.preview ||
@@ -287,14 +281,18 @@ export default function CartView() {
                   className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl border bg-card text-card-foreground shadow-xs transition-all hover:border-border"
                 >
                   {/* Product Thumbnail */}
-                  <div className="relative size-24 sm:size-28 rounded-xl overflow-hidden bg-muted/30 border shrink-0 flex items-center justify-center">
+                  <a
+                    href={productUrl}
+                    className="relative size-24 sm:size-28 rounded-xl overflow-hidden bg-muted/30 border shrink-0 flex items-center justify-center hover:opacity-85 transition-opacity"
+                    title={`View ${product?.name || variant.name}`}
+                  >
                     <img
                       src={imageUrl}
                       alt={product?.name || variant.name}
                       className="size-full object-cover object-center"
                       loading="lazy"
                     />
-                  </div>
+                  </a>
 
                   {/* Line Details */}
                   <div className="flex flex-1 flex-col justify-between min-w-0">
@@ -302,7 +300,7 @@ export default function CartView() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <a
-                            href={product?.slug ? `/products/${product.slug}` : "/products"}
+                            href={productUrl}
                             className="font-bold text-base sm:text-lg text-foreground hover:text-primary transition-colors line-clamp-1"
                           >
                             {product?.name || variant.name}
@@ -462,53 +460,6 @@ export default function CartView() {
 
                 <Separator />
 
-                {/* Promo Code Input */}
-                <form onSubmit={handleApplyCoupon} className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Promo / Coupon code"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      className="h-9 text-xs"
-                    />
-                    <Button
-                      type="submit"
-                      variant="secondary"
-                      size="sm"
-                      disabled={isApplyingPromo || !promoCode.trim()}
-                      className="h-9 px-3.5 text-xs font-semibold shrink-0 cursor-pointer"
-                    >
-                      {isApplyingPromo ? <Spinner className="size-3.5" /> : "Apply"}
-                    </Button>
-                  </div>
-
-                  {/* Active Coupons Badges */}
-                  {order.couponCodes && order.couponCodes.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {order.couponCodes.map((code) => (
-                        <Badge
-                          key={code}
-                          variant="secondary"
-                          className="text-[11px] gap-1.5 pl-2 pr-1 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                        >
-                          <Tag className="size-3" />
-                          <span className="font-mono">{code}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveCoupon(code)}
-                            className="hover:text-destructive p-0.5 rounded-full"
-                            title="Remove coupon"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </form>
-
-                <Separator />
-
                 {/* Total */}
                 <div className="flex items-baseline justify-between pt-1">
                   <span className="text-base font-bold text-foreground">Estimated Total</span>
@@ -527,11 +478,14 @@ export default function CartView() {
                   size="lg"
                   className="w-full h-12 text-sm font-semibold gap-2 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer mt-2"
                   onClick={() => {
-                    // Direct to checkout page or contact flow
-                    window.location.href = "/checkout";
+                    if (authInitialized && !customer) {
+                      window.location.href = "/auth?tab=signin&redirect=/checkout";
+                    } else {
+                      window.location.href = "/checkout";
+                    }
                   }}
                 >
-                  <span>Proceed to Checkout</span>
+                  <span>{customer ? "Proceed to Checkout" : "Sign In to Checkout"}</span>
                   <ArrowRight className="size-4" />
                 </Button>
               </CardContent>

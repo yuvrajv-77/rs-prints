@@ -210,7 +210,7 @@ export default function UserNav() {
                   </a>
 
                   <a
-                    href="/products"
+                    href="/categories"
                     onClick={() => setIsUserOpen(false)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-foreground/90 hover:text-foreground hover:bg-muted/70 transition-colors"
                   >
@@ -243,10 +243,10 @@ export default function UserNav() {
                   </p>
                 </div>
 
-                {/* Google Sign-In */}
+                {/* Google Sign-In (Hidden as requested) */}
                 <a
                   href="/auth?tab=signin"
-                  className="w-full flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl border border-border/80 bg-background hover:bg-muted/60 text-xs sm:text-sm font-medium text-foreground transition-all shadow-xs"
+                  className="hidden w-full items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl border border-border/80 bg-background hover:bg-muted/60 text-xs sm:text-sm font-medium text-foreground transition-all shadow-xs"
                 >
                   <svg className="size-4 shrink-0" viewBox="0 0 24 24">
                     <path
@@ -269,8 +269,8 @@ export default function UserNav() {
                   <span>Sign in with Google</span>
                 </a>
 
-                {/* Divider */}
-                <div className="relative flex items-center justify-center">
+                {/* Divider (Hidden) */}
+                <div className="hidden relative items-center justify-center">
                   <div className="w-full border-t border-border/60" />
                   <span className="absolute bg-background px-2 text-[10px] uppercase tracking-wider text-muted-foreground">
                     or

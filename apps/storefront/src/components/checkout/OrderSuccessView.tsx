@@ -400,7 +400,7 @@ export default function OrderSuccessView({ orderCode: propCode }: OrderSuccessPr
           <Button
             size="sm"
             className="gap-2 cursor-pointer text-xs font-semibold"
-            onClick={() => (window.location.href = "/products")}
+            onClick={() => (window.location.href = "/categories")}
           >
             <ShoppingBag className="size-3.5" />
             <span>Continue Shopping</span>

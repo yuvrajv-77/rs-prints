@@ -202,7 +202,7 @@ export default function OrdersView() {
             You don't have any orders under this filter yet. Explore our customized printing collection to place your first order!
           </p>
           <a
-            href="/products"
+            href="/categories"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#f0643b] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#df562f] transition-all shadow-sm"
           >
             <ShoppingBag className="size-4" />

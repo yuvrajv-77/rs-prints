@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useStore } from "@nanostores/react"
 import { activeVariantImageStore } from "@/stores/product"
 import { Badge } from "@/components/ui/badge"
-import { SparklesIcon, ShieldCheckIcon } from "lucide-react"
+import { SparklesIcon } from "lucide-react"
 
 interface ProductGalleryProps {
   /** Array of product images, including primary, variant-specific, and secondary gallery shots */
@@ -13,8 +13,6 @@ interface ProductGalleryProps {
   }[]
   /** Promotional badge text (e.g. "Best Seller", "Custom Printed") */
   badge?: string
-  /** Turnaround speed badge text (e.g. "24-48 Hours") */
-  turnaround?: string
 }
 
 /**
@@ -31,7 +29,6 @@ interface ProductGalleryProps {
 export default function ProductGallery({
   images,
   badge = "Custom Printed",
-  turnaround = "Fast Dispatch"
 }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const activeVariantImage = useStore(activeVariantImageStore)
@@ -62,18 +59,14 @@ export default function ProductGallery({
       {/* Main Image Container */}
       <div className="relative overflow-hidden rounded-2xl bg-muted/30 aspect-4/3 sm:aspect-square flex items-center justify-center">
         {/* Floating Badges */}
-        <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
-          {badge && (
+        {badge && (
+          <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
             <Badge variant="default">
               <SparklesIcon className="size-3 mr-1" />
               {badge}
             </Badge>
-          )}
-          <Badge variant="secondary">
-            <ShieldCheckIcon className="size-3 mr-1" />
-            {turnaround}
-          </Badge>
-        </div>
+          </div>
+        )}
 
         {/* Primary Preview */}
         {displayImageUrl ? (

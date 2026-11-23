@@ -17,7 +17,7 @@ export default function SavedCreationsView() {
         </div>
 
         <a
-          href="/products"
+          href="/categories"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#f0643b] hover:bg-[#df562f] text-white text-xs font-bold uppercase tracking-wider transition-all self-start sm:self-auto cursor-pointer"
         >
           <Plus className="size-4" />
@@ -35,7 +35,7 @@ export default function SavedCreationsView() {
           Design your personalized T-Shirts, Coffee Mugs, Photo Frames, and Keychains. Save your work in progress to quickly order anytime.
         </p>
         <a
-          href="/products"
+          href="/categories"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-all"
         >
           <Sparkles className="size-4 text-amber-400" />

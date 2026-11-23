@@ -120,11 +120,19 @@ const categoriesForNav = groupedSections
                   <div
                     class="flex items-center justify-between border-b border-border/50 px-2 pt-1 pb-2"
                   >
-                    <h3
-                      class="text-base font-bold tracking-tight text-foreground"
-                    >
-                      Categories
-                    </h3>
+                    <div>
+                      <h3
+                        class="text-base font-bold tracking-tight text-foreground"
+                      >
+                        Categories
+                      </h3>
+                      <a
+                        href="/categories"
+                        class="text-[11px] text-primary hover:underline font-medium"
+                      >
+                        View Directory &rarr;
+                      </a>
+                    </div>
                     <span class="font-mono text-xs text-muted-foreground"
                       >{categoriesForNav.length} categories</span
                     >

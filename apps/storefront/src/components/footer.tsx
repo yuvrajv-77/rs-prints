@@ -25,7 +25,12 @@ export default function Footer() {
                     
                     {/* Brand & Mission Statement */}
                     <div className="max-w-md space-y-3">
-                        <a href="/" className="inline-block group">
+                        <a href="/" className="inline-flex items-center gap-2.5 sm:gap-3 group select-none">
+                            <img
+                                src="/favicon.png"
+                                alt="RS Prints Logo"
+                                className="size-8 md:size-10 object-contain shrink-0 transition-transform group-hover:scale-105"
+                            />
                             <span className="font-heading text-3xl md:text-4xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                                 RS Prints
                             </span>
@@ -114,12 +119,6 @@ export default function Footer() {
                             className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
                         >
                             Shipping & Returns
-                        </a>
-                        <a 
-                            href="/faq" 
-                            className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
-                        >
-                            FAQs
                         </a>
                         <a 
                             href="/contact" 

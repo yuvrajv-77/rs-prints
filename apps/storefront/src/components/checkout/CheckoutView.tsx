@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { $cart, fetchActiveOrder, clearCartState } from "@/stores/cart";
+import { $cart, fetchActiveOrder, clearCartState, applyCoupon, removeCoupon } from "@/stores/cart";
 import { $currentUser, fetchCurrentUser } from "@/stores/auth";
 import {
   getEligibleShippingMethods,
@@ -48,6 +48,7 @@ import {
   Banknote,
   ShoppingBag,
   Zap,
+  Tag,
 } from "lucide-react";
 
 interface ShippingQuote {
@@ -101,11 +102,14 @@ const INDIAN_STATES = [
 
 function formatRupees(amountInPaise?: number | null): string {
   if (typeof amountInPaise !== "number") return "₹0";
+  const rupees = amountInPaise / 100;
+  const hasDecimals = Math.abs(amountInPaise % 100) !== 0;
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(Math.round(amountInPaise / 100));
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: 2,
+  }).format(rupees);
 }
 
 export default function CheckoutView() {
@@ -130,12 +134,33 @@ export default function CheckoutView() {
   const [shippingMethods, setShippingMethods] = useState<ShippingQuote[]>([]);
   const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string>("");
   const [paymentMethods, setPaymentMethods] = useState<PaymentQuote[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"razorpay" | "cash-on-delivery">("razorpay");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"razorpay" | "cash-on-delivery">("cash-on-delivery");
 
   // Status State
   const [isMethodsLoading, setIsMethodsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Promo / Coupon Code State
+  const [promoCode, setPromoCode] = useState("");
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!promoCode.trim()) return;
+    setIsApplyingPromo(true);
+    try {
+      const success = await applyCoupon(promoCode);
+      if (success) {
+        setPromoCode("");
+      }
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
+
+  const handleRemoveCoupon = async (code: string) => {
+    await removeCoupon(code);
+  };
 
   // 1. Initial hydration of cart & auth
   useEffect(() => {
@@ -153,6 +178,18 @@ export default function CheckoutView() {
       if (!phone && cust.phoneNumber) setPhone(cust.phoneNumber);
     }
   }, [authState.customer, order?.customer]);
+
+  // 2b. Prefill address from order if already set
+  useEffect(() => {
+    if (order?.shippingAddress) {
+      const addr = order.shippingAddress;
+      if (!streetLine1 && addr.streetLine1) setStreetLine1(addr.streetLine1);
+      if (!streetLine2 && addr.streetLine2) setStreetLine2(addr.streetLine2);
+      if (!city && addr.city) setCity(addr.city);
+      if (addr.province) setProvince(addr.province);
+      if (!postalCode && addr.postalCode) setPostalCode(addr.postalCode);
+    }
+  }, [order?.shippingAddress]);
 
   // 3. Load eligible shipping and payment methods
   useEffect(() => {
@@ -182,17 +219,37 @@ export default function CheckoutView() {
     loadMethods();
   }, []);
 
-  // When order shipping updates, recompute shipping quote
+  // Pricing calculations
+  const rawSubtotal = lines.reduce((acc, line) => acc + (line.linePriceWithTax || 0), 0);
+  const currentSubtotal = order?.subTotalWithTax ?? rawSubtotal;
+
+  // Vendure returns discount amounts as negative numbers (e.g. -2500 for ₹25)
+  const discountFromDiscounts = Math.abs(
+    order?.discounts?.reduce((acc, d) => acc + (d.amountWithTax || 0), 0) ?? 0
+  );
+  // Also check difference between raw item prices and discounted subTotal
+  const discountFromLines = Math.max(0, rawSubtotal - currentSubtotal);
+  const totalDiscounts = Math.max(discountFromDiscounts, discountFromLines);
+
   const selectedShipping = shippingMethods.find((s) => s.id === selectedShippingMethodId);
   const estimatedShippingCost = selectedShipping ? selectedShipping.priceWithTax : (order?.shippingWithTax ?? 0);
-  const currentSubtotal = order?.subTotalWithTax ?? 0;
-  const totalDiscounts = order?.discounts?.reduce((acc, d) => acc + (d.amountWithTax || 0), 0) ?? 0;
-  const estimatedGrandTotal = Math.max(0, currentSubtotal - totalDiscounts + estimatedShippingCost);
+  const estimatedGrandTotal = Math.max(0, currentSubtotal + estimatedShippingCost);
 
   // Handle Form Submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMessage(null);
+
+    // Require authentication to checkout
+    if (!authState.customer) {
+      toast.add({
+        title: "Sign In Required",
+        description: "Please sign in to your RS Prints account to complete your order.",
+        type: "error",
+      });
+      window.location.href = "/auth?tab=signin&redirect=/checkout";
+      return;
+    }
 
     // Validation
     if (!firstName.trim() || !lastName.trim()) {
@@ -221,28 +278,21 @@ export default function CheckoutView() {
       setErrorMessage("Please enter a valid 6-digit Indian PIN code.");
       return;
     }
-    if (!selectedShippingMethodId && shippingMethods.length > 0) {
-      setErrorMessage("Please choose a delivery method.");
-      return;
-    }
 
     setIsSubmitting(true);
 
     try {
-      // Step 1: Set Customer details
-      // Only required for guest checkouts. When already logged in, Vendure has already linked
-      // the authenticated Customer to this active order.
-      const isAlreadyLoggedIn = Boolean(authState.customer || order?.customer);
-      if (!isAlreadyLoggedIn) {
+      // Step 1: Link Customer details to order if needed
+      if (!order?.customer) {
         const customerRes = await setCustomerForOrder({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          emailAddress: email.trim(),
-          phoneNumber: cleanPhone,
+          firstName: firstName.trim() || authState.customer.firstName || "",
+          lastName: lastName.trim() || authState.customer.lastName || "",
+          emailAddress: email.trim() || authState.customer.emailAddress || "",
+          phoneNumber: cleanPhone || authState.customer.phoneNumber || undefined,
         });
 
         if (customerRes.error) {
-          throw new Error(customerRes.error);
+          console.warn("setCustomerForOrder notice:", customerRes.error);
         }
       }
 
@@ -263,8 +313,19 @@ export default function CheckoutView() {
       }
 
       // Step 3: Set Shipping Method
-      if (selectedShippingMethodId) {
-        const shippingRes = await setOrderShippingMethod(selectedShippingMethodId);
+      let shippingMethodIdToUse = selectedShippingMethodId;
+      if (!shippingMethodIdToUse && shippingMethods.length > 0) {
+        shippingMethodIdToUse = shippingMethods[0].id;
+      }
+      if (!shippingMethodIdToUse) {
+        const eligible = await getEligibleShippingMethods();
+        if (eligible && eligible.length > 0) {
+          shippingMethodIdToUse = eligible[0].id;
+        }
+      }
+
+      if (shippingMethodIdToUse) {
+        const shippingRes = await setOrderShippingMethod(shippingMethodIdToUse);
         if (shippingRes.error) {
           throw new Error(shippingRes.error);
         }
@@ -364,14 +425,66 @@ export default function CheckoutView() {
     }
   }
 
-  // Loading state
-  if (!cartState.initialized) {
+  // Loading state (Cart & Auth)
+  if (!cartState.initialized || !authState.initialized) {
     return (
       <div className="container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-[50vh] text-center">
         <Spinner className="size-10 text-primary mb-4" />
         <p className="text-sm font-medium text-muted-foreground animate-pulse">
           Preparing secure checkout...
         </p>
+      </div>
+    );
+  }
+
+  // Authentication Required Gate
+  if (!authState.customer) {
+    return (
+      <div className="container mx-auto px-4 py-16 max-w-2xl text-center">
+        <div className="rounded-3xl border bg-card p-8 sm:p-12 shadow-sm space-y-6">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Lock className="size-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+              Sign In to Complete Your Order
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              You must be logged in to proceed with checkout and place your order. Sign in or create an account to continue.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto font-bold shadow-md shadow-primary/20 gap-2 cursor-pointer"
+              onClick={() => (window.location.href = "/auth?tab=signin&redirect=/checkout")}
+            >
+              <User className="size-4" />
+              <span>Sign In to Account</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto font-semibold cursor-pointer"
+              onClick={() => (window.location.href = "/auth?tab=signup&redirect=/checkout")}
+            >
+              <span>Create an Account</span>
+            </Button>
+          </div>
+
+          <div className="pt-4 border-t flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <a href="/cart" className="hover:text-foreground flex items-center gap-1 font-medium transition-colors">
+              <ArrowLeft className="size-3.5" />
+              <span>Return to Cart</span>
+            </a>
+            <span>•</span>
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <ShieldCheck className="size-3.5" />
+              <span>256-Bit SSL Encrypted Checkout</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -393,7 +506,7 @@ export default function CheckoutView() {
           <Button
             size="lg"
             className="cursor-pointer gap-2 font-semibold shadow-md shadow-primary/20"
-            onClick={() => (window.location.href = "/products")}
+            onClick={() => (window.location.href = "/categories")}
           >
             <span>Explore Products</span>
           </Button>
@@ -782,32 +895,73 @@ export default function CheckoutView() {
               <div className="max-h-60 overflow-y-auto space-y-3 pr-1 divide-y divide-border/40">
                 {lines.map((line) => {
                   const variant = line.productVariant;
+                  const product = variant.product;
+                  const productUrl = product?.slug ? `/products/${product.slug}` : "/products";
                   const imageUrl =
                     line.featuredAsset?.preview ||
                     variant.featuredAsset?.preview ||
-                    variant.product?.featuredAsset?.preview ||
+                    product?.featuredAsset?.preview ||
                     "/placeholder-product.png";
+
+                  const isLineDiscounted =
+                    typeof line.discountedUnitPriceWithTax === "number" &&
+                    line.discountedUnitPriceWithTax < line.unitPriceWithTax;
+
+                  const lineEffectivePrice = isLineDiscounted
+                    ? line.discountedUnitPriceWithTax * line.quantity
+                    : line.linePriceWithTax;
 
                   return (
                     <div key={line.id} className="flex items-center gap-3 pt-2.5 first:pt-0">
-                      <div className="size-12 rounded-lg bg-muted/40 border shrink-0 overflow-hidden flex items-center justify-center">
+                      <a
+                        href={productUrl}
+                        className="size-12 rounded-lg bg-muted/40 border shrink-0 overflow-hidden flex items-center justify-center hover:opacity-85 transition-opacity"
+                        title={`View ${product?.name || variant.name}`}
+                      >
                         <img
                           src={imageUrl}
                           alt={variant.name}
                           className="size-full object-cover"
                         />
-                      </div>
+                      </a>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-semibold text-foreground truncate">
-                          {variant.product?.name || variant.name}
-                        </h4>
-                        <p className="text-[11px] text-muted-foreground">
-                          Qty: {line.quantity} × {formatRupees(line.unitPriceWithTax)}
-                        </p>
+                        <a
+                          href={productUrl}
+                          className="text-xs font-semibold text-foreground hover:text-primary transition-colors truncate block"
+                          title={`View ${product?.name || variant.name}`}
+                        >
+                          {product?.name || variant.name}
+                        </a>
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                          <span>Qty: {line.quantity} ×</span>
+                          {isLineDiscounted ? (
+                            <>
+                              <span className="line-through text-muted-foreground/70">
+                                {formatRupees(line.unitPriceWithTax)}
+                              </span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                {formatRupees(line.discountedUnitPriceWithTax)}
+                              </span>
+                            </>
+                          ) : (
+                            <span>{formatRupees(line.unitPriceWithTax)}</span>
+                          )}
+                        </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-foreground">
-                          {formatRupees(line.linePriceWithTax)}
+                        {isLineDiscounted && (
+                          <div className="text-[10px] line-through text-muted-foreground/70">
+                            {formatRupees(line.linePriceWithTax)}
+                          </div>
+                        )}
+                        <span
+                          className={`text-xs font-bold ${
+                            isLineDiscounted
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-foreground"
+                          }`}
+                        >
+                          {formatRupees(lineEffectivePrice)}
                         </span>
                       </div>
                     </div>
@@ -817,18 +971,89 @@ export default function CheckoutView() {
 
               <Separator />
 
+              {/* Promo / Coupon Code Section */}
+              {order?.couponCodes && order.couponCodes.length > 0 ? (
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-950/20 p-3 flex items-center justify-between gap-2.5 transition-all">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <Tag className="size-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                          {order.couponCodes[0]}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 font-bold px-1.5 py-0"
+                        >
+                          Applied
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-emerald-600/90 dark:text-emerald-400/90 truncate mt-0.5">
+                        {totalDiscounts > 0
+                          ? `Saved ${formatRupees(totalDiscounts)} on this order`
+                          : "Coupon code applied (minimum cart requirements not met)"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={isApplyingPromo}
+                    onClick={() => handleRemoveCoupon(order.couponCodes[0])}
+                    className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 px-2.5 shrink-0 cursor-pointer"
+                  >
+                    {isApplyingPromo ? <Spinner className="size-3.5" /> : "Remove"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Coupon code (e.g. SAVE10)"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      className="h-9 text-xs"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleApplyCoupon}
+                      disabled={isApplyingPromo || !promoCode.trim()}
+                      className="h-9 px-3.5 text-xs font-semibold shrink-0 cursor-pointer"
+                    >
+                      {isApplyingPromo ? <Spinner className="size-3.5" /> : "Apply"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
               {/* Price Breakdown */}
               <div className="space-y-2 text-xs">
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Items Subtotal</span>
                   <span className="font-semibold text-foreground">
-                    {formatRupees(currentSubtotal)}
+                    {formatRupees(rawSubtotal)}
                   </span>
                 </div>
 
                 {totalDiscounts > 0 && (
                   <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <span>Discount Savings</span>
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="size-3" />
+                      <span>Discount Savings</span>
+                    </span>
                     <span>-{formatRupees(totalDiscounts)}</span>
                   </div>
                 )}

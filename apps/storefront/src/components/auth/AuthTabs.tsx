@@ -112,7 +112,7 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
         return redirect
       }
     }
-    return "/products"
+    return "/categories"
   }
 
   // ==========================================
@@ -403,8 +403,8 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
         </button>
       </div>
 
-      {/* Social Logins */}
-      <div className="space-y-2 mb-5">
+      {/* Social Logins (Hidden as requested) */}
+      <div className="hidden space-y-2 mb-5">
         <Button
           type="button"
           variant="outline"
@@ -440,8 +440,8 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
         </Button>
       </div>
 
-      {/* Divider */}
-      <div className="relative my-5">
+      {/* Divider (Hidden) */}
+      <div className="hidden relative my-5">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
         </div>
@@ -683,7 +683,7 @@ export default function AuthTabs({ initialTab = "signin" }: AuthTabsProps) {
                       type: "info",
                     })
                   }}
-                  className="w-full h-8 text-xs font-medium rounded-xl border-border/80 hover:bg-muted/60 flex items-center justify-center gap-2 cursor-pointer"
+                  className="hidden w-full h-8 text-xs font-medium rounded-xl border-border/80 hover:bg-muted/60 items-center justify-center gap-2 cursor-pointer"
                 >
                   <svg className="size-3.5 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.14z" />

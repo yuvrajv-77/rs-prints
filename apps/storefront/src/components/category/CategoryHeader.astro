@@ -1,0 +1,104 @@
+---
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
+import { Badge } from "@/components/ui/badge"
+import { ArrowLeft, Layers } from "lucide-react"
+
+interface BreadcrumbStep {
+  title: string
+  href?: string
+}
+
+interface Props {
+  title: string
+  description?: string
+  totalCount?: number
+  breadcrumbs: BreadcrumbStep[]
+  parentBacktrack?: {
+    title: string
+    href: string
+    count?: number
+  }
+}
+
+const { title, description, totalCount, breadcrumbs, parentBacktrack } = Astro.props
+---
+
+<header class="border-b border-border/60 bg-linear-to-b from-primary/10 via-background to-background pt-6 pb-8 md:pt-10 md:pb-12">
+  <div class="container mx-auto px-4">
+    <!-- Responsive Breadcrumbs -->
+    <div class="mb-5 overflow-x-auto scrollbar-none py-1">
+      <Breadcrumb>
+        <BreadcrumbList className="text-xs sm:text-sm flex-nowrap whitespace-nowrap">
+          {breadcrumbs.map((crumb, idx) => {
+            const isLast = idx === breadcrumbs.length - 1
+            return (
+              <>
+                <BreadcrumbItem>
+                  {isLast || !crumb.href ? (
+                    <BreadcrumbPage className="font-semibold text-foreground max-w-[200px] sm:max-w-none truncate">
+                      {crumb.title}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink href={crumb.href} className="text-muted-foreground hover:text-foreground">
+                      {crumb.title}
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {!isLast && <BreadcrumbSeparator />}
+              </>
+            )
+          })}
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
+
+    <!-- Backtrack parent link (if on subcategory page) -->
+    {parentBacktrack && (
+      <div class="mb-4">
+        <a
+          href={parentBacktrack.href}
+          class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors bg-primary/10 hover:bg-primary/15 px-3 py-1.5 rounded-full border border-primary/20"
+        >
+          <ArrowLeft className="size-3.5" />
+          <span>All {parentBacktrack.title}</span>
+          {parentBacktrack.count !== undefined && (
+            <span class="text-[11px] font-mono opacity-80">({parentBacktrack.count})</span>
+          )}
+        </a>
+      </div>
+    )}
+
+    <!-- Main Title & Description -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div class="space-y-2 max-w-3xl">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <h1 class="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
+            {title}
+          </h1>
+          {totalCount !== undefined && (
+            <Badge variant="secondary" className="text-xs font-mono px-2.5 py-0.5 rounded-full">
+              {totalCount} {totalCount === 1 ? "Product" : "Products"}
+            </Badge>
+          )}
+        </div>
+        {description && (
+          <p class="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed">
+            {description}
+          </p>
+        )}
+      </div>
+
+      <div class="hidden lg:flex items-center gap-2 text-xs text-muted-foreground font-mono self-start md:self-auto">
+        <Layers className="size-4 text-primary" />
+        <span>RS Prints Catalog</span>
+      </div>
+    </div>
+  </div>
+</header>

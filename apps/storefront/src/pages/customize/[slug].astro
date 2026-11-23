@@ -1,0 +1,80 @@
+---
+/**
+ * Dynamic Custom Product Customizer Route (`/customize/[slug]`)
+ *
+ * Lets customers upload their custom photos, logos, and custom text onto
+ * realistic merchandise mockups (T-shirts, Mugs, etc.) with real-time editing.
+ */
+import Layout from "@/layouts/main.astro"
+import ProductCustomizer from "@/components/customizer/ProductCustomizer"
+import type { Product } from "@/types/product"
+import { getProductBySlug } from "@/lib/vendure/queries/products"
+import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
+import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage
+} from "@/components/ui/breadcrumb"
+
+// Edge Caching
+setEdgeCache(Astro.response, CACHE_PRESETS.PRODUCT_DETAIL)
+
+const { slug } = Astro.params
+
+let vendureProduct = null
+try {
+  vendureProduct = await getProductBySlug(slug!)
+} catch (err) {
+  console.error(`Error loading product for customize slug "${slug}":`, err)
+}
+
+let product: Product | undefined = undefined
+
+if (vendureProduct) {
+  product = mapVendureProductToStorefrontProduct(vendureProduct)
+} else {
+  const { getProductBySlug: getMockProduct } = await import("@/data/products")
+  const mockProduct = getMockProduct(slug!)
+  if (mockProduct) {
+    product = mockProduct
+  }
+}
+---
+
+<Layout
+  title={product ? `Customize ${product.title} - Online Mockup Studio` : "Online Product Customizer - RS Prints"}
+  description="Design and preview custom t-shirts, mugs, and merchandise. Upload your own artwork, add text, and export print-ready proofs."
+  canonicalUrl={`/customize/${slug}`}
+>
+  <div class="container mx-auto px-4 py-6">
+    <Breadcrumb className="mb-4">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/categories">Categories</BreadcrumbLink>
+        </BreadcrumbItem>
+        {product && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/products/${product.slug}`}>{product.title}</BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Customizer Studio</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+
+    <ProductCustomizer client:load product={product} />
+  </div>
+</Layout>

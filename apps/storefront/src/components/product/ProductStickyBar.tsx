@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import type { Product } from "@/types/product"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { MessageCircleIcon } from "lucide-react"
 
 interface ProductStickyBarProps {
@@ -35,14 +34,9 @@ export default function ProductStickyBar({ product }: ProductStickyBarProps) {
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-3 shadow-lg animate-in slide-in-from-bottom duration-300">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-foreground truncate block">
-              {product.title}
-            </span>
-            <Badge variant="outline" className="text-[10px] py-0 px-1 border-primary/40 shrink-0">
-              {product.turnaround}
-            </Badge>
-          </div>
+          <span className="text-xs font-bold text-foreground truncate block">
+            {product.title}
+          </span>
           <div className="text-xs text-muted-foreground">
             From <span className="text-sm font-extrabold text-foreground">{product.startingPrice}</span>
           </div>

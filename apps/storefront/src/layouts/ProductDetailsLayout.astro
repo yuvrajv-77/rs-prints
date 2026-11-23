@@ -92,13 +92,13 @@ const schemaMarkup = [
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href="/products">Products</BreadcrumbLink>
+          <BreadcrumbLink href="/categories">Categories</BreadcrumbLink>
         </BreadcrumbItem>
         {parentCollection && (
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/products#${parentCollection.slug}`}>
+              <BreadcrumbLink href={`/categories/${parentCollection.slug}`}>
                 {parentCollection.name}
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -108,7 +108,7 @@ const schemaMarkup = [
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/products#${subcollection.slug}`}>
+              <BreadcrumbLink href={parentCollection ? `/categories/${parentCollection.slug}/${subcollection.slug}` : `/categories/${subcollection.slug}`}>
                 {subcollection.name}
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -129,7 +129,6 @@ const schemaMarkup = [
           client:load
           images={product.images}
           badge={product.badge}
-          turnaround={product.turnaround}
         />
       </div>
 

@@ -185,36 +185,29 @@ export default function MobileNav() {
                     <div className="my-2 border-b border-border/60 mx-4" />
 
                     {/* Main Categories Navigation List */}
-                    <div className="px-2 space-y-0.5">
-                      <a
-                        href="/products"
-                        className="flex items-center px-3 py-2.5 rounded-lg text-sm font-bold text-foreground hover:bg-muted/70 transition-colors"
-                      >
-                        View All
-                      </a>
-
+                    <div className="px-2 space-y-1">
                       {NAVIGATION_CATEGORIES.map((category) => (
-                        <button
+                        <div
                           key={category.id}
-                          type="button"
-                          onClick={() => setActiveCategory(category)}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-foreground hover:bg-muted/70 transition-colors text-left group"
+                          className="flex items-center justify-between rounded-lg hover:bg-muted/70 transition-colors pr-1 group"
                         >
-                          <span>{category.title}</span>
-                          <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
-                        </button>
+                          <a
+                            href={category.href}
+                            onClick={() => setIsOpen(false)}
+                            className="flex-1 px-3 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors text-left"
+                          >
+                            {category.title}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => setActiveCategory(category)}
+                            aria-label={`Open ${category.title} subcategories`}
+                            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                          >
+                            <ChevronRight className="size-4 shrink-0" />
+                          </button>
+                        </div>
                       ))}
-
-                      {/* Additional Links */}
-                      <a
-                        href="/bulk-order"
-                        className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-foreground hover:bg-muted/70 transition-colors"
-                      >
-                        <span>Bulk Orders</span>
-                        <span className="rounded-full bg-primary/15 text-primary text-[10px] px-2 py-0.5 font-mono">
-                          Min 40
-                        </span>
-                      </a>
                     </div>
                   </div>
                 </div>
@@ -229,22 +222,31 @@ export default function MobileNav() {
                       className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors py-1.5 px-1 rounded-md"
                     >
                       <ArrowLeft className="size-4 shrink-0 text-foreground" />
-                      <span className="truncate max-w-[240px]">
+                      <span className="truncate max-w-[170px]">
                         {activeCategory.title}
                       </span>
                     </button>
 
-                    <SheetClose
-                      render={
-                        <button
-                          type="button"
-                          aria-label="Close menu"
-                          className="flex size-9 items-center justify-center rounded-lg text-foreground/80 hover:text-foreground hover:bg-muted transition-colors shrink-0"
-                        />
-                      }
-                    >
-                      <X className="size-5" />
-                    </SheetClose>
+                    <div className="flex items-center gap-1">
+                      <a
+                        href={activeCategory.href}
+                        onClick={() => setIsOpen(false)}
+                        className="text-xs font-semibold text-primary hover:underline px-2 py-1"
+                      >
+                        Visit Category
+                      </a>
+                      <SheetClose
+                        render={
+                          <button
+                            type="button"
+                            aria-label="Close menu"
+                            className="flex size-9 items-center justify-center rounded-lg text-foreground/80 hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                          />
+                        }
+                      >
+                        <X className="size-5" />
+                      </SheetClose>
+                    </div>
                   </div>
 
                   {/* Submenu Navigation with Accordion */}
@@ -281,6 +283,15 @@ export default function MobileNav() {
                                   </a>
                                 </li>
                               ))}
+                              <li className="pt-1 pb-1 pl-7 pr-4">
+                                <a
+                                  href={subcat.href}
+                                  onClick={() => setIsOpen(false)}
+                                  className="text-xs font-semibold text-primary hover:underline"
+                                >
+                                  View all {subcat.title} &rarr;
+                                </a>
+                              </li>
                             </ul>
                           </AccordionContent>
                         </AccordionItem>
@@ -288,13 +299,14 @@ export default function MobileNav() {
                     </Accordion>
 
                     {/* Bottom: See All Link */}
-                    <div className="pt-4 px-4 pb-6">
+                    <div className="pt-4 px-4 pb-6 border-t border-border/30 mt-4">
                       <a
-                        href={activeCategory.seeAllHref}
+                        href={activeCategory.href}
                         onClick={() => setIsOpen(false)}
-                        className="block text-sm font-semibold text-foreground hover:text-primary transition-colors py-2"
+                        className="flex items-center justify-between text-sm font-semibold text-primary hover:underline py-2"
                       >
-                        See All
+                        <span>Shop all {activeCategory.title} products</span>
+                        <ChevronRight className="size-4" />
                       </a>
                     </div>
                   </div>

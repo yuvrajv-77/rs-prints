@@ -1,7 +1,7 @@
 /**
  * Product Highlights
  * Bullet points displayed on the product detail page summarizing key selling points
- * (e.g. "Fast Turnaround", "High-Definition Print").
+ * (e.g. "Prompt Dispatch", "High-Definition Print").
  */
 export interface ProductHighlight {
   /** Short headline title of the highlight */
@@ -163,8 +163,8 @@ export interface Product {
   startingPriceNumber: number
   /** Minimum order quantity text (e.g. "1 Piece") */
   minOrder: string
-  /** Typical production & dispatch timeline (e.g. "24-48 Hours") */
-  turnaround: string
+  /** Typical production & dispatch timeline (optional) */
+  turnaround?: string
   /** Promotional or status pill (e.g. "Best Seller", "Custom Printed") */
   badge?: string
   /** Internal catalogue / SKU code used for print inventory reference */

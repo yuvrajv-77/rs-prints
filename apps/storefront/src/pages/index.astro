@@ -6,7 +6,7 @@ import CategoryCarousel from "@/components/CategoryCarousel"
 import CustomerFavoritesCarousel from "@/components/product/CustomerFavoritesCarousel"
 import ProductCarousel from "@/components/product/ProductCarousel"
 import { getProductBySlug } from "@/data/products"
-import { getFeaturedProducts } from "@/lib/vendure/queries/products"
+import { getCollectionProducts, getFeaturedProducts } from "@/lib/vendure/queries/products"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 import brandConfig from "@/data/brandConfig.json"
 
@@ -35,29 +35,7 @@ import {
   Sparkle,
 } from "lucide-react"
 
-// Trust and value proposition badges
-const valueHighlights = [
-  {
-    icon: Clock,
-    title: "Fast Dispatch",
-    desc: "Speedy production & prompt shipping across India",
-  },
-  {
-    icon: Package,
-    title: "No Minimum Orders",
-    desc: "Order 1 personalized piece or 5,000+ units",
-  },
-  {
-    icon: Sparkles,
-    title: "High-Definition Prints",
-    desc: "Vibrant, durable sublimation & direct print clarity",
-  },
-  {
-    icon: Layers,
-    title: "Bulk Tier Savings",
-    desc: "Save up to 45% for corporate, college & event orders",
-  },
-]
+
 
 // 3-step simple process
 const howItWorks = [
@@ -112,8 +90,24 @@ const defaultFeaturedItems = [
   { slug: "blended-plush-tote-bag-a090", categorySlug: "tote-bag" },
 ]
 
-// Fetch ONLY 8 lightweight featured products from Vendure instead of downloading the entire catalog
-let featuredProducts = await getFeaturedProducts(8)
+// 1. Fetch Customer Favorites from Vendure collection (falls back to top Vendure products or curated bestsellers if empty/offline)
+let featuredProducts = await getCollectionProducts(
+  [
+    "customers-favourite",
+    "customers-favourites",
+    "customer-favourites",
+    "customer-favourite",
+    "customers-favorites",
+    "customers-favorite",
+    "customer-favorites",
+    "customer-favorite",
+  ],
+  10
+)
+
+if (featuredProducts.length === 0) {
+  featuredProducts = await getFeaturedProducts(10)
+}
 
 if (featuredProducts.length === 0) {
   featuredProducts = defaultFeaturedItems
@@ -138,12 +132,20 @@ const defaultGiftSlugs = [
   { slug: "rectangular-mdf-keychain-a044", categorySlug: "mdf-products" },
 ]
 
-const giftProducts = defaultGiftSlugs
-  .map((item) => {
-    const prod = getProductBySlug(item.slug)
-    return prod ? { product: prod, categorySlug: item.categorySlug } : null
-  })
-  .filter((x): x is { product: any; categorySlug: string } => Boolean(x))
+// 2. Fetch Gift Items from Vendure collection (falls back to local curated gifts if empty/offline)
+let giftProducts = await getCollectionProducts(
+  ["gifts-accessories", "gift-items", "gift-item", "gifts", "mdf-products"],
+  10
+)
+
+if (giftProducts.length === 0) {
+  giftProducts = defaultGiftSlugs
+    .map((item) => {
+      const prod = getProductBySlug(item.slug)
+      return prod ? { product: prod, categorySlug: item.categorySlug } : null
+    })
+    .filter((x): x is { product: any; categorySlug: string } => Boolean(x))
+}
 ---
 
 <Layout
@@ -178,10 +180,10 @@ const giftProducts = defaultGiftSlugs
 
       <div class="pt-2 text-center">
         <a
-          href="/products"
+          href="/categories"
           class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-border bg-card hover:bg-muted/70 text-foreground text-sm font-semibold transition-all hover:scale-[1.01] active:scale-[0.99] shadow-2xs"
         >
-          View Full 240+ Item Catalogue
+          View Full Categories Catalogue
           <ArrowRight class="size-4" />
         </a>
       </div>

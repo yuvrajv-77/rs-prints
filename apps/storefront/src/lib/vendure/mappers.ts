@@ -1,4 +1,5 @@
 import type { Product } from "@/types/product";
+import { formatAssetUrl } from "./client";
 
 /**
  * Predefined color name to hex palette mapper.
@@ -81,7 +82,7 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
     currencyCode: v.currencyCode,
     stockLevel: v.stockLevel,
     featuredAsset: v.featuredAsset
-      ? { id: v.featuredAsset.id, preview: v.featuredAsset.preview }
+      ? { id: v.featuredAsset.id, preview: formatAssetUrl(v.featuredAsset.preview) }
       : undefined,
     // Map options belonging to this variant (e.g. Size: 'L', Color: 'Black')
     options: (v.options || []).map((o: any) => ({
@@ -105,34 +106,41 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
 
   // A. Primary product featured image
   if (vp.featuredAsset?.preview) {
+    const formattedUrl = formatAssetUrl(vp.featuredAsset.preview);
     imageList.push({
-      url: vp.featuredAsset.preview,
+      url: formattedUrl,
       alt: vp.name,
       isPrimary: true,
     });
-    seenUrls.add(vp.featuredAsset.preview);
+    seenUrls.add(formattedUrl);
   }
 
   // B. Variant-specific assets (e.g., photo of the black variant vs white variant)
   for (const v of mappedVariants) {
-    if (v.featuredAsset?.preview && !seenUrls.has(v.featuredAsset.preview)) {
-      imageList.push({
-        url: v.featuredAsset.preview,
-        alt: `${vp.name} - ${v.name}`,
-      });
-      seenUrls.add(v.featuredAsset.preview);
+    if (v.featuredAsset?.preview) {
+      const formattedUrl = formatAssetUrl(v.featuredAsset.preview);
+      if (!seenUrls.has(formattedUrl)) {
+        imageList.push({
+          url: formattedUrl,
+          alt: `${vp.name} - ${v.name}`,
+        });
+        seenUrls.add(formattedUrl);
+      }
     }
   }
 
   // C. Additional gallery assets uploaded to the product
   if (vp.assets) {
     for (const a of vp.assets) {
-      if (a.preview && !seenUrls.has(a.preview)) {
-        imageList.push({
-          url: a.preview,
-          alt: a.name || vp.name,
-        });
-        seenUrls.add(a.preview);
+      if (a.preview) {
+        const formattedUrl = formatAssetUrl(a.preview);
+        if (!seenUrls.has(formattedUrl)) {
+          imageList.push({
+            url: formattedUrl,
+            alt: a.name || vp.name,
+          });
+          seenUrls.add(formattedUrl);
+        }
       }
     }
   }
@@ -195,7 +203,6 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
     startingPrice,
     startingPriceNumber: minPriceNumber,
     minOrder: "1 Piece",
-    turnaround: "24-48 Hours",
     badge: "Custom Printed",
     rating: 4.8,
     reviewCount: 156,
@@ -207,7 +214,7 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
     optionGroups: optionGroups.length > 0 ? optionGroups : undefined,
     variants: mappedVariants,
     featuredAsset: vp.featuredAsset
-      ? { id: vp.featuredAsset.id, preview: vp.featuredAsset.preview }
+      ? { id: vp.featuredAsset.id, preview: formatAssetUrl(vp.featuredAsset.preview) }
       : undefined,
     highlights: [
       {
@@ -215,8 +222,8 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
         desc: "Fade-resistant colors and razor-sharp print detailing.",
       },
       {
-        title: "Fast Turnaround",
-        desc: "Dispatches within 24 to 48 hours with door-to-door tracking.",
+        title: "Prompt Dispatch",
+        desc: "Carefully printed and dispatched with door-to-door tracking.",
       },
       {
         title: "Custom Personalization",
