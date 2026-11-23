@@ -4,9 +4,10 @@ import {
     DefaultSchedulerPlugin,
     DefaultSearchPlugin,
     VendureConfig,
-
+    AccountRegistrationEvent,
+    CustomerService,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
+import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader, EmailEventListener } from '@vendure/email-plugin';
 // import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
@@ -27,6 +28,24 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 // PORT wins because hosting platforms inject it into the environment at runtime, and that
 // must take precedence over any value baked into the .env file at scaffold time.
 const serverPort = +process.env.PORT || +process.env.VENDURE_SERVER_PORT || 3000;
+
+/**
+ * Welcome Email Handler for new customer registrations.
+ * Automatically sends a personalized, branded welcome email via Hostinger SMTP.
+ */
+export const welcomeEmailHandler = new EmailEventListener('welcome')
+    .on(AccountRegistrationEvent)
+    .loadData(async ({ event, injector }) => {
+        const customerService = injector.get(CustomerService);
+        const customer = await customerService.findOneByUserId(event.ctx, event.user.id);
+        return { customer };
+    })
+    .setRecipient(event => event.user.identifier)
+    .setFrom('{{ fromAddress }}')
+    .setSubject('Welcome to RS Prints! 🎉 Your account is ready')
+    .setTemplateVars(event => ({
+        customer: event.data.customer,
+    }));
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -140,19 +159,33 @@ export const config: VendureConfig = {
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
         EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
             route: 'mailbox',
-            handlers: defaultEmailHandlers,
+            handlers: [...defaultEmailHandlers, welcomeEmailHandler],
             templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
             globalTemplateVars: {
-                // The following variables will change depending on your storefront implementation.
-                // Here we are assuming a storefront running at http://localhost:8080.
-                fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://localhost:8080/verify',
-                passwordResetUrl: 'http://localhost:8080/password-reset',
-                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
+                fromAddress: `"${process.env.EMAIL_FROM_NAME || 'RS Prints'}" <${process.env.EMAIL_FROM_ADDRESS || 'support@thersprints.com'}>`,
+                storefrontUrl: process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev',
+                verifyEmailAddressUrl: `${process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev'}/verify`,
+                passwordResetUrl: `${process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev'}/password-reset`,
+                changeEmailAddressUrl: `${process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev'}/verify-email-address-change`,
             },
+            ...(process.env.SMTP_HOST
+                ? {
+                    transport: {
+                        type: 'smtp' as const,
+                        host: process.env.SMTP_HOST,
+                        port: Number(process.env.SMTP_PORT) || 465,
+                        secure: (process.env.SMTP_PORT || '465') === '465',
+                        auth: {
+                            user: process.env.SMTP_USER || 'support@thersprints.com',
+                            pass: process.env.SMTP_PASS || '',
+                        },
+                    },
+                }
+                : {
+                    devMode: true as const,
+                    outputPath: path.join(__dirname, '../static/email/test-emails'),
+                }),
         }),
         DashboardPlugin.init({
             route: 'dashboard',

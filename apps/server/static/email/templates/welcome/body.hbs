@@ -1,0 +1,54 @@
+{{> header title="Welcome to RS Prints!" }}
+
+<mj-section background-color="#ffffff" padding="36px 24px">
+    <mj-column>
+        <mj-text font-size="22px" font-weight="bold" color="#0f172a" font-family="Helvetica, Arial, sans-serif" padding="0 0 16px 0">
+            Welcome to RS Prints! 🎉
+        </mj-text>
+
+        <mj-text font-size="15px" color="#334155" line-height="24px" font-family="Helvetica, Arial, sans-serif" padding="0 0 14px 0">
+            Hi <strong>{{#if customer.firstName}}{{ customer.firstName }}{{else}}there{{/if}}</strong>,
+        </mj-text>
+
+        <mj-text font-size="15px" color="#334155" line-height="24px" font-family="Helvetica, Arial, sans-serif" padding="0 0 24px 0">
+            Thank you for creating an account with <strong>RS Prints</strong>! Your account has been registered with <strong>{{ customer.emailAddress }}</strong> and is ready for you to explore, customize, and order high-definition personalized merchandise.
+        </mj-text>
+
+        <!-- Product Categories Highlight Box -->
+        <mj-section background-color="#f8fafc" border-radius="12px" padding="20px" border="1px solid #e2e8f0">
+            <mj-column>
+                <mj-text font-size="14px" font-weight="bold" color="#0f172a" font-family="Helvetica, Arial, sans-serif" padding="0 0 10px 0">
+                    What can you customize today?
+                </mj-text>
+                <mj-text font-size="13px" color="#475569" line-height="22px" font-family="Helvetica, Arial, sans-serif" padding="0">
+                    &bull; <strong>Ceramic & Magic Neon Mugs:</strong> Personalized with your photos & quotes<br/>
+                    &bull; <strong>Custom Apparel & T-Shirts:</strong> 100% bio-washed cotton with vivid DTF prints<br/>
+                    &bull; <strong>Photo Rock & MDF Collage Frames:</strong> Handcrafted memorable keepsakes<br/>
+                    &bull; <strong>Drinkware & Stainless Steel Bottles:</strong> Double-wall vacuum flasks for gym & office<br/>
+                    &bull; <strong>Corporate Merchandise & Kits:</strong> Bulk orders with your company logo & branding
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <mj-spacer height="28px" />
+
+        <mj-button font-family="Helvetica, Arial, sans-serif"
+                   background-color="#f59e0b"
+                   color="#0f172a"
+                   font-weight="bold"
+                   font-size="15px"
+                   border-radius="10px"
+                   inner-padding="14px 28px"
+                   href="{{ storefrontUrl }}/products">
+            Start Exploring Products &rarr;
+        </mj-button>
+
+        <mj-spacer height="24px" />
+
+        <mj-text font-size="13px" color="#64748b" line-height="20px" font-family="Helvetica, Arial, sans-serif" padding="0">
+            Have a question or custom design request? Reply directly to this email or reach us on WhatsApp at <strong>+91 98765 43210</strong>. We're excited to craft your prints!
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+{{> footer }}

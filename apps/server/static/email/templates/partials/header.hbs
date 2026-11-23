@@ -2,17 +2,32 @@
     <mj-head>
         <mj-title>{{ title }}</mj-title>
         <mj-style inline="inline">
-            h3 {
-                font-size: 18px;
-                color: #555;
-                font-weight: normal;
+            h1, h2, h3 {
+                color: #0f172a;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            }
+            .brand-name {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                font-size: 24px;
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.5px;
+            }
+            .brand-accent {
+                color: #f59e0b;
             }
         </mj-style>
     </mj-head>
 
-    <mj-body>
-        <mj-section background-color="#f0f0f0">
+    <mj-body background-color="#f8fafc">
+        <!-- Header -->
+        <mj-section background-color="#ffffff" padding="28px 24px 20px" border-bottom="2px solid #f1f5f9">
             <mj-column>
-                <mj-text>[company header]</mj-text>
+                <mj-text align="center" padding="0">
+                    <span class="brand-name">RS <span class="brand-accent">Prints</span></span>
+                </mj-text>
+                <mj-text align="center" font-size="12px" color="#64748b" font-family="Helvetica, Arial, sans-serif" padding="6px 0 0 0" letter-spacing="0.5px">
+                    Custom Merchandise & High-Definition Printing Studio
+                </mj-text>
             </mj-column>
         </mj-section>
