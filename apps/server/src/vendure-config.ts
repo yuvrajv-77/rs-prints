@@ -6,8 +6,20 @@ import {
     VendureConfig,
     AccountRegistrationEvent,
     CustomerService,
+    OrderStateTransitionEvent,
+    EntityHydrator,
+    Injector,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader, EmailEventListener } from '@vendure/email-plugin';
+import {
+    EmailPlugin,
+    FileBasedTemplateLoader,
+    EmailEventListener,
+    emailVerificationHandler,
+    passwordResetHandler,
+    emailAddressChangeHandler,
+    transformOrderLineAssetUrls,
+    shippingLinesWithMethod,
+} from '@vendure/email-plugin';
 // import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
@@ -45,6 +57,67 @@ export const welcomeEmailHandler = new EmailEventListener('welcome')
     .setSubject('Welcome to RS Prints! 🎉 Your account is ready')
     .setTemplateVars(event => ({
         customer: event.data.customer,
+    }));
+
+/**
+ * Helper to hydrate full order relations and absolute asset URLs for email templates.
+ */
+const loadOrderData = async ({ event, injector }: { event: OrderStateTransitionEvent; injector: Injector }) => {
+    const entityHydrator = injector.get(EntityHydrator);
+    await entityHydrator.hydrate(event.ctx, event.order, {
+        relations: ['lines.featuredAsset', 'lines.productVariant', 'shippingLines.shippingMethod'],
+    });
+    transformOrderLineAssetUrls(event.ctx, event.order, injector);
+    const shippingLines = shippingLinesWithMethod(event.order);
+    return { shippingLines };
+};
+
+/**
+ * Order Confirmation Email Handler
+ * Sent from orders@thersprints.com when an order payment is settled.
+ */
+export const orderConfirmationHandler = new EmailEventListener('order-confirmation')
+    .on(OrderStateTransitionEvent)
+    .filter(event => event.toState === 'PaymentSettled' && event.fromState !== 'Modifying' && !!event.order.customer)
+    .loadData(loadOrderData)
+    .setRecipient(event => event.order.customer!.emailAddress)
+    .setFrom('{{ orderFromAddress }}')
+    .setSubject('Order Confirmation for #{{ order.code }} - RS Prints')
+    .setTemplateVars(event => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }));
+
+/**
+ * Order Shipped Email Handler
+ * Sent from orders@thersprints.com when an order transitions to Shipped.
+ */
+export const orderShippedHandler = new EmailEventListener('order-shipped')
+    .on(OrderStateTransitionEvent)
+    .filter(event => event.toState === 'Shipped' && !!event.order.customer)
+    .loadData(loadOrderData)
+    .setRecipient(event => event.order.customer!.emailAddress)
+    .setFrom('{{ orderFromAddress }}')
+    .setSubject('Your RS Prints Order #{{ order.code }} Has Shipped! 🚚')
+    .setTemplateVars(event => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }));
+
+/**
+ * Order Delivered Email Handler
+ * Sent from orders@thersprints.com when an order transitions to Delivered.
+ */
+export const orderDeliveredHandler = new EmailEventListener('order-delivered')
+    .on(OrderStateTransitionEvent)
+    .filter(event => event.toState === 'Delivered' && !!event.order.customer)
+    .loadData(loadOrderData)
+    .setRecipient(event => event.order.customer!.emailAddress)
+    .setFrom('{{ orderFromAddress }}')
+    .setSubject('Your RS Prints Order #{{ order.code }} Has Been Delivered! 🎉')
+    .setTemplateVars(event => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
     }));
 
 export const config: VendureConfig = {
@@ -160,10 +233,19 @@ export const config: VendureConfig = {
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
         EmailPlugin.init({
             route: 'mailbox',
-            handlers: [...defaultEmailHandlers, welcomeEmailHandler],
+            handlers: [
+                orderConfirmationHandler,
+                orderShippedHandler,
+                orderDeliveredHandler,
+                welcomeEmailHandler,
+                emailVerificationHandler,
+                passwordResetHandler,
+                emailAddressChangeHandler,
+            ],
             templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
             globalTemplateVars: {
                 fromAddress: `"${process.env.EMAIL_FROM_NAME || 'RS Prints'}" <${process.env.EMAIL_FROM_ADDRESS || 'support@thersprints.com'}>`,
+                orderFromAddress: `"${process.env.ORDER_EMAIL_FROM_NAME || 'RS Prints Orders'}" <${process.env.ORDER_EMAIL_FROM_ADDRESS || 'orders@thersprints.com'}>`,
                 storefrontUrl: process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev',
                 verifyEmailAddressUrl: `${process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev'}/verify`,
                 passwordResetUrl: `${process.env.STOREFRONT_URL || 'https://rs-prints.y74125.workers.dev'}/password-reset`,
