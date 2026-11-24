@@ -17,6 +17,7 @@ import {
   ChevronUp,
   ChevronDown
 } from "lucide-react"
+import { SizeQuantityTable } from "./SizeQuantityTable"
 import type { ArtworkLayerInfo } from "../core/fabric-manager"
 
 export interface CustomizerRightSidebarProps {
@@ -44,6 +45,10 @@ export interface CustomizerRightSidebarProps {
   onRequestAddToCart: () => void
   isAddingToCart?: boolean
   unitPrice?: number
+
+  sizeQuantities: Record<string, number>
+  onQuantityChange: (sizeId: string, quantity: number) => void
+  totalQuantity: number
 }
 
 export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
@@ -65,7 +70,10 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
   onDownloadPrintFile,
   onRequestAddToCart,
   isAddingToCart = false,
-  unitPrice = 299
+  unitPrice = 299,
+  sizeQuantities,
+  onQuantityChange,
+  totalQuantity
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -328,7 +336,18 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
           </div>
         )}
 
-        {/* 4. Previews & Downloads */}
+        {/* 4. Sizes & Quantities Minimal Table */}
+        <div className="pt-1">
+          <Separator className="mb-4" />
+          <SizeQuantityTable
+            quantities={sizeQuantities}
+            onQuantityChange={onQuantityChange}
+            totalQuantity={totalQuantity}
+            unitPrice={unitPrice}
+          />
+        </div>
+
+        {/* 5. Previews & Downloads */}
         <div className="space-y-2 pt-1">
           <Separator />
           <div className="grid grid-cols-2 gap-2">
@@ -364,27 +383,38 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
         <div className="flex items-baseline justify-between">
           <div>
             <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-              Price per Piece
+              {totalQuantity > 1 ? `Total (${totalQuantity} pcs)` : "Price per Piece"}
             </span>
             <div className="text-2xl font-black text-foreground tracking-tight">
-              ₹{unitPrice}
+              ₹{unitPrice * Math.max(1, totalQuantity)}
             </div>
+            {totalQuantity > 1 && (
+              <div className="text-[10px] text-muted-foreground">
+                ₹{unitPrice} / piece
+              </div>
+            )}
           </div>
           <div className="text-[11px] text-muted-foreground text-right">
             Bio-washed 180 GSM
           </div>
         </div>
 
-        {/* Add to Cart button opens size modal */}
+        {/* Add to Cart button */}
         <Button
           type="button"
           size="lg"
           onClick={onRequestAddToCart}
-          disabled={isAddingToCart}
+          disabled={isAddingToCart || totalQuantity === 0}
           className="w-full gap-2.5 h-12 text-sm font-bold shadow-md shadow-primary/20 hover:shadow-lg transition-all cursor-pointer"
         >
           <ShoppingBag className="size-4.5" />
-          <span>{isAddingToCart ? "Adding..." : `Add to Cart • ₹${unitPrice}`}</span>
+          <span>
+            {isAddingToCart
+              ? "Adding..."
+              : totalQuantity === 0
+              ? "Select Quantity"
+              : `Add to Cart • ₹${unitPrice * totalQuantity}`}
+          </span>
         </Button>
       </div>
     </div>

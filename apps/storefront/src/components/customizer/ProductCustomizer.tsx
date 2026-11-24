@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react"
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import type { Product } from "@/types/product"
 import { addToCart } from "@/stores/cart"
 import { toast, Toaster } from "@/components/ui/toast"
@@ -8,7 +8,7 @@ import { FabricManager, type ArtworkLayerInfo, type UploadedArtworkSummary } fro
 import { CustomizerLeftSidebar } from "./ui/CustomizerLeftSidebar"
 import { CustomizerRightSidebar } from "./ui/CustomizerRightSidebar"
 import { CustomizerViewport } from "./ui/CustomizerViewport"
-import { SizeSelectionModal } from "./ui/SizeSelectionModal"
+import { SizeQuantityTable } from "./ui/SizeQuantityTable"
 import { MobileColorSheet } from "./ui/MobileColorSheet"
 import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
@@ -81,7 +81,28 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     return TSHIRT_CONFIG.defaultColorId
   })
 
-  const [selectedSize, setSelectedSize] = useState<string>("L")
+  // Size & Multi-quantity selection state (minimum 1 in any size, max 50 per size)
+  const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>({
+    S: 0,
+    M: 0,
+    L: 1,
+    XL: 0,
+    "2XL": 0
+  })
+
+  const totalQuantity = useMemo(
+    () => Object.values(sizeQuantities).reduce((sum, qty) => sum + qty, 0),
+    [sizeQuantities]
+  )
+
+  const handleQuantityChange = useCallback((sizeId: string, qty: number) => {
+    const clamped = Math.max(0, Math.min(50, qty))
+    setSizeQuantities((prev) => ({
+      ...prev,
+      [sizeId]: clamped
+    }))
+  }, [])
+
   const [selectedViewId, setSelectedViewId] = useState<"front" | "back">(TSHIRT_CONFIG.defaultViewId)
 
   const currentColor = TSHIRT_CONFIG.colors[selectedColorId] || TSHIRT_CONFIG.colors.black
@@ -97,7 +118,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false)
 
   // Modal & Bottom Sheet States
-  const [isSizeModalOpen, setIsSizeModalOpen] = useState<boolean>(false)
   const [isMobileColorSheetOpen, setIsMobileColorSheetOpen] = useState<boolean>(false)
   const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
@@ -499,6 +519,16 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const handleAddToCart = useCallback(async () => {
     if (!fabricManagerRef.current) return
 
+    const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
+    if (selectedSizesList.length === 0) {
+      toast.add({
+        title: "No Size Selected",
+        description: "Please select at least 1 item in any size before adding to cart.",
+        type: "warning"
+      })
+      return
+    }
+
     const totalArtworks = fabricManagerRef.current.getTotalArtworkCount()
     if (totalArtworks === 0) {
       toast.add({
@@ -524,52 +554,55 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       })
 
       const allArtworks = fabricManagerRef.current.getAllViewArtworks()
+      const baseVariantId = product?.variants?.[0]?.id || `mock-variant-${selectedColorId}-tshirt`
 
-      const variantId = product?.variants?.[0]?.id || `mock-variant-${selectedColorId}-tshirt`
+      for (const [sizeId, qty] of selectedSizesList) {
+        const sizeVariantId = `${baseVariantId}-${sizeId}`
 
-      const customizationId = saveCustomizationForCart({
-        productId: TSHIRT_CONFIG.productId,
-        productName: TSHIRT_CONFIG.name,
-        variantId,
-        colorId: selectedColorId,
-        colorName: currentColor.name,
-        size: selectedSize,
-        front: exportPkg.front ? {
-          positionId: currentColor.views.front.defaultPositionId,
-          positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Center Chest",
-          previewDataUrl: exportPkg.front.preview,
-          productionDataUrl: exportPkg.front.production,
-          artworks: allArtworks.front || []
-        } : undefined,
-        back: exportPkg.back ? {
-          positionId: currentColor.views.back.defaultPositionId,
-          positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Upper Back",
-          previewDataUrl: exportPkg.back.preview,
-          productionDataUrl: exportPkg.back.production,
-          artworks: allArtworks.back || []
-        } : undefined
-      })
+        const customizationId = saveCustomizationForCart({
+          productId: TSHIRT_CONFIG.productId,
+          productName: TSHIRT_CONFIG.name,
+          variantId: sizeVariantId,
+          colorId: selectedColorId,
+          colorName: currentColor.name,
+          size: sizeId,
+          front: exportPkg.front ? {
+            positionId: currentColor.views.front.defaultPositionId,
+            positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Center Chest",
+            previewDataUrl: exportPkg.front.preview,
+            productionDataUrl: exportPkg.front.production,
+            artworks: allArtworks.front || []
+          } : undefined,
+          back: exportPkg.back ? {
+            positionId: currentColor.views.back.defaultPositionId,
+            positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Upper Back",
+            previewDataUrl: exportPkg.back.preview,
+            productionDataUrl: exportPkg.back.production,
+            artworks: allArtworks.back || []
+          } : undefined
+        })
 
-      const detailsList = [
-        `Colour: ${currentColor.name}`,
-        `Size: ${selectedSize}`,
-        exportPkg.front ? `Front: ${currentView.name}` : null,
-        exportPkg.back ? `Back: Customized` : null,
-        `ID: ${customizationId}`
-      ].filter(Boolean).join(" | ")
+        const detailsList = [
+          `Colour: ${currentColor.name}`,
+          `Size: ${sizeId}`,
+          `Qty: ${qty}`,
+          exportPkg.front ? `Front: ${currentView.name}` : null,
+          exportPkg.back ? `Back: Customized` : null,
+          `ID: ${customizationId}`
+        ].filter(Boolean).join(" | ")
 
-      const success = await addToCart(variantId, 1, {
-        productName: TSHIRT_CONFIG.name,
-        variantDetails: detailsList
-      })
-
-      if (success) {
-        toast.add({
-          title: "Customized T-Shirt Added!",
-          description: `${currentColor.name} (Size: ${selectedSize}) with ${totalArtworks} layer(s) added to cart.`,
-          type: "success"
+        await addToCart(sizeVariantId, qty, {
+          productName: TSHIRT_CONFIG.name,
+          variantDetails: detailsList
         })
       }
+
+      const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
+      toast.add({
+        title: "Added to Cart!",
+        description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
+        type: "success"
+      })
     } catch (err: any) {
       console.error("Failed to add customized item to cart:", err)
       toast.add({
@@ -580,7 +613,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     } finally {
       setIsAddingToCart(false)
     }
-  }, [product, selectedColorId, currentColor, currentView, selectedSize])
+  }, [product, selectedColorId, currentColor, currentView, sizeQuantities, totalQuantity])
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
@@ -662,9 +695,12 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             onFlipV={handleFlipV}
             onDownloadMockup={handleDownloadMockup}
             onDownloadPrintFile={handleDownloadPrintFile}
-            onRequestAddToCart={() => setIsSizeModalOpen(true)}
+            onRequestAddToCart={handleAddToCart}
             isAddingToCart={isAddingToCart}
             unitPrice={299}
+            sizeQuantities={sizeQuantities}
+            onQuantityChange={handleQuantityChange}
+            totalQuantity={totalQuantity}
           />
         </div>
 
@@ -815,24 +851,45 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             )}
           </div>
 
-          {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile) */}
+          {/* Card C: Size & Quantity Minimal Table */}
+          <div className="bg-card rounded-2xl border border-border/80 p-3.5 shadow-xs">
+            <SizeQuantityTable
+              quantities={sizeQuantities}
+              onQuantityChange={handleQuantityChange}
+              totalQuantity={totalQuantity}
+              unitPrice={299}
+            />
+          </div>
+
+          {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile, direct without bottom sheet) */}
           <div className="bg-card rounded-2xl border border-border/80 p-4 mb-40 shadow-xs flex items-center justify-between gap-4 mt-1">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                Price per piece
+                {totalQuantity > 1 ? `Total (${totalQuantity} pcs)` : "Price per piece"}
               </span>
-              <div className="text-2xl font-black text-foreground">₹299</div>
+              <div className="text-2xl font-black text-foreground">
+                ₹{299 * Math.max(1, totalQuantity)}
+              </div>
+              {totalQuantity > 1 && (
+                <div className="text-[10px] text-muted-foreground">₹299 / piece</div>
+              )}
             </div>
 
-            {/* Clicking Add to Cart opens the Size Selection Bottom Sheet */}
+            {/* Direct Add to Cart without bottom sheet */}
             <Button
               size="lg"
-              onClick={() => setIsSizeModalOpen(true)}
-              disabled={isAddingToCart}
+              onClick={handleAddToCart}
+              disabled={isAddingToCart || totalQuantity === 0}
               className="h-12 px-7 font-bold text-sm shadow-md shadow-primary/20 cursor-pointer"
             >
               <ShoppingBag className="size-4.5 mr-2" />
-              <span>Add to Cart</span>
+              <span>
+                {isAddingToCart
+                  ? "Adding..."
+                  : totalQuantity === 0
+                  ? "Select Qty"
+                  : `Add to Cart • ₹${299 * totalQuantity}`}
+              </span>
             </Button>
           </div>
         </div>
@@ -841,20 +898,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       {/* ========================================================================= */}
       {/* 5. MODALS & BOTTOM SHEETS                                                 */}
       {/* ========================================================================= */}
-
-      {/* Size Selection Sheet / Modal (Triggered by Add to Cart on mobile or desktop) */}
-      <SizeSelectionModal
-        isOpen={isSizeModalOpen}
-        onClose={() => setIsSizeModalOpen(false)}
-        selectedSize={selectedSize}
-        onSelectSize={setSelectedSize}
-        onConfirmAddToCart={() => {
-          setIsSizeModalOpen(false)
-          handleAddToCart()
-        }}
-        isAddingToCart={isAddingToCart}
-        unitPrice={299}
-      />
 
       {/* Mobile Colour Bottom Sheet */}
       <MobileColorSheet
