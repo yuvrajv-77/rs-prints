@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
@@ -24,7 +24,8 @@ import {
   ChevronsUp,
   ChevronsDown,
   Palette,
-  Eye
+  Eye,
+  X
 } from "lucide-react"
 import type { ArtworkLayerInfo } from "../core/fabric-manager"
 import type { PrintPositionConfig, TShirtColorConfig } from "../config/tshirt-mockups"
@@ -104,6 +105,7 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
   unitPrice = 299
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -116,450 +118,951 @@ export const CustomizerSidebar: React.FC<CustomizerSidebarProps> = ({
   const selectedColor = colors[selectedColorId] || Object.values(colors)[0]
 
   return (
-    <div className="bg-card rounded-3xl border border-border/80 shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
-      {/* Scrollable Configuration Controls */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-5 pr-3.5 custom-scrollbar">
-        {/* 1. T-Shirt Colour Selector */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Palette className="size-3.5 text-primary" />
-            <span>Garment Colour</span>
-          </Label>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-foreground">{selectedColor?.name}</span>
-            {onClearDesign && (
-              <button
-                type="button"
-                onClick={onClearDesign}
-                className="text-[11px] text-muted-foreground hover:text-destructive underline"
-              >
-                Reset
-              </button>
-            )}
+    <>
+      {/* Hidden Global File Input for both Desktop & Mobile upload triggers */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* ========================================================================= */}
+      {/* 1. DESKTOP SIDEBAR (Visible on lg+ screens: 1024px and wider)             */}
+      {/* ========================================================================= */}
+      <div className="hidden lg:flex bg-card rounded-3xl border border-border/80 shadow-sm flex-col h-full min-h-0 overflow-hidden">
+        {/* Scrollable Configuration Controls */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-5 pr-3.5 custom-scrollbar">
+          {/* 1a. T-Shirt Colour Selector */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Palette className="size-3.5 text-primary" />
+                <span>Garment Colour</span>
+              </Label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-foreground">{selectedColor?.name}</span>
+                {onClearDesign && (
+                  <button
+                    type="button"
+                    onClick={onClearDesign}
+                    className="text-[11px] text-muted-foreground hover:text-destructive underline cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {Object.values(colors).map((color) => {
+                const isSelected = selectedColorId === color.id
+                return (
+                  <button
+                    key={color.id}
+                    type="button"
+                    onClick={() => onSelectColor(color.id)}
+                    title={color.name}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                        : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                    }`}
+                  >
+                    <span
+                      className="size-3.5 rounded-full border border-black/20 shrink-0"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                    <span>{color.name}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {Object.values(colors).map((color) => {
-            const isSelected = selectedColorId === color.id
-            return (
-              <button
-                key={color.id}
-                type="button"
-                onClick={() => onSelectColor(color.id)}
-                title={color.name}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
-                    : "border-border/80 hover:bg-muted/40 text-muted-foreground"
-                }`}
-              >
-                <span
-                  className="size-3.5 rounded-full border border-black/20 shrink-0"
-                  style={{ backgroundColor: color.hex }}
-                />
-                <span>{color.name}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* 1b. Garment Size Selector */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Garment Size
-          </Label>
-          <span className="text-xs font-semibold text-foreground">{selectedSize}</span>
-        </div>
-        <div className="grid grid-cols-5 gap-1.5">
-          {["S", "M", "L", "XL", "2XL"].map((sz) => {
-            const isSelected = selectedSize === sz
-            return (
-              <button
-                key={sz}
-                type="button"
-                onClick={() => onSelectSize(sz)}
-                className={`py-1.5 rounded-xl border text-xs font-bold transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
-                    : "border-border/80 hover:bg-muted/40 text-muted-foreground"
-                }`}
-              >
-                {sz}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* 2. View Switcher (Front <-> Back) */}
-      <div className="space-y-2.5">
-        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          View Angle
-        </Label>
-        <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/60 rounded-2xl border border-border/60">
-          <button
-            type="button"
-            onClick={() => onSelectView("front")}
-            className={`py-2 rounded-xl text-xs font-bold transition-all ${
-              selectedViewId === "front"
-                ? "bg-background text-foreground shadow-2xs border border-border/80"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Front View
-          </button>
-          <button
-            type="button"
-            onClick={() => onSelectView("back")}
-            className={`py-2 rounded-xl text-xs font-bold transition-all ${
-              selectedViewId === "back"
-                ? "bg-background text-foreground shadow-2xs border border-border/80"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Back View
-          </button>
-        </div>
-      </div>
-
-      {/* 3. Print Position Selector */}
-      <div className="space-y-2.5">
-        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-          <span>Printing Position</span>
-          <span className="text-[11px] font-mono font-medium text-primary">
-            {availablePositions[selectedPositionId]?.physicalSizeLabel}
-          </span>
-        </Label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {Object.values(availablePositions).map((pos) => {
-            const isSelected = selectedPositionId === pos.id
-            return (
-              <button
-                key={pos.id}
-                type="button"
-                onClick={() => onSelectPosition(pos.id)}
-                className={`px-3 py-2.5 rounded-xl border text-left text-xs font-semibold transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
-                    : "border-border/80 hover:bg-muted/40 text-muted-foreground"
-                }`}
-              >
-                <div className="truncate">{pos.name}</div>
-                <div className="text-[10px] font-normal text-muted-foreground mt-0.5">
-                  {pos.physicalSizeLabel}
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* 4. Upload Artwork Section */}
-      <div className="space-y-3">
-        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-          <span>Upload Customer Artwork</span>
-          <span className="text-[11px] font-normal lowercase text-muted-foreground">
-            PNG, JPEG, WEBP (Max 25MB)
-          </span>
-        </Label>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-border/80 hover:border-primary/60 rounded-2xl p-5 text-center cursor-pointer transition-all hover:bg-muted/30 group"
-        >
-          <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-            <Upload className="size-5" />
+          {/* 1b. Garment Size Selector */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Garment Size
+              </Label>
+              <span className="text-xs font-semibold text-foreground">{selectedSize}</span>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5">
+              {["S", "M", "L", "XL", "2XL"].map((sz) => {
+                const isSelected = selectedSize === sz
+                return (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={() => onSelectSize(sz)}
+                    className={`py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                        : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                    }`}
+                  >
+                    {sz}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-          <div className="text-sm font-bold text-foreground">
-            Click to Browse or Drop Photo
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Supports multiple images • Clamped strictly to print region
-          </div>
-        </div>
-      </div>
 
-      {/* 5. Uploaded Artwork Layers List & Layer Ordering */}
-      {artworkLayers.length > 0 && (
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Layers className="size-3.5 text-primary" />
-              <span>Layers ({artworkLayers.length})</span>
+          <Separator />
+
+          {/* 2. View Switcher (Front <-> Back) */}
+          <div className="space-y-2.5">
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              View Angle
             </Label>
-            <span className="text-[10px] text-muted-foreground">Top to bottom order</span>
+            <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/60 rounded-2xl border border-border/60">
+              <button
+                type="button"
+                onClick={() => onSelectView("front")}
+                className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedViewId === "front"
+                    ? "bg-background text-foreground shadow-2xs border border-border/80"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Front View
+              </button>
+              <button
+                type="button"
+                onClick={() => onSelectView("back")}
+                className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedViewId === "back"
+                    ? "bg-background text-foreground shadow-2xs border border-border/80"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Back View
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-            {artworkLayers.map((layer) => {
-              const isSelected = selectedLayer?.id === layer.id
+          {/* 3. Print Position Selector */}
+          <div className="space-y-2.5">
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+              <span>Printing Position</span>
+              <span className="text-[11px] font-mono font-medium text-primary">
+                {availablePositions[selectedPositionId]?.physicalSizeLabel}
+              </span>
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {Object.values(availablePositions).map((pos) => {
+                const isSelected = selectedPositionId === pos.id
+                return (
+                  <button
+                    key={pos.id}
+                    type="button"
+                    onClick={() => onSelectPosition(pos.id)}
+                    className={`px-3 py-2.5 rounded-xl border text-left text-xs font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                        : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                    }`}
+                  >
+                    <div className="truncate">{pos.name}</div>
+                    <div className="text-[10px] font-normal text-muted-foreground mt-0.5">
+                      {pos.physicalSizeLabel}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* 4. Upload Artwork Section */}
+          <div className="space-y-3">
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+              <span>Upload Customer Artwork</span>
+              <span className="text-[11px] font-normal lowercase text-muted-foreground">
+                PNG, JPEG, WEBP (Max 25MB)
+              </span>
+            </Label>
+
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-border/80 hover:border-primary/60 rounded-2xl p-5 text-center cursor-pointer transition-all hover:bg-muted/30 group"
+            >
+              <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                <Upload className="size-5" />
+              </div>
+              <div className="text-sm font-bold text-foreground">
+                Click to Browse or Drop Photo
+              </div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                Supports multiple images • Clamped strictly to print region
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Uploaded Artwork Layers List & Layer Ordering */}
+          {artworkLayers.length > 0 && (
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Layers className="size-3.5 text-primary" />
+                  <span>Layers ({artworkLayers.length})</span>
+                </Label>
+                <span className="text-[10px] text-muted-foreground">Top to bottom order</span>
+              </div>
+
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                {artworkLayers.map((layer) => {
+                  const isSelected = selectedLayer?.id === layer.id
+                  return (
+                    <div
+                      key={layer.id}
+                      onClick={() => onSelectLayer(layer.id)}
+                      className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/10 text-foreground font-semibold shadow-2xs"
+                          : "border-border/70 hover:bg-muted/40 text-muted-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {layer.url ? (
+                          <img
+                            src={layer.url}
+                            alt={layer.name}
+                            className="size-7 rounded-lg object-contain bg-background border border-border/60 shrink-0"
+                          />
+                        ) : (
+                          <ImageIcon className="size-4 shrink-0 text-primary" />
+                        )}
+                        <span className="truncate">{layer.name}</span>
+                      </div>
+
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onBringForward(layer.id)
+                          }}
+                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Bring forward"
+                        >
+                          <ChevronUp className="size-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onSendBackward(layer.id)
+                          }}
+                          className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Send backward"
+                        >
+                          <ChevronDown className="size-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onRemoveLayer(layer.id)
+                          }}
+                          className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors ml-1 cursor-pointer"
+                          title="Remove artwork"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 6. Selected Artwork Transform Controls */}
+          {selectedLayer && (
+            <div className="space-y-4 pt-2 border-t border-border/50 animate-in fade-in-50 duration-150">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                  <Sliders className="size-3.5 text-primary" />
+                  <span>Layer: {selectedLayer.name}</span>
+                </span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onBringToFront(selectedLayer.id)}
+                    className="h-6 text-[10px] px-1.5 cursor-pointer"
+                    title="Bring to absolute front"
+                  >
+                    Top
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onSendToBack(selectedLayer.id)}
+                    className="h-6 text-[10px] px-1.5 cursor-pointer"
+                    title="Send to bottom layer"
+                  >
+                    Bottom
+                  </Button>
+                </div>
+              </div>
+
+              {/* Scale Slider */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Scale Size</span>
+                  <span className="font-mono font-medium">
+                    {Math.round((selectedLayer.scaleX || 1) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="4.0"
+                  step="0.05"
+                  value={selectedLayer.scaleX || 1}
+                  onChange={(e) => onSetScale(parseFloat(e.target.value))}
+                  className="w-full accent-primary cursor-pointer"
+                />
+              </div>
+
+              {/* Rotation Controls: Slider + Degree Input */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs items-center">
+                  <span className="text-muted-foreground">Rotation Angle</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      min="-180"
+                      max="180"
+                      value={Math.round(selectedLayer.angle || 0)}
+                      onChange={(e) => onSetRotation(parseInt(e.target.value) || 0)}
+                      className="w-14 h-6 text-center text-xs font-mono border rounded px-1"
+                    />
+                    <span className="text-xs text-muted-foreground">°</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="-180"
+                  max="180"
+                  step="1"
+                  value={selectedLayer.angle || 0}
+                  onChange={(e) => onSetRotation(parseInt(e.target.value))}
+                  className="w-full accent-primary cursor-pointer"
+                />
+              </div>
+
+              {/* Quick Preset Rotation & Alignment Actions */}
+              <div className="grid grid-cols-4 gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onRotateDelta(90)}
+                  className="h-9 gap-1 text-xs cursor-pointer"
+                  title="Rotate 90 degrees clockwise"
+                >
+                  <RotateCw className="size-3.5" />
+                  <span>+90°</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onRotateDelta(-90)}
+                  className="h-9 gap-1 text-xs cursor-pointer"
+                  title="Rotate 90 degrees counter-clockwise"
+                >
+                  <RotateCcw className="size-3.5" />
+                  <span>-90°</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onFlipH}
+                  className="h-9 gap-1 text-xs cursor-pointer"
+                  title="Flip horizontally"
+                >
+                  <FlipHorizontal className="size-3.5" />
+                  <span>Flip H</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onCenterArtwork}
+                  className="h-9 gap-1 text-xs cursor-pointer"
+                  title="Center inside print area"
+                >
+                  <Maximize2 className="size-3.5" />
+                  <span>Center</span>
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Pinned Bottom Actions & Pricing */}
+        <div className="shrink-0 p-4 border-t border-border/60 bg-muted/20 space-y-3">
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Price per Piece
+              </span>
+              <div className="text-2xl font-extrabold text-foreground tracking-tight">
+                ₹{unitPrice}
+              </div>
+              <div className="text-[11px] text-muted-foreground">
+                Bio-washed 180 GSM Cotton • DTF Print
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onDownloadMockup}
+                className="h-8 text-xs gap-1.5 cursor-pointer"
+                title="Download composited mockup preview"
+              >
+                <Download className="size-3.5" />
+                <span>Mockup</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onDownloadPrintFile}
+                className="h-8 text-xs gap-1.5 cursor-pointer"
+                title="Download transparent production print file"
+              >
+                <Layers className="size-3.5" />
+                <span>Print File</span>
+              </Button>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            size="lg"
+            onClick={onAddToCart}
+            disabled={isAddingToCart}
+            className="w-full gap-2.5 h-11 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg transition-all cursor-pointer"
+          >
+            <ShoppingBag className="size-4.5" />
+            <span>{isAddingToCart ? "Adding to Cart..." : `Add to Cart • ₹${unitPrice}`}</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. MOBILE BOTTOM RIBBON (Visible on mobile/tablet: below lg breakpoint)   */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden w-full flex flex-col shrink-0 bg-card/95 backdrop-blur-md border border-border/80 rounded-2xl shadow-lg p-1.5 sm:p-2 z-20 space-y-1.5">
+        {/* Row 1: Horizontally scrollable quick-action chip ribbon */}
+        <div
+          className="flex items-center gap-1.5 overflow-x-auto scrollbar-none no-scrollbar py-0.5 px-0.5"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {/* View Toggle (Front | Back) */}
+          <div className="flex items-center bg-muted/70 p-0.5 rounded-full border border-border/60 shrink-0">
+            <button
+              type="button"
+              onClick={() => onSelectView("front")}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                selectedViewId === "front"
+                  ? "bg-background text-foreground shadow-2xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Front
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectView("back")}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                selectedViewId === "back"
+                  ? "bg-background text-foreground shadow-2xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Back
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-border/60 shrink-0" />
+
+          {/* Color Swatches */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {Object.values(colors).map((color) => {
+              const isSelected = selectedColorId === color.id
               return (
-                <div
-                  key={layer.id}
-                  onClick={() => onSelectLayer(layer.id)}
-                  className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-all ${
+                <button
+                  key={color.id}
+                  type="button"
+                  onClick={() => onSelectColor(color.id)}
+                  title={color.name}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold border transition-all shrink-0 cursor-pointer ${
                     isSelected
-                      ? "border-primary bg-primary/10 text-foreground font-semibold shadow-2xs"
-                      : "border-border/70 hover:bg-muted/40 text-muted-foreground"
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                      : "border-border/80 bg-background text-muted-foreground"
                   }`}
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    {layer.url ? (
-                      <img
-                        src={layer.url}
-                        alt={layer.name}
-                        className="size-7 rounded-lg object-contain bg-background border border-border/60 shrink-0"
-                      />
-                    ) : (
-                      <ImageIcon className="size-4 shrink-0 text-primary" />
-                    )}
-                    <span className="truncate">{layer.name}</span>
-                  </div>
+                  <span
+                    className="size-2.5 rounded-full border border-black/20 shrink-0"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                  <span>{color.name}</span>
+                </button>
+              )
+            })}
+          </div>
 
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    {/* Layer re-ordering */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onBringForward(layer.id)
-                      }}
-                      className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                      title="Bring forward"
-                    >
-                      <ChevronUp className="size-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onSendBackward(layer.id)
-                      }}
-                      className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                      title="Send backward"
-                    >
-                      <ChevronDown className="size-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onRemoveLayer(layer.id)
-                      }}
-                      className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors ml-1"
-                      title="Remove artwork"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  </div>
-                </div>
+          <div className="h-4 w-px bg-border/60 shrink-0" />
+
+          {/* Print Positions */}
+          <div className="flex items-center gap-1 shrink-0">
+            {Object.values(availablePositions).map((pos) => {
+              const isSelected = selectedPositionId === pos.id
+              return (
+                <button
+                  key={pos.id}
+                  type="button"
+                  onClick={() => onSelectPosition(pos.id)}
+                  className={`px-2 py-1 rounded-full text-[11px] font-semibold border transition-all shrink-0 cursor-pointer ${
+                    isSelected
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                      : "border-border/80 bg-background text-muted-foreground"
+                  }`}
+                >
+                  {pos.name}
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="h-4 w-px bg-border/60 shrink-0" />
+
+          {/* Garment Sizes */}
+          <div className="flex items-center gap-1 shrink-0">
+            {["S", "M", "L", "XL", "2XL"].map((sz) => {
+              const isSelected = selectedSize === sz
+              return (
+                <button
+                  key={sz}
+                  type="button"
+                  onClick={() => onSelectSize(sz)}
+                  className={`px-2 py-1 rounded-full text-[11px] font-bold border transition-all shrink-0 cursor-pointer ${
+                    isSelected
+                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                      : "border-border/80 bg-background text-muted-foreground"
+                  }`}
+                >
+                  {sz}
+                </button>
               )
             })}
           </div>
         </div>
-      )}
 
-      {/* 6. Selected Artwork Transform Controls */}
-      {selectedLayer && (
-        <div className="space-y-4 pt-2 border-t border-border/50 animate-in fade-in-50 duration-150">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-              <Sliders className="size-3.5 text-primary" />
-              <span>Layer: {selectedLayer.name}</span>
+        {/* Row 2: Bottom Primary Action Dock */}
+        <div className="flex items-center gap-2 pt-0.5">
+          {/* Quick Upload Button */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            className="h-10 px-3.5 gap-1.5 rounded-xl border-dashed border-primary/60 bg-primary/5 hover:bg-primary/10 text-foreground text-xs font-bold shrink-0 shadow-2xs cursor-pointer"
+            title="Upload customer artwork or logo"
+          >
+            <Upload className="size-4 text-primary" />
+            <span>+ Photo</span>
+          </Button>
+
+          {/* Expandable Options / Edit Drawer Trigger */}
+          <Button
+            type="button"
+            variant={selectedLayer ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setIsMobileDrawerOpen(true)}
+            className={`h-10 px-3 gap-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer ${
+              selectedLayer
+                ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary/40"
+                : "border-border/80 text-foreground"
+            }`}
+            title="Open fine adjustment sliders, layer ordering, and downloads"
+          >
+            <Sliders className="size-3.5 text-primary" />
+            <span>
+              {selectedLayer ? "Edit" : "Tools"}
+              {artworkLayers.length > 0 ? ` (${artworkLayers.length})` : ""}
             </span>
-            <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onBringToFront(selectedLayer.id)}
-                className="h-6 text-[10px] px-1.5"
-                title="Bring to absolute front"
-              >
-                Top
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onSendToBack(selectedLayer.id)}
-                className="h-6 text-[10px] px-1.5"
-                title="Send to bottom layer"
-              >
-                Bottom
-              </Button>
-            </div>
-          </div>
+          </Button>
 
-          {/* Scale Slider */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Scale Size</span>
-              <span className="font-mono font-medium">
-                {Math.round((selectedLayer.scaleX || 1) * 100)}%
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0.05"
-              max="4.0"
-              step="0.05"
-              value={selectedLayer.scaleX || 1}
-              onChange={(e) => onSetScale(parseFloat(e.target.value))}
-              className="w-full accent-primary cursor-pointer"
-            />
-          </div>
+          {/* Add to Cart & Price */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={onAddToCart}
+            disabled={isAddingToCart}
+            className="h-10 flex-1 rounded-xl text-xs sm:text-sm font-bold gap-1.5 shadow-md shadow-primary/20 cursor-pointer min-w-0"
+          >
+            <ShoppingBag className="size-4 shrink-0" />
+            <span className="truncate">
+              {isAddingToCart ? "Adding..." : `Add to Cart • ₹${unitPrice}`}
+            </span>
+          </Button>
+        </div>
+      </div>
 
-          {/* Rotation Controls: Slider + Degree Input */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs items-center">
-              <span className="text-muted-foreground">Rotation Angle</span>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min="-180"
-                  max="180"
-                  value={Math.round(selectedLayer.angle || 0)}
-                  onChange={(e) => onSetRotation(parseInt(e.target.value) || 0)}
-                  className="w-14 h-6 text-center text-xs font-mono border rounded px-1"
-                />
-                <span className="text-xs text-muted-foreground">°</span>
+      {/* ========================================================================= */}
+      {/* 3. MOBILE SLIDE-UP DRAWER (Detailed controls, sliders, layer manager)     */}
+      {/* ========================================================================= */}
+      {isMobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end lg:hidden">
+          {/* Backdrop with click-outside to close */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileDrawerOpen(false)}
+          />
+
+          {/* Bottom Sheet Modal Container */}
+          <div className="relative z-10 w-full max-h-[82vh] bg-card border-t border-border/80 rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+            {/* Drawer Header */}
+            <div className="px-4 py-3 border-b border-border/60 flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <Sliders className="size-4 text-primary shrink-0" />
+                <span className="font-bold text-sm text-foreground truncate">
+                  {selectedLayer ? `Edit Artwork: ${selectedLayer.name}` : "Customizer Tools"}
+                </span>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileDrawerOpen(false)}
+                className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer shrink-0"
+                title="Close drawer"
+              >
+                <X className="size-5" />
+              </button>
             </div>
-            <input
-              type="range"
-              min="-180"
-              max="180"
-              step="1"
-              value={selectedLayer.angle || 0}
-              onChange={(e) => onSetRotation(parseInt(e.target.value))}
-              className="w-full accent-primary cursor-pointer"
-            />
-          </div>
 
-          {/* Quick Preset Rotation & Alignment Actions */}
-          <div className="grid grid-cols-4 gap-2 pt-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onRotateDelta(90)}
-              className="h-9 gap-1 text-xs"
-              title="Rotate 90 degrees clockwise"
-            >
-              <RotateCw className="size-3.5" />
-              <span>+90°</span>
-            </Button>
+            {/* Drawer Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+              {/* Active Layer Fine Controls */}
+              {selectedLayer ? (
+                <div className="space-y-3.5 bg-muted/30 p-3.5 rounded-2xl border border-border/60">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      Layer Controls
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onBringToFront(selectedLayer.id)}
+                        className="h-6 text-[10px] px-1.5 cursor-pointer"
+                        title="Bring to top"
+                      >
+                        Top
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSendToBack(selectedLayer.id)}
+                        className="h-6 text-[10px] px-1.5 cursor-pointer"
+                        title="Send to bottom"
+                      >
+                        Bottom
+                      </Button>
+                    </div>
+                  </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onRotateDelta(-90)}
-              className="h-9 gap-1 text-xs"
-              title="Rotate 90 degrees counter-clockwise"
-            >
-              <RotateCcw className="size-3.5" />
-              <span>-90°</span>
-            </Button>
+                  {/* Scale Size Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Scale Size</span>
+                      <span className="font-mono font-medium">
+                        {Math.round((selectedLayer.scaleX || 1) * 100)}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.05"
+                      max="4.0"
+                      step="0.05"
+                      value={selectedLayer.scaleX || 1}
+                      onChange={(e) => onSetScale(parseFloat(e.target.value))}
+                      className="w-full accent-primary cursor-pointer"
+                    />
+                  </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onFlipH}
-              className="h-9 gap-1 text-xs"
-              title="Flip horizontally"
-            >
-              <FlipHorizontal className="size-3.5" />
-              <span>Flip H</span>
-            </Button>
+                  {/* Rotation Slider & Degree Input */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs items-center">
+                      <span className="text-muted-foreground">Rotation Angle</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="-180"
+                          max="180"
+                          value={Math.round(selectedLayer.angle || 0)}
+                          onChange={(e) => onSetRotation(parseInt(e.target.value) || 0)}
+                          className="w-14 h-6 text-center text-xs font-mono border rounded px-1"
+                        />
+                        <span className="text-xs text-muted-foreground">°</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="-180"
+                      max="180"
+                      step="1"
+                      value={selectedLayer.angle || 0}
+                      onChange={(e) => onSetRotation(parseInt(e.target.value))}
+                      className="w-full accent-primary cursor-pointer"
+                    />
+                  </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onCenterArtwork}
-              className="h-9 gap-1 text-xs"
-              title="Center inside print area"
-            >
-              <Maximize2 className="size-3.5" />
-              <span>Center</span>
-            </Button>
+                  {/* Quick Action Buttons */}
+                  <div className="grid grid-cols-4 gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onRotateDelta(90)}
+                      className="h-8 gap-1 text-[11px] cursor-pointer"
+                    >
+                      <RotateCw className="size-3" />
+                      <span>+90°</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onRotateDelta(-90)}
+                      className="h-8 gap-1 text-[11px] cursor-pointer"
+                    >
+                      <RotateCcw className="size-3" />
+                      <span>-90°</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={onFlipH}
+                      className="h-8 gap-1 text-[11px] cursor-pointer"
+                    >
+                      <FlipHorizontal className="size-3" />
+                      <span>Flip H</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={onCenterArtwork}
+                      className="h-8 gap-1 text-[11px] cursor-pointer"
+                    >
+                      <Maximize2 className="size-3" />
+                      <span>Center</span>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                artworkLayers.length === 0 && (
+                  <div className="text-center py-4 text-muted-foreground text-xs bg-muted/20 rounded-2xl border border-dashed border-border/80">
+                    <Upload className="size-6 text-primary/60 mx-auto mb-1.5" />
+                    <p className="font-semibold text-foreground">No customer photo uploaded yet</p>
+                    <p className="mt-0.5">Use the "+ Photo" button in the bottom bar to add artwork.</p>
+                  </div>
+                )
+              )}
+
+              {/* Uploaded Layers List */}
+              {artworkLayers.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <Layers className="size-3.5 text-primary" />
+                      <span>Artwork Layers ({artworkLayers.length})</span>
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">Tap layer to select</span>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {artworkLayers.map((layer) => {
+                      const isSelected = selectedLayer?.id === layer.id
+                      return (
+                        <div
+                          key={layer.id}
+                          onClick={() => onSelectLayer(layer.id)}
+                          className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-xs cursor-pointer transition-all ${
+                            isSelected
+                              ? "border-primary bg-primary/10 text-foreground font-semibold shadow-2xs"
+                              : "border-border/70 hover:bg-muted/40 text-muted-foreground"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {layer.url ? (
+                              <img
+                                src={layer.url}
+                                alt={layer.name}
+                                className="size-7 rounded-lg object-contain bg-background border border-border/60 shrink-0"
+                              />
+                            ) : (
+                              <ImageIcon className="size-4 shrink-0 text-primary" />
+                            )}
+                            <span className="truncate">{layer.name}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onBringForward(layer.id)
+                              }}
+                              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="Bring forward"
+                            >
+                              <ChevronUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onSendBackward(layer.id)
+                              }}
+                              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="Send backward"
+                            >
+                              <ChevronDown className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onRemoveLayer(layer.id)
+                              }}
+                              className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors ml-0.5 cursor-pointer"
+                              title="Remove layer"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Garment Size Selection */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Garment Size
+                </Label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {["S", "M", "L", "XL", "2XL"].map((sz) => {
+                    const isSelected = selectedSize === sz
+                    return (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => onSelectSize(sz)}
+                        className={`py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                            : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                        }`}
+                      >
+                        {sz}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Downloads & Previews Section */}
+              <div className="space-y-2 pt-1 border-t border-border/50">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Export Previews & Proofs
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onDownloadMockup}
+                    className="h-9 text-xs gap-1.5 cursor-pointer"
+                  >
+                    <Download className="size-3.5" />
+                    <span>Mockup Preview</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onDownloadPrintFile}
+                    className="h-9 text-xs gap-1.5 cursor-pointer"
+                  >
+                    <Layers className="size-3.5" />
+                    <span>DTF Print File</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Clear Design Reset Option */}
+              {onClearDesign && (
+                <div className="pt-2 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClearDesign()
+                      setIsMobileDrawerOpen(false)
+                    }}
+                    className="text-xs text-muted-foreground hover:text-destructive underline cursor-pointer"
+                  >
+                    Clear All Artwork & Reset
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Drawer Pinned Bottom CTA */}
+            <div className="p-3 border-t border-border/60 bg-muted/20">
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => {
+                  setIsMobileDrawerOpen(false)
+                  onAddToCart()
+                }}
+                disabled={isAddingToCart}
+                className="w-full gap-2 h-11 text-sm font-semibold shadow-md cursor-pointer"
+              >
+                <ShoppingBag className="size-4" />
+                <span>{isAddingToCart ? "Adding to Cart..." : `Add to Cart • ₹${unitPrice}`}</span>
+              </Button>
+            </div>
           </div>
         </div>
       )}
-      </div>
-
-      {/* Pinned Bottom Actions & Pricing */}
-      <div className="shrink-0 p-4 border-t border-border/60 bg-muted/20 space-y-3">
-        <div className="flex items-end justify-between">
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Price per Piece
-            </span>
-            <div className="text-2xl font-extrabold text-foreground tracking-tight">
-              ₹{unitPrice}
-            </div>
-            <div className="text-[11px] text-muted-foreground">
-              Bio-washed 180 GSM Cotton • DTF Print
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onDownloadMockup}
-              className="h-8 text-xs gap-1.5"
-              title="Download composited mockup preview"
-            >
-              <Download className="size-3.5" />
-              <span>Mockup</span>
-            </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onDownloadPrintFile}
-              className="h-8 text-xs gap-1.5"
-              title="Download transparent production print file"
-            >
-              <Layers className="size-3.5" />
-              <span>Print File</span>
-            </Button>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          size="lg"
-          onClick={onAddToCart}
-          disabled={isAddingToCart}
-          className="w-full gap-2.5 h-11 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg transition-all cursor-pointer"
-        >
-          <ShoppingBag className="size-4.5" />
-          <span>{isAddingToCart ? "Adding to Cart..." : `Add to Cart • ₹${unitPrice}`}</span>
-        </Button>
-      </div>
-    </div>
+    </>
   )
 }

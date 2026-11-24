@@ -518,17 +518,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   }, [product, selectedColorId, currentColor, currentView, selectedSize])
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col px-3 sm:px-6 py-2 overflow-hidden">
-      {/* Compact Studio Header */}
-      <div className="shrink-0 h-9 flex items-center justify-between border-b border-border/40 pb-1.5 mb-2">
-        {/* Left: Compact Breadcrumbs & Product Title */}
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
-          <a href="/" className="hover:text-foreground transition-colors shrink-0">Home</a>
-          <span className="text-border">/</span>
-          <a href="/categories" className="hover:text-foreground transition-colors shrink-0">Categories</a>
-          <span className="text-border">/</span>
-          <span className="font-bold text-foreground truncate max-w-[160px] sm:max-w-xs">{productTitle}</span>
-          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary shrink-0">
+    <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-1.5 sm:py-2 overflow-hidden">
+      {/* Compact Studio Header (Clean title without breadcrumbs) */}
+      <div className="shrink-0 h-8 sm:h-9 flex items-center justify-between border-b border-border/40 pb-1 mb-1.5 sm:mb-2">
+        {/* Left: Product Title & Studio Badge */}
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="font-bold text-foreground truncate text-sm sm:text-base">{productTitle}</span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary shrink-0">
             Studio
           </span>
         </div>
@@ -554,10 +550,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         </div>
       </div>
 
-      {/* Main 2-Column Responsive Workspace: takes 100% remaining height without page scrollbar */}
-      <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-6 items-stretch overflow-hidden">
-        {/* Left Column: Canvas Viewport (Mobile: 42% height, Desktop: 7-8 cols full height) */}
-        <div className="h-[42%] lg:h-full lg:col-span-7 xl:col-span-8 flex flex-col items-center justify-center min-h-0 relative overflow-hidden">
+      {/* Main Responsive Workspace: Canvas is full flex on mobile, sidebar docks as bottom ribbon */}
+      <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-12 gap-2 lg:gap-6 items-stretch overflow-hidden relative">
+        {/* Canvas Viewport: on mobile takes flex-1 (all vertical space), on desktop takes 7-8 cols */}
+        <div className="flex-1 min-h-0 w-full h-full lg:col-span-7 xl:col-span-8 flex flex-col items-center justify-center relative overflow-hidden">
           <CustomizerViewport
             containerRef={containerRef}
             canvasRef={canvasRef}
@@ -568,8 +564,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           />
         </div>
 
-        {/* Right Column: Customizer Sidebar (Mobile: 58% height, Desktop: 4-5 cols full height) */}
-        <div className="h-[58%] lg:h-full lg:col-span-5 xl:col-span-4 min-h-0 flex flex-col overflow-hidden">
+        {/* Customizer Sidebar / Mobile Ribbon: desktop sidebar card, mobile bottom ribbon */}
+        <div className="shrink-0 lg:shrink w-full lg:h-full lg:col-span-5 xl:col-span-4 min-h-0 flex flex-col overflow-visible lg:overflow-hidden">
           <CustomizerSidebar
             colors={TSHIRT_CONFIG.colors}
             selectedColorId={selectedColorId}

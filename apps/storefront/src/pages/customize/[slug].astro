@@ -11,14 +11,6 @@ import type { Product } from "@/types/product"
 import { getProductBySlug } from "@/lib/vendure/queries/products"
 import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage
-} from "@/components/ui/breadcrumb"
 
 // Edge Caching
 setEdgeCache(Astro.response, CACHE_PRESETS.PRODUCT_DETAIL)

@@ -8,14 +8,6 @@
 import Layout from "@/layouts/main.astro"
 import ProductCustomizer from "@/components/customizer/ProductCustomizer"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage
-} from "@/components/ui/breadcrumb"
 
 // Cache edge response
 setEdgeCache(Astro.response, CACHE_PRESETS.STATIC_PAGE)
