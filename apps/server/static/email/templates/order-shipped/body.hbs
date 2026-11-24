@@ -45,10 +45,14 @@
             Shipment Status
         </mj-text>
         <mj-text font-size="14px" color="#1e293b" line-height="22px" padding="0">
-            <strong>Carrier / Service:</strong> Standard Express Transit<br/>
+            <strong>Carrier / Courier:</strong> {{#if fulfillment.method}}{{ fulfillment.method }}{{else}}Express Courier{{/if}}<br/>
+            {{#if fulfillment.trackingCode}}
+                <strong>Tracking ID (AWB):</strong> <span style="font-family: monospace; font-weight: 700; color: #0284c7; background-color: #f0f9ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">{{ fulfillment.trackingCode }}</span><br/>
+            {{else}}
+                <strong>Tracking:</strong> Active & Trackable Online<br/>
+            {{/if}}
             <strong>Expected Delivery:</strong> 3–5 Business Days<br/>
-            <strong>Tracking:</strong> Active & Trackable Online<br/>
-            <strong>Status:</strong> Dispatched from New Delhi
+            <strong>Status:</strong> Dispatched from RS Prints Studio
         </mj-text>
     </mj-column>
 </mj-section>

@@ -46,6 +46,8 @@
         </mj-text>
         <mj-text font-size="14px" color="#1e293b" line-height="22px" padding="0">
             <strong>Order Code:</strong> #{{ order.code }}<br/>
+            {{#if fulfillment.method}}<strong>Delivered Via:</strong> {{ fulfillment.method }}<br/>{{/if}}
+            {{#if fulfillment.trackingCode}}<strong>Tracking ID:</strong> {{ fulfillment.trackingCode }}<br/>{{/if}}
             <strong>Status:</strong> Delivered<br/>
             <strong>Satisfaction Guarantee:</strong> 100% Quality Checked<br/>
             <strong>Need Assistance?</strong> Instant WhatsApp Support

@@ -65,7 +65,7 @@ export const welcomeEmailHandler = new EmailEventListener('welcome')
 const loadOrderData = async ({ event, injector }: { event: OrderStateTransitionEvent; injector: Injector }) => {
     const entityHydrator = injector.get(EntityHydrator);
     await entityHydrator.hydrate(event.ctx, event.order, {
-        relations: ['lines.featuredAsset', 'lines.productVariant', 'shippingLines.shippingMethod'],
+        relations: ['lines.featuredAsset', 'lines.productVariant', 'shippingLines.shippingMethod', 'fulfillments'],
     });
     transformOrderLineAssetUrls(event.ctx, event.order, injector);
     const shippingLines = shippingLinesWithMethod(event.order);
@@ -102,6 +102,7 @@ export const orderShippedHandler = new EmailEventListener('order-shipped')
     .setTemplateVars(event => ({
         order: event.order,
         shippingLines: event.data.shippingLines,
+        fulfillment: event.order.fulfillments?.[event.order.fulfillments.length - 1],
     }));
 
 /**
@@ -118,6 +119,7 @@ export const orderDeliveredHandler = new EmailEventListener('order-delivered')
     .setTemplateVars(event => ({
         order: event.order,
         shippingLines: event.data.shippingLines,
+        fulfillment: event.order.fulfillments?.[event.order.fulfillments.length - 1],
     }));
 
 export const config: VendureConfig = {
