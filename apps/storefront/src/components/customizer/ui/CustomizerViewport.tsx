@@ -1,5 +1,5 @@
 import React from "react"
-import { Eye, EyeOff, Sparkles } from "lucide-react"
+import { Eye, EyeOff, Sparkles, Shirt } from "lucide-react"
 
 export interface CustomizerViewportProps {
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -8,6 +8,8 @@ export interface CustomizerViewportProps {
   showGuides: boolean
   onToggleGuides: () => void
   isLoading?: boolean
+  selectedViewId?: "front" | "back"
+  onSelectView?: (viewId: "front" | "back") => void
 }
 
 export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
@@ -16,7 +18,9 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
   selectedPositionName,
   showGuides,
   onToggleGuides,
-  isLoading = false
+  isLoading = false,
+  selectedViewId,
+  onSelectView
 }) => {
   return (
     <div className="w-full h-full min-h-0 flex flex-col items-center justify-between relative overflow-hidden">
@@ -53,6 +57,38 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
           </div>
         )}
       </div>
+
+      {/* Front / Back selector in mockup box below mockup - only on mobile screens */}
+      {selectedViewId && onSelectView && (
+        <div className="lg:hidden mt-2 shrink-0 flex items-center justify-center z-10">
+          <div className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-md p-1 rounded-full border border-border shadow-xs">
+            <button
+              type="button"
+              onClick={() => onSelectView("front")}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                selectedViewId === "front"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Shirt className="size-3.5" />
+              <span>Front</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectView("back")}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                selectedViewId === "back"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Shirt className="size-3.5 rotate-180" />
+              <span>Back</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

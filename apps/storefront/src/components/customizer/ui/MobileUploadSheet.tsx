@@ -71,6 +71,7 @@ export const MobileUploadSheet: React.FC<MobileUploadSheetProps> = ({
     const file = e.target.files?.[0]
     if (file) {
       onUploadImage(file)
+      onClose()
       e.target.value = ""
     }
   }

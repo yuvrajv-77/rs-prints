@@ -10,6 +10,7 @@ import { CustomizerRightSidebar } from "./ui/CustomizerRightSidebar"
 import { CustomizerViewport } from "./ui/CustomizerViewport"
 import { SizeSelectionModal } from "./ui/SizeSelectionModal"
 import { MobileColorSheet } from "./ui/MobileColorSheet"
+import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
 import {
   saveCustomizationForCart,
@@ -23,7 +24,8 @@ import {
   Download,
   Layers,
   ShoppingBag,
-  RotateCcw
+  RotateCcw,
+  Maximize2
 } from "lucide-react"
 
 export interface ProductCustomizerProps {
@@ -92,6 +94,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   // Modal & Bottom Sheet States
   const [isSizeModalOpen, setIsSizeModalOpen] = useState<boolean>(false)
   const [isMobileColorSheetOpen, setIsMobileColorSheetOpen] = useState<boolean>(false)
+  const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
 
   // Sync product name & color to URL parameters
@@ -534,13 +537,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
-      {/* Studio Header: Clean, bold and low-profile */}
-      <div className="shrink-0 h-9 flex items-center justify-between border-b border-border/40 pb-1 mb-2">
+      {/* Studio Header: Clean, bold and low-profile without product name */}
+      <div className="shrink-0 h-8 flex items-center justify-between border-b border-border/40 pb-1 mb-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="font-black text-foreground truncate text-sm sm:text-base tracking-tight">
-            {productTitle}
-          </span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary shrink-0">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-primary/10 text-primary uppercase shrink-0">
             Studio
           </span>
         </div>
@@ -561,7 +561,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       {/* ========================================================================= */}
       {/* MAIN RESPONSIVE WORKSPACE                                                 */}
       {/* - Desktop: 3-Column (Left Sidebar + Center Canvas + Right Sidebar)        */}
-      {/* - Mobile: Column Stack (Canvas on top + Cards below + Sticky Checkout)   */}
+      {/* - Mobile: Column Stack (Canvas + Tabs + Cards + In-flow Checkout)        */}
       {/* ========================================================================= */}
       <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-12 gap-5 items-stretch overflow-visible lg:overflow-hidden">
         {/* 1. Left Sidebar (Visible on Desktop lg+) */}
@@ -590,6 +590,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             showGuides={showGuides}
             onToggleGuides={handleToggleGuides}
             isLoading={isLoading}
+            selectedViewId={selectedViewId}
+            onSelectView={handleSelectView}
           />
         </div>
 
@@ -620,76 +622,49 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         </div>
 
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
-        <div className="lg:hidden flex flex-col w-full space-y-3.5 pb-24 pt-1">
-          {/* Card A: Colour Swatches (NO label on them) + View Switcher */}
-          <div className="bg-card rounded-2xl border border-border/80 p-3.5 shadow-xs flex items-center justify-between gap-2">
-            {/* Color Discs without labels */}
-            <div className="flex items-center gap-3">
-              {Object.values(TSHIRT_CONFIG.colors).map((color) => {
-                const isSelected = selectedColorId === color.id
-                return (
-                  <button
-                    key={color.id}
-                    type="button"
-                    onClick={() => handleSelectColor(color.id)}
-                    title={color.name}
-                    aria-label={color.name}
-                    className={`size-11 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center relative shadow-sm ${
-                      isSelected
-                        ? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-110 border-primary"
-                        : "border-border/80 opacity-80 hover:opacity-100"
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                  >
-                    {isSelected && (
-                      <span
-                        className={`size-2 rounded-full ${
-                          color.id === "white" ? "bg-black" : "bg-white"
-                        }`}
-                      />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* View Switcher: Front / Back */}
-            <div className="flex items-center bg-muted/60 p-1 rounded-full border border-border/60">
-              <button
-                type="button"
-                onClick={() => handleSelectView("front")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  selectedViewId === "front"
-                    ? "bg-background text-foreground shadow-2xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Front
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectView("back")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  selectedViewId === "back"
-                    ? "bg-background text-foreground shadow-2xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Back
-              </button>
-            </div>
-
-            {/* Button to open Color Bottom Sheet for position & details */}
-            <Button
-              variant="outline"
-              size="sm"
+        <div className="lg:hidden flex flex-col w-full space-y-3 pb-8 pt-1">
+          {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
+          <div className="bg-card rounded-2xl border border-border/80 p-3 shadow-xs grid grid-cols-2 gap-3">
+            {/* Button 1: Colour Selection Button */}
+            <button
+              type="button"
               onClick={() => setIsMobileColorSheetOpen(true)}
-              className="h-9 px-2.5 rounded-xl text-xs gap-1 cursor-pointer shrink-0"
-              title="Open color and placement bottom sheet"
+              className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/70 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Select garment colour"
             >
-              <Sliders className="size-3.5 text-primary" />
-              <span className="hidden sm:inline">Options</span>
-            </Button>
+              {/* Keep color icon as it is */}
+              <div
+                className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
+                style={{ backgroundColor: currentColor.hex }}
+              >
+                <span
+                  className={`size-2 rounded-full ${
+                    currentColor.id === "white" ? "bg-black" : "bg-white"
+                  }`}
+                />
+              </div>
+              {/* Just below it add the color label */}
+              <span className="text-xs font-bold text-foreground mt-2 truncate max-w-full">
+                {currentColor.name}
+              </span>
+            </button>
+
+            {/* Button 2: Print Placement Selection Button */}
+            <button
+              type="button"
+              onClick={() => setIsMobilePlacementSheetOpen(true)}
+              className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/70 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Select print placement"
+            >
+              {/* Simple icon for selection button */}
+              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center text-primary shadow-xs transition-transform group-hover:scale-105">
+                <Maximize2 className="size-5" />
+              </div>
+              {/* Just below it add the placement label */}
+              <span className="text-xs font-bold text-foreground mt-2 truncate max-w-full">
+                {currentPosition.name}
+              </span>
+            </button>
           </div>
 
           {/* Card B: Upload Design / Artwork Controls */}
@@ -754,13 +729,14 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             </Button>
           </div>
 
-          {/* Pinned Bottom Sticky Checkout Bar on Mobile */}
-          <div className="fixed bottom-0 inset-x-0 z-30 bg-card/95 backdrop-blur-md border-t border-border/80 p-3 px-4 flex items-center justify-between shadow-2xl">
+          {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile) */}
+          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex items-center justify-between gap-4 mt-1">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                 Price per piece
               </span>
-              <div className="text-xl font-black text-foreground">₹299</div>
+              <div className="text-2xl font-black text-foreground">₹299</div>
+              <div className="text-[10px] text-muted-foreground">Bio-washed Cotton • DTF Print</div>
             </div>
 
             {/* Clicking Add to Cart opens the Size Selection Bottom Sheet */}
@@ -768,9 +744,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
               size="lg"
               onClick={() => setIsSizeModalOpen(true)}
               disabled={isAddingToCart}
-              className="h-11 px-6 font-bold text-sm shadow-md shadow-primary/20 cursor-pointer"
+              className="h-12 px-7 font-bold text-sm shadow-md shadow-primary/20 cursor-pointer"
             >
-              <ShoppingBag className="size-4 mr-1.5" />
+              <ShoppingBag className="size-4.5 mr-2" />
               <span>Add to Cart</span>
             </Button>
           </div>
@@ -795,19 +771,22 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         unitPrice={299}
       />
 
-      {/* Mobile Color & View Angle Bottom Sheet */}
+      {/* Mobile Colour Bottom Sheet */}
       <MobileColorSheet
         isOpen={isMobileColorSheetOpen}
         onClose={() => setIsMobileColorSheetOpen(false)}
         colors={TSHIRT_CONFIG.colors}
         selectedColorId={selectedColorId}
         onSelectColor={handleSelectColor}
-        selectedViewId={selectedViewId}
-        onSelectView={handleSelectView}
+      />
+
+      {/* Mobile Print Placement Bottom Sheet */}
+      <MobilePlacementSheet
+        isOpen={isMobilePlacementSheetOpen}
+        onClose={() => setIsMobilePlacementSheetOpen(false)}
         availablePositions={currentView.positions}
         selectedPositionId={selectedPositionId}
         onSelectPosition={handleSelectPosition}
-        onClearDesign={handleClearDesign}
       />
 
       {/* Mobile Upload Design & Transform Bottom Sheet */}
