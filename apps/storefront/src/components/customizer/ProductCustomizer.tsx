@@ -12,6 +12,7 @@ import { SizeSelectionModal } from "./ui/SizeSelectionModal"
 import { MobileColorSheet } from "./ui/MobileColorSheet"
 import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
+import { MobileSlidersSheet } from "./ui/MobileSlidersSheet"
 import {
   saveCustomizationForCart,
   saveDesignDraft,
@@ -25,7 +26,10 @@ import {
   Layers,
   ShoppingBag,
   RotateCcw,
-  Maximize2
+  Maximize2,
+  ChevronDown,
+  SlidersHorizontal,
+  ChevronRight
 } from "lucide-react"
 
 export interface ProductCustomizerProps {
@@ -96,6 +100,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isMobileColorSheetOpen, setIsMobileColorSheetOpen] = useState<boolean>(false)
   const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
+  const [isMobileSlidersSheetOpen, setIsMobileSlidersSheetOpen] = useState<boolean>(false)
 
   // Sync product name & color to URL parameters
   const syncUrlParams = useCallback((colorId: string, title?: string) => {
@@ -623,13 +628,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
         <div className="lg:hidden flex flex-col w-full space-y-3 pb-32 sm:pb-36 pt-1">
-          {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
-          <div className="bg-card rounded-2xl border border-border/80 p-3 shadow-xs grid grid-cols-2 gap-3">
+          {/* Mobile Selection Tabs: Colour, Print Placement & Edit Sliders Buttons */}
+          <div className="bg-card rounded-2xl border border-border/80 shadow-xs grid grid-cols-3 gap-2 sm:gap-3 p-3">
             {/* Button 1: Colour Selection Button */}
             <button
               type="button"
               onClick={() => setIsMobileColorSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/70 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
               title="Select garment colour"
             >
               {/* Keep color icon as it is */}
@@ -644,8 +649,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                 />
               </div>
               {/* Just below it add the color label */}
-              <span className="text-xs font-bold text-foreground mt-2 truncate max-w-full">
-                {currentColor.name}
+              <span className="text-xs flex items-center justify-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
+                Color <ChevronRight className="size-3 shrink-0" />
               </span>
             </button>
 
@@ -653,16 +658,33 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             <button
               type="button"
               onClick={() => setIsMobilePlacementSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-border/70 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
               title="Select print placement"
             >
               {/* Simple icon for selection button */}
-              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center text-primary shadow-xs transition-transform group-hover:scale-105">
+              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                 <Maximize2 className="size-5" />
               </div>
               {/* Just below it add the placement label */}
-              <span className="text-xs font-bold text-foreground mt-2 truncate max-w-full">
-                {currentPosition.name}
+              <span className="text-xs line-clamp-1 flex justify-center items-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
+                {currentPosition.name} <ChevronRight className="size-3 shrink-0" />
+              </span>
+            </button>
+
+            {/* Button 3: Sliders Placement Selection Button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileSlidersSheetOpen(true)}
+              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
+              title="Adjust size, position and rotation"
+            >
+              {/* Simple icon for selection button */}
+              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                <SlidersHorizontal className="size-5" />
+              </div>
+              {/* Just below it add the placement label */}
+              <span className="text-xs line-clamp-1 flex justify-center items-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
+                Edit <ChevronRight className="size-3 shrink-0" />
               </span>
             </button>
           </div>
@@ -730,7 +752,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           </div>
 
           {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile) */}
-          <div className="bg-card rounded-2xl border border-border/80 p-4 shadow-xs flex items-center justify-between gap-4 mt-1">
+          <div className="bg-card rounded-2xl border border-border/80 p-4 mb-40 shadow-xs flex items-center justify-between gap-4 mt-1">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                 Price per piece
@@ -811,6 +833,24 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         onDownloadPrintFile={handleDownloadPrintFile}
       />
 
+      {/* Mobile Sliders / Transform Bottom Sheet */}
+      <MobileSlidersSheet
+        isOpen={isMobileSlidersSheetOpen}
+        onClose={() => setIsMobileSlidersSheetOpen(false)}
+        artworkLayers={artworkLayers}
+        selectedLayer={selectedLayer}
+        onSelectLayer={handleSelectLayer}
+        onRemoveLayer={handleRemoveLayer}
+        onRotateDelta={handleRotateDelta}
+        onSetRotation={handleSetRotation}
+        onSetScale={handleSetScale}
+        onCenterArtwork={handleCenterArtwork}
+        onFlipH={handleFlipH}
+        onBringToFront={handleBringToFront}
+        onSendToBack={handleSendToBack}
+        onOpenUploadSheet={() => setIsMobileUploadSheetOpen(true)}
+      />
+
       {/* Hidden file input triggered by on-canvas placeholder click */}
       <input
         ref={fileInputRef}
@@ -826,7 +866,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         }}
       />
 
-      <Toaster />
+
     </div>
   )
 }
