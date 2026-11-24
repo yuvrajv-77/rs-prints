@@ -1,5 +1,6 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 import { Separator } from "@/components/ui/separator"
 import {
   Palette,
@@ -8,7 +9,9 @@ import {
   RotateCcw,
   Sparkles,
   Shirt,
-  Maximize2
+  Maximize2,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react"
 import type { PrintPositionConfig, TShirtColorConfig } from "../config/tshirt-mockups"
 
@@ -24,6 +27,9 @@ export interface CustomizerLeftSidebarProps {
   showGuides: boolean
   onToggleGuides: () => void
   onClearDesign?: () => void
+  zoomLevel?: number
+  onZoomIn?: () => void
+  onZoomOut?: () => void
 }
 
 export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
@@ -37,7 +43,10 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
   onSelectPosition,
   showGuides,
   onToggleGuides,
-  onClearDesign
+  onClearDesign,
+  zoomLevel = 1.0,
+  onZoomIn,
+  onZoomOut
 }) => {
   return (
     <div className="bg-card rounded-3xl border border-border/80 shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
@@ -110,7 +119,45 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
 
         <Separator />
 
-        {/* 3. Print Position Selector */}
+        {/* 3. Zoom Controls (Shadcn ButtonGroup with icons only) */}
+        {onZoomIn && onZoomOut && (
+          <>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                Zoom
+              </span>
+              <ButtonGroup>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={onZoomIn}
+                  disabled={zoomLevel >= 2.2}
+                  className="size-8 cursor-pointer"
+                  title="Zoom In"
+                  aria-label="Zoom In"
+                >
+                  <ZoomIn className="size-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={onZoomOut}
+                  disabled={zoomLevel <= 0.6}
+                  className="size-8 cursor-pointer"
+                  title="Zoom Out"
+                  aria-label="Zoom Out"
+                >
+                  <ZoomOut className="size-4" />
+                </Button>
+              </ButtonGroup>
+            </div>
+            <Separator />
+          </>
+        )}
+
+        {/* 4. Print Position Selector */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">

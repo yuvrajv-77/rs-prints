@@ -1,5 +1,7 @@
 import React from "react"
-import { Eye, EyeOff, Sparkles, Shirt } from "lucide-react"
+import { Eye, EyeOff, Sparkles, Shirt, ZoomIn, ZoomOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
 
 export interface CustomizerViewportProps {
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -10,6 +12,9 @@ export interface CustomizerViewportProps {
   isLoading?: boolean
   selectedViewId?: "front" | "back"
   onSelectView?: (viewId: "front" | "back") => void
+  zoomLevel?: number
+  onZoomIn?: () => void
+  onZoomOut?: () => void
 }
 
 export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
@@ -20,7 +25,10 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
   onToggleGuides,
   isLoading = false,
   selectedViewId,
-  onSelectView
+  onSelectView,
+  zoomLevel = 1.0,
+  onZoomIn,
+  onZoomOut
 }) => {
   return (
     <div className="w-full h-full min-h-0 flex flex-col items-center justify-between relative overflow-hidden">
@@ -46,7 +54,7 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
         ref={containerRef}
         className="relative w-full flex-1 min-h-0 flex items-center justify-center select-none overflow-hidden"
       >
-        <canvas ref={canvasRef} className="block max-w-full max-h-full" />
+        <canvas ref={canvasRef} className="block" />
 
         {/* Loading overlay */}
         {isLoading && (
@@ -57,6 +65,38 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
           </div>
         )}
       </div>
+
+      {/* Mobile Fixed Zoom Controls on Left of Mockup */}
+      {onZoomIn && onZoomOut && (
+        <div className="lg:hidden absolute left-2.5 sm:left-3.5 top-1/2 -translate-y-1/2 z-20">
+          <ButtonGroup orientation="vertical" className="bg-background/90 backdrop-blur-md shadow-md rounded-2xl border border-border/80 overflow-hidden">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onZoomIn}
+              disabled={zoomLevel >= 2.2}
+              className="size-9 p-0 rounded-b-none border-b border-border/60 cursor-pointer hover:bg-muted/60 flex items-center justify-center"
+              title="Zoom In"
+              aria-label="Zoom In"
+            >
+              <ZoomIn className="size-4.5 text-foreground" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onZoomOut}
+              disabled={zoomLevel <= 0.6}
+              className="size-9 p-0 rounded-t-none cursor-pointer hover:bg-muted/60 flex items-center justify-center"
+              title="Zoom Out"
+              aria-label="Zoom Out"
+            >
+              <ZoomOut className="size-4.5 text-foreground" />
+            </Button>
+          </ButtonGroup>
+        </div>
+      )}
 
       {/* Front / Back selector in mockup box below mockup - only on mobile screens */}
       {selectedViewId && onSelectView && (

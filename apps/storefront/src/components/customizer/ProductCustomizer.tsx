@@ -248,13 +248,14 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         ? draft.colorId
         : TSHIRT_CONFIG.defaultColorId
 
-    const initialViewId = draft?.selectedViewId || TSHIRT_CONFIG.defaultViewId
+    // Always default to front view when customizer loads
+    const initialViewId: "front" | "back" = "front"
     const initialColor = TSHIRT_CONFIG.colors[initialColorId] || TSHIRT_CONFIG.colors.black
-    const initialView = initialColor.views[initialViewId] || initialColor.views.front
-    const initialPosition = initialView.positions[draft?.selectedPositionId || initialView.defaultPositionId] || Object.values(initialView.positions)[0]
+    const initialView = initialColor.views.front
+    const initialPosition = initialView.positions[initialView.defaultPositionId] || Object.values(initialView.positions)[0]
 
     setSelectedColorId(initialColorId)
-    setSelectedViewId(initialViewId)
+    setSelectedViewId("front")
     setSelectedPositionId(initialPosition.id)
 
     const manager = new FabricManager({
@@ -477,6 +478,21 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     fabricManagerRef.current?.selectArtwork(art.id)
   }, [selectedViewId, handleSelectView])
 
+  // Canvas Zoom Controls
+  const [zoomLevel, setZoomLevel] = useState<number>(1.0)
+
+  const handleZoomIn = useCallback(() => {
+    if (!fabricManagerRef.current) return
+    const next = fabricManagerRef.current.zoomIn(0.2)
+    setZoomLevel(next)
+  }, [])
+
+  const handleZoomOut = useCallback(() => {
+    if (!fabricManagerRef.current) return
+    const next = fabricManagerRef.current.zoomOut(0.2)
+    setZoomLevel(next)
+  }, [])
+
   // Guide Toggle
   const handleToggleGuides = useCallback(() => {
     setShowGuides((prev) => {
@@ -564,6 +580,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   // Clear design draft
   const handleClearDesign = useCallback(() => {
     fabricManagerRef.current?.clearAllArtworks()
+    fabricManagerRef.current?.resetZoom()
+    setZoomLevel(1.0)
     setAllUploadedArtworks([])
     clearDesignDraft(TSHIRT_CONFIG.productId)
     toast.add({
@@ -762,6 +780,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             showGuides={showGuides}
             onToggleGuides={handleToggleGuides}
             onClearDesign={handleClearDesign}
+            zoomLevel={zoomLevel}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
           />
         </div>
 
@@ -776,6 +797,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             isLoading={isLoading}
             selectedViewId={selectedViewId}
             onSelectView={handleSelectView}
+            zoomLevel={zoomLevel}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
           />
         </div>
 

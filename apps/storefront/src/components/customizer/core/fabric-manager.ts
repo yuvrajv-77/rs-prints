@@ -82,6 +82,7 @@ export class FabricManager {
   private showGuides: boolean = true
   private resizeObserver: ResizeObserver | null = null
   private currentZoom: number = 1
+  private zoomLevel: number = 1.0
 
   // Per-view state store for preserving artworks across front/back transitions
   private viewArtworkStore: Record<"front" | "back", SerializedArtwork[]> = {
@@ -999,6 +1000,31 @@ export class FabricManager {
   }
 
   /**
+   * Zoom Controls (Zoom In, Zoom Out, Reset)
+   */
+  public zoomIn(step = 0.2): number {
+    return this.setZoomLevel(this.zoomLevel + step)
+  }
+
+  public zoomOut(step = 0.2): number {
+    return this.setZoomLevel(this.zoomLevel - step)
+  }
+
+  public resetZoom(): number {
+    return this.setZoomLevel(1.0)
+  }
+
+  public getZoomLevel(): number {
+    return this.zoomLevel
+  }
+
+  public setZoomLevel(level: number): number {
+    this.zoomLevel = Math.max(0.6, Math.min(2.5, Math.round(level * 100) / 100))
+    this.handleResize()
+    return this.zoomLevel
+  }
+
+  /**
    * Responsive canvas handling:
    * Sets canvas zoom and dimensions matching the container,
    * fitting both width and height without overflowing or altering coordinates.
@@ -1010,8 +1036,8 @@ export class FabricManager {
     const containerHeight = this.containerEl.clientHeight || 400
 
     // Compute scale so the mockup fits entirely within container bounds in both dimensions.
-    // Apply 0.78 factor to leave breathing room and ensure the garment fits screens neatly.
-    const FIT_RATIO = 0.78
+    // Apply 0.78 * zoomLevel factor to allow responsive user-controlled zoom.
+    const FIT_RATIO = 0.78 * this.zoomLevel
     const scaleX = containerWidth / this.baseWidth
     const scaleY = containerHeight / this.baseHeight
     const zoom = Math.min(scaleX, scaleY) * FIT_RATIO
