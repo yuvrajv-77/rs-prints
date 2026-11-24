@@ -357,7 +357,7 @@ export const MobileUploadSheet: React.FC<MobileUploadSheetProps> = ({
         </div>
 
         {/* Footer Done Button */}
-        <div className="p-4 border-t border-border/60 bg-muted/20">
+        <div className="p-4 pb-12 sm:pb-8 border-t border-border/60 bg-muted/20">
           <Button
             type="button"
             size="lg"

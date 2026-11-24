@@ -51,7 +51,7 @@ export const MobilePlacementSheet: React.FC<MobilePlacementSheetProps> = ({
         </div>
 
         {/* Placement Options List */}
-        <div className="p-4 space-y-2 overflow-y-auto custom-scrollbar">
+        <div className="p-4 pb-14 sm:pb-10 space-y-2 overflow-y-auto custom-scrollbar">
           {Object.values(availablePositions).map((pos) => {
             const isSelected = selectedPositionId === pos.id
             return (

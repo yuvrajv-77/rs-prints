@@ -622,7 +622,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         </div>
 
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
-        <div className="lg:hidden flex flex-col w-full space-y-3 pb-8 pt-1">
+        <div className="lg:hidden flex flex-col w-full space-y-3 pb-32 sm:pb-36 pt-1">
           {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
           <div className="bg-card rounded-2xl border border-border/80 p-3 shadow-xs grid grid-cols-2 gap-3">
             {/* Button 1: Colour Selection Button */}

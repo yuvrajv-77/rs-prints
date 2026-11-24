@@ -51,7 +51,7 @@ export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
         </div>
 
         {/* Available Colours List */}
-        <div className="p-4 space-y-2.5 overflow-y-auto custom-scrollbar">
+        <div className="p-4 pb-14 sm:pb-10 space-y-2.5 overflow-y-auto custom-scrollbar">
           {Object.values(colors).map((color) => {
             const isSelected = selectedColorId === color.id
             return (
