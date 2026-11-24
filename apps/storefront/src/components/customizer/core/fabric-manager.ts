@@ -29,6 +29,13 @@ export interface SerializedArtwork {
   opacity: number
 }
 
+export interface UploadedArtworkSummary {
+  id: string
+  name: string
+  url: string
+  view: "front" | "back"
+}
+
 export interface FabricManagerOptions {
   canvasEl: HTMLCanvasElement
   containerEl: HTMLElement
@@ -39,6 +46,7 @@ export interface FabricManagerOptions {
   mockupImageUrl: string
   onSelectionChange?: (selectedLayer: ArtworkLayerInfo | null) => void
   onLayersChange?: (layers: ArtworkLayerInfo[]) => void
+  onAllArtworksChange?: (artworks: UploadedArtworkSummary[]) => void
   onTriggerUpload?: () => void
   onError?: (message: string) => void
 }
@@ -64,6 +72,7 @@ export class FabricManager {
   private mockupImageUrl: string
   private onSelectionChange?: (selectedLayer: ArtworkLayerInfo | null) => void
   private onLayersChange?: (layers: ArtworkLayerInfo[]) => void
+  private onAllArtworksChange?: (artworks: UploadedArtworkSummary[]) => void
   private onTriggerUpload?: () => void
   private onError?: (message: string) => void
 
@@ -89,6 +98,7 @@ export class FabricManager {
     this.mockupImageUrl = options.mockupImageUrl
     this.onSelectionChange = options.onSelectionChange
     this.onLayersChange = options.onLayersChange
+    this.onAllArtworksChange = options.onAllArtworksChange
     this.onTriggerUpload = options.onTriggerUpload
     this.onError = options.onError
 
@@ -406,6 +416,11 @@ export class FabricManager {
   public async addArtworkImage(dataUrl: string, fileName?: string): Promise<FabricObject | null> {
     if (!this.canvas || !this.clipRect) return null
 
+    if (this.getTotalArtworkCount() >= 2) {
+      this.onError?.("Maximum of 2 images allowed across views.")
+      return null
+    }
+
     try {
       const imgObj = await FabricImage.fromURL(dataUrl, {
         crossOrigin: "anonymous"
@@ -489,6 +504,13 @@ export class FabricManager {
       const target = this.getArtworkObjects().find((obj) => (obj.data as any)?.id === objectId)
       if (target) {
         this.canvas.remove(target)
+      } else {
+        if (this.viewArtworkStore.front) {
+          this.viewArtworkStore.front = this.viewArtworkStore.front.filter((art) => art.id !== objectId)
+        }
+        if (this.viewArtworkStore.back) {
+          this.viewArtworkStore.back = this.viewArtworkStore.back.filter((art) => art.id !== objectId)
+        }
       }
     } else {
       const active = this.canvas.getActiveObject()
@@ -1066,6 +1088,7 @@ export class FabricManager {
       }
     })
     this.onLayersChange?.(layers)
+    this.onAllArtworksChange?.(this.getAllUploadedArtworks())
   }
 
   /**
@@ -1125,6 +1148,53 @@ export class FabricManager {
     const otherViewId = this.currentViewId === "front" ? "back" : "front"
     const otherCount = (this.viewArtworkStore[otherViewId] || []).length
     return currentCount + otherCount
+  }
+
+  /**
+   * Get all uploaded artworks across all views (Front & Back)
+   */
+  public getAllUploadedArtworks(): UploadedArtworkSummary[] {
+    const list: UploadedArtworkSummary[] = []
+
+    if (this.currentViewId === "front") {
+      for (const obj of this.getArtworkObjects()) {
+        const data = (obj.data as any) || {}
+        list.push({
+          id: data.id || `layer-${Math.random()}`,
+          name: data.name || "Artwork",
+          url: data.originalUrl || "",
+          view: "front"
+        })
+      }
+      for (const art of this.viewArtworkStore.back || []) {
+        list.push({
+          id: art.id,
+          name: art.name,
+          url: art.dataUrl,
+          view: "back"
+        })
+      }
+    } else {
+      for (const art of this.viewArtworkStore.front || []) {
+        list.push({
+          id: art.id,
+          name: art.name,
+          url: art.dataUrl,
+          view: "front"
+        })
+      }
+      for (const obj of this.getArtworkObjects()) {
+        const data = (obj.data as any) || {}
+        list.push({
+          id: data.id || `layer-${Math.random()}`,
+          name: data.name || "Artwork",
+          url: data.originalUrl || "",
+          view: "back"
+        })
+      }
+    }
+
+    return list
   }
 
   /**

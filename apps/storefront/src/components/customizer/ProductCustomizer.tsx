@@ -4,7 +4,7 @@ import { addToCart } from "@/stores/cart"
 import { toast, Toaster } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button"
 import { TSHIRT_CONFIG } from "./config/tshirt-mockups"
-import { FabricManager, type ArtworkLayerInfo } from "./core/fabric-manager"
+import { FabricManager, type ArtworkLayerInfo, type UploadedArtworkSummary } from "./core/fabric-manager"
 import { CustomizerLeftSidebar } from "./ui/CustomizerLeftSidebar"
 import { CustomizerRightSidebar } from "./ui/CustomizerRightSidebar"
 import { CustomizerViewport } from "./ui/CustomizerViewport"
@@ -12,7 +12,6 @@ import { SizeSelectionModal } from "./ui/SizeSelectionModal"
 import { MobileColorSheet } from "./ui/MobileColorSheet"
 import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
-import { MobileSlidersSheet } from "./ui/MobileSlidersSheet"
 import {
   saveCustomizationForCart,
   saveDesignDraft,
@@ -29,7 +28,8 @@ import {
   Maximize2,
   ChevronDown,
   SlidersHorizontal,
-  ChevronRight
+  ChevronRight,
+  X
 } from "lucide-react"
 
 export interface ProductCustomizerProps {
@@ -93,6 +93,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   // Artwork layers state
   const [artworkLayers, setArtworkLayers] = useState<ArtworkLayerInfo[]>([])
   const [selectedLayer, setSelectedLayer] = useState<ArtworkLayerInfo | null>(null)
+  const [allUploadedArtworks, setAllUploadedArtworks] = useState<UploadedArtworkSummary[]>([])
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false)
 
   // Modal & Bottom Sheet States
@@ -100,7 +101,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isMobileColorSheetOpen, setIsMobileColorSheetOpen] = useState<boolean>(false)
   const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
-  const [isMobileSlidersSheetOpen, setIsMobileSlidersSheetOpen] = useState<boolean>(false)
 
   // Sync product name & color to URL parameters
   const syncUrlParams = useCallback((colorId: string, title?: string) => {
@@ -149,6 +149,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       },
       onLayersChange: (layers) => {
         setArtworkLayers(layers)
+      },
+      onAllArtworksChange: (artworks) => {
+        setAllUploadedArtworks(artworks)
       },
       onTriggerUpload: () => {
         fileInputRef.current?.click()
@@ -270,6 +273,15 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   // Upload artwork image
   const handleUploadImage = useCallback((file: File) => {
+    if (fabricManagerRef.current && fabricManagerRef.current.getTotalArtworkCount() >= 2) {
+      toast.add({
+        title: "Maximum Images Reached",
+        description: "You can upload a maximum of 2 designs only. Please delete an image first.",
+        type: "warning"
+      })
+      return
+    }
+
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       toast.add({
         title: "Unsupported File Format",
@@ -325,6 +337,25 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     reader.readAsDataURL(file)
   }, [triggerAutoSave])
 
+  const handleTriggerUpload = useCallback(() => {
+    if (allUploadedArtworks.length >= 2 || (fabricManagerRef.current && fabricManagerRef.current.getTotalArtworkCount() >= 2)) {
+      toast.add({
+        title: "Maximum Images Reached",
+        description: "You can upload a maximum of 2 designs only. Please delete an image first.",
+        type: "warning"
+      })
+      return
+    }
+    fileInputRef.current?.click()
+  }, [allUploadedArtworks.length])
+
+  const handleThumbnailClick = useCallback((art: UploadedArtworkSummary) => {
+    if (selectedViewId !== art.view) {
+      handleSelectView(art.view)
+    }
+    fabricManagerRef.current?.selectArtwork(art.id)
+  }, [selectedViewId, handleSelectView])
+
   // Guide Toggle
   const handleToggleGuides = useCallback(() => {
     setShowGuides((prev) => {
@@ -339,6 +370,16 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     fabricManagerRef.current?.rotateActiveObject(delta)
     triggerAutoSave()
   }, [triggerAutoSave])
+
+  const handleRotateImage = useCallback(() => {
+    if (!fabricManagerRef.current) return
+    const targetId = selectedLayer?.id || artworkLayers[artworkLayers.length - 1]?.id
+    if (targetId) {
+      fabricManagerRef.current.selectArtwork(targetId)
+    }
+    fabricManagerRef.current.rotateActiveObject(90)
+    triggerAutoSave()
+  }, [selectedLayer, artworkLayers, triggerAutoSave])
 
   const handleSetRotation = useCallback((angle: number) => {
     fabricManagerRef.current?.setActiveObjectAngle(angle)
@@ -402,6 +443,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   // Clear design draft
   const handleClearDesign = useCallback(() => {
     fabricManagerRef.current?.clearAllArtworks()
+    setAllUploadedArtworks([])
     clearDesignDraft(TSHIRT_CONFIG.productId)
     toast.add({
       title: "Design Cleared",
@@ -628,13 +670,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
         <div className="lg:hidden flex flex-col w-full space-y-3 pb-32 sm:pb-36 pt-1">
-          {/* Mobile Selection Tabs: Colour, Print Placement & Edit Sliders Buttons */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-xs grid grid-cols-3 gap-2 sm:gap-3 p-3">
+          {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
+          <div className="bg-card rounded-2xl border border-border/80  shadow-xs grid grid-cols-4 gap-3">
             {/* Button 1: Colour Selection Button */}
             <button
               type="button"
               onClick={() => setIsMobileColorSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
+              className="flex flex-col items-center justify-center   hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
               title="Select garment colour"
             >
               {/* Keep color icon as it is */}
@@ -643,14 +685,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                 style={{ backgroundColor: currentColor.hex }}
               >
                 <span
-                  className={`size-2 rounded-full ${
-                    currentColor.id === "white" ? "bg-black" : "bg-white"
-                  }`}
+                  className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"
+                    }`}
                 />
               </div>
               {/* Just below it add the color label */}
-              <span className="text-xs flex items-center justify-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
-                Color <ChevronRight className="size-3 shrink-0" />
+              <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
+                Color {<ChevronRight className="size-3" />}
               </span>
             </button>
 
@@ -658,7 +699,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             <button
               type="button"
               onClick={() => setIsMobilePlacementSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
+              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
               title="Select print placement"
             >
               {/* Simple icon for selection button */}
@@ -666,89 +707,112 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                 <Maximize2 className="size-5" />
               </div>
               {/* Just below it add the placement label */}
-              <span className="text-xs line-clamp-1 flex justify-center items-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
-                {currentPosition.name} <ChevronRight className="size-3 shrink-0" />
+              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
+                {currentPosition.name}{<ChevronRight className="size-3" />}
               </span>
             </button>
 
-            {/* Button 3: Sliders Placement Selection Button */}
+            {/* Button 3: Rotate Placement Selection Button */}
             <button
               type="button"
-              onClick={() => setIsMobileSlidersSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-2 rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10 border border-border/70"
-              title="Adjust size, position and rotation"
+              onClick={handleRotateImage}
+              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Select print placement"
             >
               {/* Simple icon for selection button */}
               <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-                <SlidersHorizontal className="size-5" />
+                <RotateCcw className="size-5" />
               </div>
               {/* Just below it add the placement label */}
-              <span className="text-xs line-clamp-1 flex justify-center items-center gap-0.5 font-bold text-foreground mt-2 truncate w-full">
-                Edit <ChevronRight className="size-3 shrink-0" />
+              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
+                Rotate
               </span>
             </button>
+
+            {/* Button 4: Download Placement Selection Button */}
+            <button
+              type="button"
+              onClick={handleDownloadMockup}
+              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Select print placement"
+            >
+              {/* Simple icon for selection button */}
+              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                <Download className="size-5" />
+              </div>
+              {/* Just below it add the placement label */}
+              <span className="text-xs text-wrap flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
+               Preview
+              </span>
+            </button>
+
           </div>
 
           {/* Card B: Upload Design / Artwork Controls */}
-          <div className="bg-card rounded-2xl border border-border/80 p-3.5 shadow-xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              {selectedLayer?.url ? (
-                <img
-                  src={selectedLayer.url}
-                  alt={selectedLayer.name}
-                  className="size-11 rounded-xl object-contain bg-background border border-border/60 shrink-0"
-                />
-              ) : (
-                <div className="size-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Upload className="size-5" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-foreground truncate">
-                  {selectedLayer ? selectedLayer.name : "Customer Artwork"}
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  {selectedLayer
-                    ? `${Math.round((selectedLayer.scaleX || 1) * 100)}% size • DTF Ready`
-                    : "Tap to upload photo or logo"}
-                </div>
+          <div className="bg-card rounded-2xl border border-border/80 p-3 shadow-xs">
+            {allUploadedArtworks.length === 0 ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleTriggerUpload}
+                className="w-full h-14 rounded-xl text-xs font-bold gap-2 border-dashed border-primary/50 hover:border-primary hover:bg-primary/5 cursor-pointer flex items-center justify-center transition-all"
+              >
+                <Upload className="size-4 text-primary" />
+                <span>Upload Design</span>
+              </Button>
+            ) : (
+              <div className="flex items-center gap-3 w-full">
+                {/* Uploaded image thumbnails (up to 2 maximum) */}
+                {allUploadedArtworks.map((art) => (
+                  <div key={art.id} className="flex flex-col items-center shrink-0">
+                    <div
+                      onClick={() => handleThumbnailClick(art)}
+                      className={`relative size-14 rounded-xl border p-1 bg-background flex items-center justify-center cursor-pointer transition-all shadow-2xs ${
+                        selectedViewId === art.view
+                          ? "border-primary ring-2 ring-primary/20"
+                          : "border-border/80 hover:border-primary/50"
+                      }`}
+                      title={`Click to view ${art.view} design (${art.name})`}
+                    >
+                      <img
+                        src={art.url}
+                        alt={art.name}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                      {/* Cross button on top right corner to delete image */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleRemoveLayer(art.id)
+                        }}
+                        className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 flex items-center justify-center shadow-xs cursor-pointer z-10 transition-transform active:scale-90"
+                        title="Delete image"
+                      >
+                        <X className="size-3 stroke-[3]" />
+                      </button>
+                    </div>
+                    {/* Label below image for front or back */}
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1 text-center">
+                      {art.view === "front" ? "Front" : "Back"}
+                    </span>
+                  </div>
+                ))}
+
+                {/* Upload button taking remaining space (when under maximum of 2) */}
+                {allUploadedArtworks.length < 2 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleTriggerUpload}
+                    className="flex-1 h-14 rounded-xl text-xs font-bold gap-1.5 border-dashed border-primary/50 hover:border-primary hover:bg-primary/5 cursor-pointer flex items-center justify-center transition-all min-w-0"
+                  >
+                    <Upload className="size-4 text-primary shrink-0" />
+                    <span className="truncate">Upload Design</span>
+                  </Button>
+                )}
               </div>
-            </div>
-
-            {/* Upload Design button opens the upload bottom sheet */}
-            <Button
-              variant={artworkLayers.length > 0 ? "secondary" : "outline"}
-              size="sm"
-              onClick={() => setIsMobileUploadSheetOpen(true)}
-              className="h-10 px-3.5 rounded-xl text-xs font-bold gap-1.5 shrink-0 cursor-pointer border-dashed border-primary/50"
-            >
-              <Upload className="size-4 text-primary" />
-              <span>{artworkLayers.length > 0 ? "Edit Artwork" : "Upload Design"}</span>
-            </Button>
-          </div>
-
-          {/* Card C: Previews & Downloads */}
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadMockup}
-              className="h-10 text-xs font-semibold gap-1.5 rounded-xl cursor-pointer"
-            >
-              <Download className="size-3.5" />
-              <span>Mockup Preview</span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadPrintFile}
-              className="h-10 text-xs font-semibold gap-1.5 rounded-xl cursor-pointer"
-            >
-              <Layers className="size-3.5" />
-              <span>DTF Print File</span>
-            </Button>
+            )}
           </div>
 
           {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile) */}
@@ -758,7 +822,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                 Price per piece
               </span>
               <div className="text-2xl font-black text-foreground">₹299</div>
-              <div className="text-[10px] text-muted-foreground">Bio-washed Cotton • DTF Print</div>
             </div>
 
             {/* Clicking Add to Cart opens the Size Selection Bottom Sheet */}
@@ -831,24 +894,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         onFlipH={handleFlipH}
         onDownloadMockup={handleDownloadMockup}
         onDownloadPrintFile={handleDownloadPrintFile}
-      />
-
-      {/* Mobile Sliders / Transform Bottom Sheet */}
-      <MobileSlidersSheet
-        isOpen={isMobileSlidersSheetOpen}
-        onClose={() => setIsMobileSlidersSheetOpen(false)}
-        artworkLayers={artworkLayers}
-        selectedLayer={selectedLayer}
-        onSelectLayer={handleSelectLayer}
-        onRemoveLayer={handleRemoveLayer}
-        onRotateDelta={handleRotateDelta}
-        onSetRotation={handleSetRotation}
-        onSetScale={handleSetScale}
-        onCenterArtwork={handleCenterArtwork}
-        onFlipH={handleFlipH}
-        onBringToFront={handleBringToFront}
-        onSendToBack={handleSendToBack}
-        onOpenUploadSheet={() => setIsMobileUploadSheetOpen(true)}
       />
 
       {/* Hidden file input triggered by on-canvas placeholder click */}
