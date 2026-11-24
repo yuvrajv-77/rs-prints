@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/main.astro"
 import type { Product } from "@/types/product"
-import { getRelatedProducts } from "@/data/products"
+import { getRelatedProductsFromCollection } from "@/lib/catalog"
 import ProductGallery from "@/components/product/ProductGallery"
 import ProductConfigurator from "@/components/product/ProductConfigurator"
 import ProductFaq from "@/components/product/ProductFaq"
@@ -34,7 +34,13 @@ interface Props {
 
 const { product, subcollection, parentCollection } = Astro.props
 
-const relatedProducts = getRelatedProducts(product.slug, 3)
+const relatedProducts = await getRelatedProductsFromCollection({
+  currentSlug: product.slug,
+  subcollectionSlug: subcollection?.slug,
+  parentCollectionSlug: parentCollection?.slug,
+  categoryName: product.category,
+  limit: 4,
+})
 
 // SEO Schema markup: Product + FAQPage
 const schemaMarkup = [
@@ -175,8 +181,22 @@ const schemaMarkup = [
       </div>
     </div>
 
-    <!-- Frequently Customized Together -->
-    <RelatedProducts products={relatedProducts} />
+    <!-- Frequently Customized Together / Same Collection Products -->
+    <RelatedProducts
+      products={relatedProducts}
+      categorySlug={subcollection?.slug || (product.category ? product.category.toLowerCase().replace(/\s+/g, "-") : "")}
+      parentCategorySlug={parentCollection?.slug}
+      collectionTitle={subcollection?.name || parentCollection?.name || product.category}
+      viewAllHref={
+        subcollection && parentCollection
+          ? `/categories/${parentCollection.slug}/${subcollection.slug}`
+          : parentCollection
+          ? `/categories/${parentCollection.slug}`
+          : subcollection
+          ? `/categories/${subcollection.slug}`
+          : "/categories"
+      }
+    />
   </div>
 
   <!-- Mobile Sticky Action Bar for handheld conversions -->

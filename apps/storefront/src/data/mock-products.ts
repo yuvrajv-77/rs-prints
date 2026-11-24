@@ -15167,9 +15167,77 @@ export function getProductsByCategory(category: string): Product[] {
 
 export function getRelatedProducts(
   currentSlug: string,
-  limit = 3
+  categoryOrSubcategorySlug?: string,
+  limit = 4
 ): Product[] {
-  return products.filter((p) => p.slug !== currentSlug).slice(0, limit)
+  const currentProduct = products.find((p) => p.slug === currentSlug)
+  const categoryToMatch = categoryOrSubcategorySlug || currentProduct?.category
+
+  let related: Product[] = []
+
+  if (categoryToMatch) {
+    const norm = categoryToMatch.toLowerCase().replace(/[-_]/g, " ").trim()
+    const normSlug = categoryToMatch.toLowerCase().trim()
+
+    // 1. Direct match on product.category
+    related = products.filter(
+      (p) =>
+        p.slug !== currentSlug &&
+        p.category &&
+        (p.category.toLowerCase() === norm ||
+          p.category.toLowerCase().replace(/[-_]/g, " ") === norm ||
+          p.category.toLowerCase().replace(/\s+/g, "-") === normSlug)
+    )
+
+    // 2. Subcategory match in PARENT_CATEGORIES
+    if (related.length < limit) {
+      for (const parent of PARENT_CATEGORIES) {
+        for (const sub of parent.subcategories) {
+          const subMatches =
+            sub.id.toLowerCase() === normSlug ||
+            sub.title.toLowerCase() === norm ||
+            sub.slugs.includes(currentSlug)
+
+          if (subMatches) {
+            const extra = sub.slugs
+              .filter((s) => s !== currentSlug && !related.some((r) => r.slug === s))
+              .map((s) => products.find((p) => p.slug === s))
+              .filter((p): p is Product => Boolean(p))
+            related = [...related, ...extra]
+            break
+          }
+        }
+        if (related.length >= limit) break
+      }
+    }
+
+    // 3. Parent category match (e.g. all Mugs if viewing a mug)
+    if (related.length < limit) {
+      for (const parent of PARENT_CATEGORIES) {
+        const parentMatches =
+          parent.id.toLowerCase() === normSlug ||
+          parent.title.toLowerCase() === norm ||
+          parent.subcategories.some((s) => s.slugs.includes(currentSlug))
+
+        if (parentMatches) {
+          const allParentSlugs = parent.subcategories.flatMap((s) => s.slugs)
+          const extra = allParentSlugs
+            .filter((s) => s !== currentSlug && !related.some((r) => r.slug === s))
+            .map((s) => products.find((p) => p.slug === s))
+            .filter((p): p is Product => Boolean(p))
+          related = [...related, ...extra]
+          break
+        }
+      }
+    }
+  }
+
+  // Fallback if no category matches
+  if (related.length === 0) {
+    related = products.filter((p) => p.slug !== currentSlug)
+  }
+
+  return related.slice(0, limit)
 }
 
 export const PARENT_CATEGORIES: ParentCategory[] = [

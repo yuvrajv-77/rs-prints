@@ -298,6 +298,39 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
     return `https://wa.me/919876543210?text=${text}`
   }, [product.title, currentVariant, selectedOptions, selectedMaterial, selectedMethod, quantity, unitPrice, subtotal])
 
+  // 7. Dynamic URL for "Customize Online" studio passing chosen configuration (colors, size, capacity, quantity, etc.)
+  const customizeUrl = useMemo(() => {
+    const sp = new URLSearchParams()
+    sp.set("product", product.title)
+
+    for (const [groupName, optionVal] of Object.entries(selectedOptions)) {
+      if (!optionVal) continue
+      const lowerGroup = groupName.toLowerCase().trim()
+      if (lowerGroup.includes("color") || lowerGroup === "colour") {
+        sp.set("color", optionVal.toLowerCase())
+      } else if (lowerGroup.includes("size")) {
+        sp.set("size", optionVal)
+      } else if (lowerGroup.includes("capacity") || lowerGroup.includes("volume")) {
+        sp.set("capacity", optionVal)
+      } else {
+        const cleanKey = lowerGroup.replace(/\s+/g, "_")
+        sp.set(cleanKey, optionVal)
+      }
+    }
+
+    if (selectedMaterial) {
+      sp.set("material", selectedMaterial)
+    }
+    if (selectedMethod) {
+      sp.set("method", selectedMethod)
+    }
+    if (quantity > 1) {
+      sp.set("quantity", quantity.toString())
+    }
+
+    return `/customize/${product.slug}?${sp.toString()}`
+  }, [product.title, product.slug, selectedOptions, selectedMaterial, selectedMethod, quantity])
+
   const handleOptionChange = (groupName: string, value: string) => {
     setSelectedOptions((prev) => {
       const next: Record<string, string> = {
@@ -588,25 +621,17 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 pt-2">
         {/* Customize Design Online Studio CTA */}
-        {(() => {
-          const activeColor = Object.entries(selectedOptions).find(([k]) => k.toLowerCase().includes("color"))?.[1] || "black"
-          return (
-            <a
-              href={`/customize/${product.slug}?product=${encodeURIComponent(product.title)}&color=${encodeURIComponent(activeColor.toLowerCase())}`}
-              className="w-full"
-            >
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="w-full gap-2.5 h-12 text-sm font-bold border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary hover:border-primary/60 transition-all cursor-pointer shadow-2xs"
-              >
-                <Sparkles className="size-4" />
-                <span>Customize Online (Add Image & Text)</span>
-              </Button>
-            </a>
-          )
-        })()}
+        <a href={customizeUrl} className="w-full">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full gap-2.5 h-12 text-sm font-bold border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary hover:border-primary/60 transition-all cursor-pointer shadow-2xs"
+          >
+            <Sparkles className="size-4" />
+            <span>Customize Online (Add Image & Text)</span>
+          </Button>
+        </a>
 
         {/* Primary Add to Cart Button */}
         <Button

@@ -44,8 +44,22 @@ const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"]
 function normalizeColorParam(param: string | null): string | null {
   if (!param) return null
   const clean = param.toLowerCase().trim().replace(/[_\s]+/g, "-")
-  if (clean === "black" || clean === "pitch-black" || clean === "pitchblack") return "black"
-  if (clean === "white" || clean === "crisp-white" || clean === "crispwhite") return "white"
+  if (clean === "black" || clean === "pitch-black" || clean === "pitchblack" || clean.includes("black")) return "black"
+  if (clean === "white" || clean === "crisp-white" || clean === "crispwhite" || clean.includes("white")) return "white"
+  if (clean in TSHIRT_CONFIG.colors) return clean
+  return null
+}
+
+// Helper to normalize size parameter from URL
+function normalizeSizeParam(param: string | null): string | null {
+  if (!param) return null
+  const clean = param.trim().toUpperCase()
+  if (clean === "S" || clean === "SMALL") return "S"
+  if (clean === "M" || clean === "MEDIUM") return "M"
+  if (clean === "L" || clean === "LARGE") return "L"
+  if (clean === "XL" || clean === "EXTRA LARGE" || clean === "X-LARGE") return "XL"
+  if (clean === "2XL" || clean === "XXL" || clean === "2-XL" || clean === "DOUBLE LARGE" || clean === "XX-LARGE") return "2XL"
+  if (["S", "M", "L", "XL", "2XL"].includes(clean)) return clean
   return null
 }
 
@@ -58,16 +72,36 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showGuides, setShowGuides] = useState<boolean>(true)
 
-  // Product Title from props or URL parameter
+  // Product Title from URL parameter, prop, or fallback
   const [productTitle, setProductTitle] = useState<string>(() => {
-    if (product?.title) return product.title
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search)
       const p = sp.get("product")
       if (p) return p
     }
+    if (product?.title) return product.title
     return TSHIRT_CONFIG.name
   })
+
+  // Additional custom attributes from URL (e.g. capacity, material, method)
+  const [customAttributes] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {}
+    const sp = new URLSearchParams(window.location.search)
+    const attrs: Record<string, string> = {}
+    for (const [key, val] of sp.entries()) {
+      const lower = key.toLowerCase()
+      if (!["product", "color", "size", "quantity"].includes(lower) && val) {
+        attrs[lower] = val
+      }
+    }
+    return attrs
+  })
+
+  // Unit price from product prop or default 299
+  const unitPrice = useMemo(() => {
+    if (product?.startingPriceNumber) return Math.round(product.startingPriceNumber)
+    return 299
+  }, [product?.startingPriceNumber])
 
   // Determine initial color: URL parameter -> saved draft -> default
   const [selectedColorId, setSelectedColorId] = useState<string>(() => {
@@ -81,13 +115,40 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     return TSHIRT_CONFIG.defaultColorId
   })
 
-  // Size & Multi-quantity selection state (minimum 1 in any size, max 50 per size)
-  const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>({
-    S: 0,
-    M: 0,
-    L: 1,
-    XL: 0,
-    "2XL": 0
+  // Size & Multi-quantity selection state (pre-populated from URL if provided)
+  const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>(() => {
+    const defaultSizes: Record<string, number> = {
+      S: 0,
+      M: 0,
+      L: 1,
+      XL: 0,
+      "2XL": 0
+    }
+
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      const sizeParam = normalizeSizeParam(sp.get("size"))
+      const rawQty = parseInt(sp.get("quantity") || "", 10)
+      const validQty = isNaN(rawQty) || rawQty < 1 ? 1 : Math.min(50, rawQty)
+
+      if (sizeParam && sizeParam in defaultSizes) {
+        return {
+          S: 0,
+          M: 0,
+          L: 0,
+          XL: 0,
+          "2XL": 0,
+          [sizeParam]: validQty
+        }
+      } else if (!isNaN(rawQty) && rawQty >= 1) {
+        return {
+          ...defaultSizes,
+          L: validQty
+        }
+      }
+    }
+
+    return defaultSizes
   })
 
   const totalQuantity = useMemo(
@@ -95,13 +156,51 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     [sizeQuantities]
   )
 
+  // Sync product name, color, size, and custom configuration to URL parameters
+  const syncUrlParams = useCallback(
+    (colorId: string, title?: string, sizes?: Record<string, number>) => {
+      if (typeof window === "undefined") return
+      const activeTitle = title || productTitle
+      const url = new URL(window.location.href)
+      url.searchParams.set("product", activeTitle)
+      url.searchParams.set("color", colorId)
+
+      // Retain custom attributes from URL (e.g. capacity, material, method)
+      for (const [k, v] of Object.entries(customAttributes)) {
+        if (v) url.searchParams.set(k, v)
+      }
+
+      const currentSizes = sizes || sizeQuantities
+      const activeSizeEntries = Object.entries(currentSizes).filter(([_, q]) => q > 0)
+      if (activeSizeEntries.length === 1) {
+        url.searchParams.set("size", activeSizeEntries[0][0])
+        if (activeSizeEntries[0][1] > 1) {
+          url.searchParams.set("quantity", activeSizeEntries[0][1].toString())
+        } else {
+          url.searchParams.delete("quantity")
+        }
+      } else if (activeSizeEntries.length > 1) {
+        url.searchParams.delete("size")
+        const total = activeSizeEntries.reduce((acc, [_, q]) => acc + q, 0)
+        url.searchParams.set("quantity", total.toString())
+      }
+
+      window.history.replaceState({}, "", url.toString())
+    },
+    [productTitle, customAttributes, sizeQuantities]
+  )
+
   const handleQuantityChange = useCallback((sizeId: string, qty: number) => {
     const clamped = Math.max(0, Math.min(50, qty))
-    setSizeQuantities((prev) => ({
-      ...prev,
-      [sizeId]: clamped
-    }))
-  }, [])
+    setSizeQuantities((prev) => {
+      const next = {
+        ...prev,
+        [sizeId]: clamped
+      }
+      syncUrlParams(selectedColorId, productTitle, next)
+      return next
+    })
+  }, [selectedColorId, productTitle, syncUrlParams])
 
   const [selectedViewId, setSelectedViewId] = useState<"front" | "back">(TSHIRT_CONFIG.defaultViewId)
 
@@ -122,20 +221,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
 
-  // Sync product name & color to URL parameters
-  const syncUrlParams = useCallback((colorId: string, title?: string) => {
-    if (typeof window === "undefined") return
-    const activeTitle = title || productTitle
-    const url = new URL(window.location.href)
-    url.searchParams.set("product", activeTitle)
-    url.searchParams.set("color", colorId)
-    window.history.replaceState({}, "", url.toString())
-  }, [productTitle])
-
   // Initial URL synchronization on mount
   useEffect(() => {
-    syncUrlParams(selectedColorId, productTitle)
-  }, [selectedColorId, productTitle, syncUrlParams])
+    syncUrlParams(selectedColorId, productTitle, sizeQuantities)
+  }, [selectedColorId, productTitle, syncUrlParams, sizeQuantities])
 
   // Initialize Fabric Canvas and restore drafts if available
   useEffect(() => {
@@ -143,10 +232,22 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
     setIsLoading(true)
 
-    // Check for existing saved draft
+    // Check for existing saved draft or URL parameter override
     const draft = loadDesignDraft(TSHIRT_CONFIG.productId)
 
-    const initialColorId = draft?.colorId || TSHIRT_CONFIG.defaultColorId
+    let urlColorId: string | null = null
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      urlColorId = normalizeColorParam(sp.get("color"))
+    }
+
+    const initialColorId =
+      urlColorId && TSHIRT_CONFIG.colors[urlColorId]
+        ? urlColorId
+        : draft?.colorId && TSHIRT_CONFIG.colors[draft.colorId]
+        ? draft.colorId
+        : TSHIRT_CONFIG.defaultColorId
+
     const initialViewId = draft?.selectedViewId || TSHIRT_CONFIG.defaultViewId
     const initialColor = TSHIRT_CONFIG.colors[initialColorId] || TSHIRT_CONFIG.colors.black
     const initialView = initialColor.views[initialViewId] || initialColor.views.front
@@ -560,8 +661,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         const sizeVariantId = `${baseVariantId}-${sizeId}`
 
         const customizationId = saveCustomizationForCart({
-          productId: TSHIRT_CONFIG.productId,
-          productName: TSHIRT_CONFIG.name,
+          productId: product?.id || TSHIRT_CONFIG.productId,
+          productName: productTitle || product?.title || TSHIRT_CONFIG.name,
           variantId: sizeVariantId,
           colorId: selectedColorId,
           colorName: currentColor.name,
@@ -583,6 +684,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         })
 
         const detailsList = [
+          ...Object.entries(customAttributes).map(
+            ([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}`
+          ),
           `Colour: ${currentColor.name}`,
           `Size: ${sizeId}`,
           `Qty: ${qty}`,
@@ -592,7 +696,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         ].filter(Boolean).join(" | ")
 
         await addToCart(sizeVariantId, qty, {
-          productName: TSHIRT_CONFIG.name,
+          productName: productTitle || product?.title || TSHIRT_CONFIG.name,
           variantDetails: detailsList
         })
       }
@@ -613,7 +717,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     } finally {
       setIsAddingToCart(false)
     }
-  }, [product, selectedColorId, currentColor, currentView, sizeQuantities, totalQuantity])
+  }, [product, productTitle, customAttributes, selectedColorId, currentColor, currentView, sizeQuantities, totalQuantity])
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
@@ -697,7 +801,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             onDownloadPrintFile={handleDownloadPrintFile}
             onRequestAddToCart={handleAddToCart}
             isAddingToCart={isAddingToCart}
-            unitPrice={299}
+            unitPrice={unitPrice}
             sizeQuantities={sizeQuantities}
             onQuantityChange={handleQuantityChange}
             totalQuantity={totalQuantity}
@@ -857,7 +961,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
               quantities={sizeQuantities}
               onQuantityChange={handleQuantityChange}
               totalQuantity={totalQuantity}
-              unitPrice={299}
+              unitPrice={unitPrice}
             />
           </div>
 
@@ -868,10 +972,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                 {totalQuantity > 1 ? `Total (${totalQuantity} pcs)` : "Price per piece"}
               </span>
               <div className="text-2xl font-black text-foreground">
-                ₹{299 * Math.max(1, totalQuantity)}
+                ₹{unitPrice * Math.max(1, totalQuantity)}
               </div>
               {totalQuantity > 1 && (
-                <div className="text-[10px] text-muted-foreground">₹299 / piece</div>
+                <div className="text-[10px] text-muted-foreground">₹{unitPrice} / piece</div>
               )}
             </div>
 
@@ -888,7 +992,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                   ? "Adding..."
                   : totalQuantity === 0
                   ? "Select Qty"
-                  : `Add to Cart • ₹${299 * totalQuantity}`}
+                  : `Add to Cart • ₹${unitPrice * totalQuantity}`}
               </span>
             </Button>
           </div>

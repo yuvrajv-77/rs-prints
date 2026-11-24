@@ -25,7 +25,7 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
   return (
     <div className="w-full h-full min-h-0 flex flex-col items-center justify-between relative overflow-hidden">
       {/* Top indicator & boundary toggle - clean, unboxed */}
-      <div className="w-full shrink-0 flex items-center justify-between mb-1 px-1.5 text-xs text-muted-foreground">
+      <div className="w-full shrink-0 hidden lg:flex items-center justify-between mb-1 px-1.5 text-xs text-muted-foreground">
         <span className="font-semibold text-foreground/80 flex items-center gap-1.5">
           <Sparkles className="size-3.5 text-primary" />
           <span>{selectedPositionName}</span>
@@ -71,7 +71,7 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Shirt className="size-3.5" />
+              <Shirt className="size-4.5" />
               <span>Front</span>
             </button>
             <button
@@ -83,7 +83,7 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Shirt className="size-3.5 rotate-180" />
+              <Shirt className="size-4.5 rotate-180" />
               <span>Back</span>
             </button>
           </div>

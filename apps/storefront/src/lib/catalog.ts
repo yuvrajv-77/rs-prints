@@ -1,5 +1,5 @@
 import type { Product } from "@/types/product"
-import { getVendureGroupedSections } from "@/lib/vendure/queries/products"
+import { getVendureGroupedSections, getCollectionProducts } from "@/lib/vendure/queries/products"
 
 export interface CatalogSubcategory {
   id: string
@@ -283,3 +283,54 @@ export async function getSubcategoryBySlug(
     facets,
   }
 }
+
+/**
+ * Fetches related products specifically from the same collection or category.
+ * Highly optimized: uses Vendure's collection-scoped search query (take: limit + 2, <3 KB payload)
+ * with in-memory caching to avoid full-catalog downloads or database egress spikes.
+ * Falls back safely to collection-matched mock data.
+ */
+export async function getRelatedProductsFromCollection({
+  currentSlug,
+  subcollectionSlug,
+  parentCollectionSlug,
+  categoryName,
+  limit = 4,
+}: {
+  currentSlug: string
+  subcollectionSlug?: string
+  parentCollectionSlug?: string
+  categoryName?: string
+  limit?: number
+}): Promise<Product[]> {
+  const targetCandidates = [subcollectionSlug, parentCollectionSlug, categoryName].filter(
+    (s): s is string => Boolean(s && s.trim().length > 0)
+  )
+
+  // 1. Try fetching via Vendure collection search API (lightweight, scoped, cached 5 min)
+  if (targetCandidates.length > 0) {
+    try {
+      const collectionItems = await getCollectionProducts(targetCandidates, limit + 2)
+      if (collectionItems && collectionItems.length > 0) {
+        const filtered = collectionItems
+          .map((item) => item.product)
+          .filter((p: Product) => p && p.slug !== currentSlug)
+
+        if (filtered.length > 0) {
+          return filtered.slice(0, limit)
+        }
+      }
+    } catch {
+      // Fallback to local catalog below
+    }
+  }
+
+  // 2. Fallback to mock catalog using collection/category matching
+  const { getRelatedProducts } = await import("@/data/products")
+  return getRelatedProducts(
+    currentSlug,
+    subcollectionSlug || parentCollectionSlug || categoryName,
+    limit
+  )
+}
+
