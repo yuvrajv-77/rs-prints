@@ -230,8 +230,24 @@ export const config: VendureConfig = {
                 })
                 : undefined,
         }),
-        DefaultSchedulerPlugin.init(),
-        DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
+        // Reduce Neon database polling/egress: default 200ms pollInterval & 10s scheduler
+        // check keep Neon compute awake 24/7 and generate millions of scans/week.
+        DefaultSchedulerPlugin.init({
+            manualTriggerCheckInterval: 60_000,
+        }),
+        DefaultJobQueuePlugin.init({
+            useDatabaseForBuffer: true,
+            keepJobsCount: 50,
+            pollInterval: (queueName) => {
+                if (queueName === 'send-email') {
+                    return 10_000;
+                }
+                if (queueName === 'update-search-index' || queueName === 'apply-collection-filters') {
+                    return 15_000;
+                }
+                return 30_000;
+            },
+        }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
         EmailPlugin.init({
             route: 'mailbox',
