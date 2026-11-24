@@ -350,7 +350,7 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
 
         {product.description && (
           <div
-            className="text-sm md:text-base text-muted-foreground leading-relaxed prose prose-sm max-w-none"
+            className="hidden md:block text-sm md:text-base text-muted-foreground leading-relaxed prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         )}
@@ -656,6 +656,19 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
           </a>
         </div>
       </div>
+
+      {/* Mobile Description: Rendered below Add to Cart & order actions on mobile screens */}
+      {product.description && (
+        <div className="md:hidden space-y-2 pt-2 border-t border-border/60">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Product Description
+          </h3>
+          <div
+            className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        </div>
+      )}
 
       <Toaster />
     </div>
