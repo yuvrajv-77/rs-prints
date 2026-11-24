@@ -8,6 +8,7 @@ allowBuilds:
   '@apollo/protobufjs': true
   msw: true
   workerd: true
+  canvas: set this to true or false
 
 minimumReleaseAgeExclude:
   - '@cloudflare/workerd-darwin-64@1.20261116.1'

@@ -48,7 +48,17 @@ import {
   Truck,
   UserPlus,
   User,
+  Sparkles,
+  Eye,
+  Download
 } from "lucide-react";
+import { getCustomizationForLine, type CustomizationMetadata } from "@/stores/customization";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 /**
  * Format integer paise into Indian Rupee format (₹)
@@ -65,6 +75,7 @@ export default function CartView() {
   const { customer, initialized: authInitialized } = useStore($currentUser);
 
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null);
+  const [activeProofModal, setActiveProofModal] = useState<CustomizationMetadata | null>(null);
 
   useEffect(() => {
     if (!cartState.initialized) {
@@ -208,11 +219,7 @@ export default function CartView() {
               </a>
             )}
           </div>
-
-      
         </div>
-
-    
 
         <Toaster />
       </div>
@@ -267,7 +274,10 @@ export default function CartView() {
               const product = variant.product;
               const productUrl = product?.slug ? `/products/${product.slug}` : "/products";
               const isLineUpdating = updatingLineId === line.id;
+              const customization = getCustomizationForLine(line.productVariant.id);
               const imageUrl =
+                customization?.front?.previewDataUrl ||
+                customization?.back?.previewDataUrl ||
                 line.featuredAsset?.preview ||
                 variant.featuredAsset?.preview ||
                 product?.featuredAsset?.preview ||
@@ -281,10 +291,12 @@ export default function CartView() {
                   className="flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl border bg-card text-card-foreground shadow-xs transition-all hover:border-border"
                 >
                   {/* Product Thumbnail */}
-                  <a
-                    href={productUrl}
-                    className="relative size-24 sm:size-28 rounded-xl overflow-hidden bg-muted/30 border shrink-0 flex items-center justify-center hover:opacity-85 transition-opacity"
-                    title={`View ${product?.name || variant.name}`}
+                  <div
+                    onClick={() => customization && setActiveProofModal(customization)}
+                    className={`relative size-24 sm:size-28 rounded-xl overflow-hidden bg-muted/30 border shrink-0 flex items-center justify-center transition-opacity ${
+                      customization ? "cursor-pointer hover:ring-2 hover:ring-primary/40" : ""
+                    }`}
+                    title={customization ? "Click to view customization proof" : `View ${product?.name || variant.name}`}
                   >
                     <img
                       src={imageUrl}
@@ -292,7 +304,12 @@ export default function CartView() {
                       className="size-full object-cover object-center"
                       loading="lazy"
                     />
-                  </a>
+                    {customization && (
+                      <span className="absolute bottom-1 right-1 bg-background/90 backdrop-blur-xs text-[9px] font-bold px-1 py-0.5 rounded border border-border/80 shadow-2xs">
+                        Custom
+                      </span>
+                    )}
+                  </div>
 
                   {/* Line Details */}
                   <div className="flex flex-1 flex-col justify-between min-w-0">
@@ -342,6 +359,22 @@ export default function CartView() {
                               <span>{opt.name}</span>
                             </Badge>
                           ))}
+                        </div>
+                      )}
+
+                      {/* Customization Details & Proof Action */}
+                      {customization && (
+                        <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                          <Badge className="bg-primary/10 text-primary border-primary/30 text-[10px] font-semibold gap-1">
+                            <Sparkles className="size-3" /> Custom Proof Available
+                          </Badge>
+                          <button
+                            type="button"
+                            onClick={() => setActiveProofModal(customization)}
+                            className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Eye className="size-3" /> View Design Proof
+                          </button>
                         </div>
                       )}
                     </div>
@@ -515,6 +548,70 @@ export default function CartView() {
             </Card>
           </div>
         </div>
+
+        {/* Proof Preview Modal Dialog */}
+        {activeProofModal && (
+          <Dialog open={!!activeProofModal} onOpenChange={(open) => !open && setActiveProofModal(null)}>
+            <DialogContent className="max-w-2xl p-6 bg-card border rounded-3xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+                  <Sparkles className="size-4 text-primary" />
+                  <span>Customized Artwork Proof - {activeProofModal.productName}</span>
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4 py-2">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border/60 flex-wrap">
+                  <div><strong className="text-foreground">Colour:</strong> {activeProofModal.colorName}</div>
+                  <div><strong className="text-foreground">Size:</strong> {activeProofModal.size}</div>
+                  <div><strong className="text-foreground">Proof ID:</strong> {activeProofModal.id}</div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {activeProofModal.front && (
+                    <div className="space-y-2 text-center border rounded-2xl p-3 bg-muted/20">
+                      <span className="text-xs font-bold text-foreground block">
+                        Front View ({activeProofModal.front.positionName})
+                      </span>
+                      <img
+                        src={activeProofModal.front.previewDataUrl}
+                        alt="Front proof"
+                        className="w-full aspect-square object-contain rounded-xl bg-white border"
+                      />
+                      <a
+                        href={activeProofModal.front.productionDataUrl}
+                        download={`rs-prints-production-front-${activeProofModal.id}.png`}
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
+                      >
+                        <Download className="size-3" /> Download Print File
+                      </a>
+                    </div>
+                  )}
+
+                  {activeProofModal.back && (
+                    <div className="space-y-2 text-center border rounded-2xl p-3 bg-muted/20">
+                      <span className="text-xs font-bold text-foreground block">
+                        Back View ({activeProofModal.back.positionName})
+                      </span>
+                      <img
+                        src={activeProofModal.back.previewDataUrl}
+                        alt="Back proof"
+                        className="w-full aspect-square object-contain rounded-xl bg-white border"
+                      />
+                      <a
+                        href={activeProofModal.back.productionDataUrl}
+                        download={`rs-prints-production-back-${activeProofModal.id}.png`}
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
+                      >
+                        <Download className="size-3" /> Download Print File
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Toaster />
       </div>

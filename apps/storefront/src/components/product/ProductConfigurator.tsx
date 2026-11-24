@@ -588,17 +588,25 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 pt-2">
         {/* Customize Design Online Studio CTA */}
-        <a href={`/customize/${product.slug}`} className="w-full">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="w-full gap-2.5 h-12 text-sm font-bold border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary hover:border-primary/60 transition-all cursor-pointer shadow-2xs"
-          >
-            <Sparkles className="size-4" />
-            <span>Customize Online (Add Image & Text)</span>
-          </Button>
-        </a>
+        {(() => {
+          const activeColor = Object.entries(selectedOptions).find(([k]) => k.toLowerCase().includes("color"))?.[1] || "black"
+          return (
+            <a
+              href={`/customize/${product.slug}?product=${encodeURIComponent(product.title)}&color=${encodeURIComponent(activeColor.toLowerCase())}`}
+              className="w-full"
+            >
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full gap-2.5 h-12 text-sm font-bold border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary hover:border-primary/60 transition-all cursor-pointer shadow-2xs"
+              >
+                <Sparkles className="size-4" />
+                <span>Customize Online (Add Image & Text)</span>
+              </Button>
+            </a>
+          )
+        })()}
 
         {/* Primary Add to Cart Button */}
         <Button

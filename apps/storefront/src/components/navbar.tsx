@@ -69,6 +69,7 @@ export default function Navbar() {
   const activeCategory = NAVIGATION_CATEGORIES.find(
     (c) => c.id === activeCategoryId
   )
+  const isHelpActive = activeCategoryId === "help"
 
   const renderSubcategoryColumn = (subcat: NavigationSubcategory) => {
     const displayedItems = subcat.items.slice(0, MAX_PRODUCTS)
@@ -120,6 +121,126 @@ export default function Navbar() {
     )
   }
 
+  const renderHelpContent = () => (
+    <div className="flex justify-between items-start gap-12 w-full">
+      {/* Help Link Columns */}
+      <div className="grid grid-cols-2 gap-12 flex-1 max-w-2xl">
+        {/* Column 1: Company & Inquiries */}
+        <div className="flex flex-col">
+          <h4 className="text-[15px] font-bold text-foreground mb-3 tracking-tight">
+            Company &amp; Inquiries
+          </h4>
+          <ul className="flex flex-col gap-2">
+            <li>
+              <a
+                href="/about"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                About Us
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                Contact Us
+              </a>
+            </li>
+            <li>
+              <a
+                href="/bulk-order"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                Bulk &amp; Corporate Orders
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Column 2: Policies & Terms */}
+        <div className="flex flex-col">
+          <h4 className="text-[15px] font-bold text-foreground mb-3 tracking-tight">
+            Policies &amp; Legal
+          </h4>
+          <ul className="flex flex-col gap-2">
+            <li>
+              <a
+                href="/terms-and-conditions"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                Terms &amp; Conditions
+              </a>
+            </li>
+            <li>
+              <a
+                href="/shipping-and-refund-policy"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                Shipping &amp; Refund Policy
+              </a>
+            </li>
+            <li>
+              <a
+                href="/privacy-policy"
+                onClick={() => setActiveCategoryId(null)}
+                className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
+              >
+                Privacy Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Column 3: Direct Contact Card */}
+      <div className="w-80 shrink-0 rounded-2xl bg-muted/40 border border-border/60 p-5 flex flex-col justify-between">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Customer Support
+          </span>
+          <h4 className="text-sm font-bold text-foreground mt-1">
+            Need Help or Custom Quotes?
+          </h4>
+          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+            Our team is available to assist you with order tracking, design requirements, and custom merchandise questions.
+          </p>
+
+          <div className="mt-4 space-y-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground">Email:</span>
+              <a
+                href="mailto:support@thersprints.com"
+                className="text-primary hover:underline"
+              >
+                support@thersprints.com
+              </a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground">Hours:</span>
+              <span>Mon – Sat: 9:30 AM – 7:30 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="https://wa.me/919876543210"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs font-semibold text-primary hover:underline"
+        >
+          <span>Chat on WhatsApp</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  )
+
   const renderCategoryContent = (category: NavigationCategory) => {
     const spotlight = CATEGORY_SPOTLIGHTS[category.id]
 
@@ -133,7 +254,6 @@ export default function Navbar() {
     }
 
     // 2. Gifts & Accessories (6 subcategories) -> 5 balanced columns
-    // (MDF Collage Frames, Glass Frames, Stone & Wooden, Hard Board, plus stacked small accessories)
     if (category.id === "gifts-accessories") {
       const mainCols = category.subcategories.filter(
         (s) => s.id !== "mdf-products" && s.id !== "sublimation-accessories"
@@ -154,7 +274,6 @@ export default function Navbar() {
     }
 
     // 3. 2-Subcategory Categories (Mugs, Clothing, Bags, Home & Living)
-    // 2 columns on the left + Spotlight Card on the right for balanced composition
     return (
       <div className="flex justify-between items-start gap-12 w-full">
         <div className="grid grid-cols-2 gap-12 flex-1 max-w-2xl">
@@ -233,10 +352,33 @@ export default function Navbar() {
             </div>
           )
         })}
+
+        {/* Help Dropdown Trigger */}
+        <div
+          className="relative h-20 flex items-center"
+          onMouseEnter={() => handleMouseEnter("help")}
+        >
+          <a
+            href="/contact"
+            className={cn(
+              "relative flex items-center px-3.5 py-2 text-[15px] transition-colors cursor-pointer select-none",
+              isHelpActive
+                ? "text-foreground font-bold"
+                : "text-foreground/80 font-medium hover:text-foreground"
+            )}
+          >
+            Help
+
+            {/* Solid active underline indicator */}
+            {isHelpActive && (
+              <span className="absolute bottom-0 left-3 right-3 h-[3px] bg-foreground rounded-full transition-all duration-150" />
+            )}
+          </a>
+        </div>
       </nav>
 
       {/* Full-width Mega Menu Dropdown */}
-      {activeCategory && (
+      {(activeCategory || isHelpActive) && (
         <>
           {/* Subtle Dimming Backdrop */}
           <div
@@ -257,31 +399,55 @@ export default function Navbar() {
           >
             <div className="max-w-7xl mx-auto px-8 lg:px-12 pt-8 pb-7">
               {/* Content Grid */}
-              {renderCategoryContent(activeCategory)}
+              {isHelpActive ? renderHelpContent() : activeCategory && renderCategoryContent(activeCategory)}
 
               {/* Bottom Vistaprint-style Footer Bar */}
               <div className="mt-8 pt-6 border-t border-border/60 flex items-center justify-between">
-                <a
-                  href={activeCategory.href}
-                  onClick={() => setActiveCategoryId(null)}
-                  className="text-[15px] font-bold text-foreground hover:text-primary hover:underline flex items-center gap-2 group"
-                >
-                  <span>See All {activeCategory.title}</span>
-                  <span
-                    className="transition-transform group-hover:translate-x-1"
-                    aria-hidden="true"
-                  >
-                    &rarr;
-                  </span>
-                </a>
+                {isHelpActive ? (
+                  <>
+                    <a
+                      href="/contact"
+                      onClick={() => setActiveCategoryId(null)}
+                      className="text-[15px] font-bold text-foreground hover:text-primary hover:underline flex items-center gap-2 group"
+                    >
+                      <span>Need help? Contact Customer Support</span>
+                      <span
+                        className="transition-transform group-hover:translate-x-1"
+                        aria-hidden="true"
+                      >
+                        &rarr;
+                      </span>
+                    </a>
 
-                <span className="text-xs text-muted-foreground font-mono">
-                  {activeCategory.subcategories.reduce(
-                    (acc, sub) => acc + sub.items.length,
-                    0
-                  )}{" "}
-                  total products
-                </span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      Available Mon – Sat: 9:30 AM – 7:30 PM
+                    </span>
+                  </>
+                ) : activeCategory ? (
+                  <>
+                    <a
+                      href={activeCategory.href}
+                      onClick={() => setActiveCategoryId(null)}
+                      className="text-[15px] font-bold text-foreground hover:text-primary hover:underline flex items-center gap-2 group"
+                    >
+                      <span>See All {activeCategory.title}</span>
+                      <span
+                        className="transition-transform group-hover:translate-x-1"
+                        aria-hidden="true"
+                      >
+                        &rarr;
+                      </span>
+                    </a>
+
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {activeCategory.subcategories.reduce(
+                        (acc, sub) => acc + sub.items.length,
+                        0
+                      )}{" "}
+                      total products
+                    </span>
+                  </>
+                ) : null}
               </div>
             </div>
           </div>

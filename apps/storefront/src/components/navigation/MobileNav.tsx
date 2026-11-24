@@ -209,6 +209,61 @@ export default function MobileNav() {
                         </div>
                       ))}
                     </div>
+
+                    {/* Divider */}
+                    <div className="my-3 border-b border-border/60 mx-4" />
+
+                    {/* Help & Information Section */}
+                    <div className="px-2 space-y-0.5">
+                      <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Help &amp; Company
+                      </div>
+                      <a
+                        href="/about"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        About Us
+                      </a>
+                      <a
+                        href="/contact"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        Contact Us
+                      </a>
+                      <a
+                        href="/bulk-order"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        <span>Bulk &amp; Corporate Orders</span>
+                        <span className="rounded-full bg-primary/15 text-primary text-[10px] px-2 py-0.5 font-mono">
+                          Min 40
+                        </span>
+                      </a>
+                      <a
+                        href="/terms-and-conditions"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        Terms &amp; Conditions
+                      </a>
+                      <a
+                        href="/shipping-and-refund-policy"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        Shipping &amp; Refund Policy
+                      </a>
+                      <a
+                        href="/privacy-policy"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
+                      >
+                        Privacy Policy
+                      </a>
+                    </div>
                   </div>
                 </div>
               ) : (

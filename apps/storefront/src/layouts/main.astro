@@ -30,6 +30,8 @@ interface Props {
     | "banner"
     | (string & {})
   schemaMarkup?: Record<string, any> | Record<string, any>[]
+  hideFooter?: boolean
+  noScroll?: boolean
 }
 
 const {
@@ -39,6 +41,8 @@ const {
   ogType = "website",
   currentActive = "home",
   schemaMarkup,
+  hideFooter = false,
+  noScroll = false
 } = Astro.props
 
 // Build absolute canonical URL
@@ -85,9 +89,12 @@ const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
     }
   </head>
   <body
-    class="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20"
+    class:list={[
+      "flex min-h-screen flex-col bg-background font-sans text-foreground antialiased selection:bg-primary/20",
+      noScroll && "h-screen max-h-screen overflow-hidden"
+    ]}
   >
-    <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header class="sticky top-0 z-50 w-full shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <!-- Desktop Navigation Bar (hidden on mobile) -->
       <div class="container mx-auto hidden md:flex h-20 items-center justify-between px-4">
         <BrandLogo />
@@ -101,16 +108,13 @@ const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
       </div>
     </header>
 
-
-
-    
     <!-- Main Content -->
-    <main class="flex flex-1 flex-col">
+    <main class:list={["flex flex-1 flex-col min-h-0", noScroll && "h-[calc(100dvh-5rem)] md:h-[calc(100dvh-5rem)] overflow-hidden"]}>
       <slot />
     </main>
 
     <!-- Footer -->
-    <Footer client:load />
+    {!hideFooter && <Footer client:load />}
 
     <!-- Ensure pure light mode -->
     <script is:inline>

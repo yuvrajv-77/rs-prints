@@ -359,6 +359,11 @@ export const NAVIGATION_CATEGORIES: NavigationCategory[] = [
         "href": "/categories/clothing/custom-t-shirts",
         "items": [
           {
+            "title": "Interactive T-Shirt Customizer",
+            "href": "/customize",
+            "badge": "Studio"
+          },
+          {
             "title": "Custom Round-Neck T-Shirt",
             "href": "/products/app-round-tshirt"
           }

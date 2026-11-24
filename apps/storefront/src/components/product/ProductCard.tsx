@@ -127,7 +127,7 @@ export default function ProductCard({
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                window.location.href = `/customize/${product.slug}`
+                window.location.href = `/customize/${product.slug}?product=${encodeURIComponent(product.title)}&color=black`
               }}
               className="font-medium text-primary inline-flex items-center gap-0.5 hover:underline cursor-pointer group-hover:translate-x-0.5 transition-transform"
             >
