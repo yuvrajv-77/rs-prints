@@ -739,27 +739,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
-      {/* Studio Header: Clean, bold and low-profile without product name */}
-      <div className="shrink-0 h-8 flex items-center justify-between border-b border-border/40 pb-1 mb-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide bg-primary/10 text-primary uppercase shrink-0">
-            Studio
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={handleClearDesign}
-            className="text-[11px] font-semibold text-muted-foreground hover:text-destructive transition-colors px-1 cursor-pointer flex items-center gap-1"
-            title="Clear all artwork and reset design"
-          >
-            <RotateCcw className="size-3" />
-            <span>Reset</span>
-          </button>
-        </div>
-      </div>
-
+     
       {/* ========================================================================= */}
       {/* MAIN RESPONSIVE WORKSPACE                                                 */}
       {/* - Desktop: 3-Column (Left Sidebar + Center Canvas + Right Sidebar)        */}

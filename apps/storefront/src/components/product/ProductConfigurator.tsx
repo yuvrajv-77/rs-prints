@@ -620,40 +620,18 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 pt-2">
-        {/* Customize Design Online Studio CTA */}
+        {/* Primary Customize Button (Replaces Add to Cart) */}
         <a href={customizeUrl} className="w-full">
           <Button
             type="button"
-            variant="outline"
             size="lg"
-            className="w-full gap-2.5 h-12 text-sm font-bold border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary hover:border-primary/60 transition-all cursor-pointer shadow-2xs"
+            className="w-full gap-2.5 h-13 text-sm font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer"
+            disabled={currentVariant?.stockLevel === "OUT_OF_STOCK"}
           >
-            <Sparkles className="size-4" />
-            <span>Customize Online (Add Image & Text)</span>
+            <Sparkles className="size-4.5" />
+            <span>Customize • ₹{subtotal.toLocaleString("en-IN")}</span>
           </Button>
         </a>
-
-        {/* Primary Add to Cart Button */}
-        <Button
-          size="lg"
-          className="w-full gap-2.5 h-13 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer"
-          disabled={isAddingToCart || currentVariant?.stockLevel === "OUT_OF_STOCK"}
-          onClick={handleAddToCart}
-        >
-          {isAddingToCart ? (
-            <>
-              <Spinner className="size-4" />
-              <span>Adding to Cart...</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="size-4.5" />
-              <span>
-                Add to Cart • ₹{subtotal.toLocaleString("en-IN")}
-              </span>
-            </>
-          )}
-        </Button>
 
         {/* Secondary: WhatsApp Consultation & Bulk Quote Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

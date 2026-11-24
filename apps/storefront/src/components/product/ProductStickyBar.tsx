@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import type { Product } from "@/types/product"
 import { Button } from "@/components/ui/button"
-import { MessageCircleIcon } from "lucide-react"
+import { Sparkles, MessageCircleIcon } from "lucide-react"
 
 interface ProductStickyBarProps {
   product: Product
@@ -42,17 +42,28 @@ export default function ProductStickyBar({ product }: ProductStickyBarProps) {
           </div>
         </div>
 
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0"
-        >
-          <Button size="sm" className="font-bold text-xs gap-1.5 shadow-sm">
-            <MessageCircleIcon className="size-3.5" />
-            Instant Order
-          </Button>
-        </a>
+        <div className="flex items-center gap-2 shrink-0">
+          <a
+            href={`/customize/${product.slug}`}
+            className="shrink-0"
+          >
+            <Button size="sm" className="font-bold text-xs gap-1.5 shadow-sm">
+              <Sparkles className="size-3.5" />
+              Customize
+            </Button>
+          </a>
+
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0"
+          >
+            <Button size="sm" variant="outline" className="font-semibold text-xs px-2.5">
+              <MessageCircleIcon className="size-3.5" />
+            </Button>
+          </a>
+        </div>
       </div>
     </div>
   )
