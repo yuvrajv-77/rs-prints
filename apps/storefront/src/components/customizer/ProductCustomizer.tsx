@@ -3,12 +3,13 @@ import type { Product } from "@/types/product"
 import { addToCart } from "@/stores/cart"
 import { toast, Toaster } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button"
-import { TSHIRT_CONFIG } from "./config/tshirt-mockups"
+import { resolveCustomizerProfile, type CustomizerProductProfile } from "./config/product-registry"
 import { FabricManager, type ArtworkLayerInfo, type UploadedArtworkSummary } from "./core/fabric-manager"
 import { CustomizerLeftSidebar } from "./ui/CustomizerLeftSidebar"
 import { CustomizerRightSidebar } from "./ui/CustomizerRightSidebar"
 import { CustomizerViewport } from "./ui/CustomizerViewport"
 import { SizeQuantityTable } from "./ui/SizeQuantityTable"
+import { DirectQuantitySelector } from "./ui/DirectQuantitySelector"
 import { MobileColorSheet } from "./ui/MobileColorSheet"
 import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
@@ -40,16 +41,6 @@ export interface ProductCustomizerProps {
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
 const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"]
 
-// Helper to normalize color parameter from URL
-function normalizeColorParam(param: string | null): string | null {
-  if (!param) return null
-  const clean = param.toLowerCase().trim().replace(/[_\s]+/g, "-")
-  if (clean === "black" || clean === "pitch-black" || clean === "pitchblack" || clean.includes("black")) return "black"
-  if (clean === "white" || clean === "crisp-white" || clean === "crispwhite" || clean.includes("white")) return "white"
-  if (clean in TSHIRT_CONFIG.colors) return clean
-  return null
-}
-
 // Helper to normalize size parameter from URL
 function normalizeSizeParam(param: string | null): string | null {
   if (!param) return null
@@ -72,6 +63,27 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showGuides, setShowGuides] = useState<boolean>(true)
 
+  // Resolve product profile dynamically (T-shirt vs Mug vs Bottle vs Bag)
+  const profile: CustomizerProductProfile = useMemo(() => {
+    let sp: URLSearchParams | null = null
+    if (typeof window !== "undefined") {
+      sp = new URLSearchParams(window.location.search)
+    }
+    return resolveCustomizerProfile(product, sp)
+  }, [product])
+
+  const activeConfig = profile.config
+
+  // Helper to normalize color parameter from URL against active configuration
+  const normalizeColorParam = useCallback((param: string | null): string | null => {
+    if (!param) return null
+    const clean = param.toLowerCase().trim().replace(/[_\s]+/g, "-")
+    if (clean === "black" || clean === "pitch-black" || clean === "pitchblack" || clean.includes("black")) return "black"
+    if (clean === "white" || clean === "crisp-white" || clean === "crispwhite" || clean.includes("white")) return "white"
+    if (clean in activeConfig.colors) return clean
+    return null
+  }, [activeConfig.colors])
+
   // Product Title from URL parameter, prop, or fallback
   const [productTitle, setProductTitle] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -80,7 +92,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       if (p) return p
     }
     if (product?.title) return product.title
-    return TSHIRT_CONFIG.name
+    return activeConfig.name
   })
 
   // Additional custom attributes from URL (e.g. capacity, material, method)
@@ -90,7 +102,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     const attrs: Record<string, string> = {}
     for (const [key, val] of sp.entries()) {
       const lower = key.toLowerCase()
-      if (!["product", "color", "size", "quantity"].includes(lower) && val) {
+      if (!["product", "color", "size", "quantity", "type", "category"].includes(lower) && val) {
         attrs[lower] = val
       }
     }
@@ -105,17 +117,17 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   // Determine initial color: URL parameter -> saved draft -> default
   const [selectedColorId, setSelectedColorId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
+    if (profile.hasDynamicColors && typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search)
       const c = normalizeColorParam(sp.get("color"))
-      if (c && TSHIRT_CONFIG.colors[c]) return c
+      if (c && activeConfig.colors[c]) return c
     }
-    const draft = loadDesignDraft(TSHIRT_CONFIG.productId)
-    if (draft?.colorId && TSHIRT_CONFIG.colors[draft.colorId]) return draft.colorId
-    return TSHIRT_CONFIG.defaultColorId
+    const draft = loadDesignDraft(activeConfig.productId)
+    if (draft?.colorId && activeConfig.colors[draft.colorId]) return draft.colorId
+    return activeConfig.defaultColorId
   })
 
-  // Size & Multi-quantity selection state (pre-populated from URL if provided)
+  // Size & Multi-quantity selection state (for apparel)
   const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>(() => {
     const defaultSizes: Record<string, number> = {
       S: 0,
@@ -151,43 +163,69 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     return defaultSizes
   })
 
-  const totalQuantity = useMemo(
-    () => Object.values(sizeQuantities).reduce((sum, qty) => sum + qty, 0),
-    [sizeQuantities]
-  )
+  // Direct quantity state (for mugs, drinkware, and bags)
+  const [directQuantity, setDirectQuantity] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      const rawQty = parseInt(sp.get("quantity") || "", 10)
+      if (!isNaN(rawQty) && rawQty >= 1) return Math.min(500, rawQty)
+    }
+    return 1
+  })
+
+  const totalQuantity = useMemo(() => {
+    if (profile.hasGarmentSizes) {
+      return Object.values(sizeQuantities).reduce((sum, qty) => sum + qty, 0)
+    }
+    return directQuantity
+  }, [profile.hasGarmentSizes, sizeQuantities, directQuantity])
 
   // Sync product name, color, size, and custom configuration to URL parameters
   const syncUrlParams = useCallback(
-    (colorId: string, title?: string, sizes?: Record<string, number>) => {
+    (colorId: string, title?: string, sizes?: Record<string, number>, directQty?: number) => {
       if (typeof window === "undefined") return
       const activeTitle = title || productTitle
       const url = new URL(window.location.href)
       url.searchParams.set("product", activeTitle)
-      url.searchParams.set("color", colorId)
+      if (profile.hasDynamicColors) {
+        url.searchParams.set("color", colorId)
+      } else {
+        url.searchParams.delete("color")
+      }
 
       // Retain custom attributes from URL (e.g. capacity, material, method)
       for (const [k, v] of Object.entries(customAttributes)) {
         if (v) url.searchParams.set(k, v)
       }
 
-      const currentSizes = sizes || sizeQuantities
-      const activeSizeEntries = Object.entries(currentSizes).filter(([_, q]) => q > 0)
-      if (activeSizeEntries.length === 1) {
-        url.searchParams.set("size", activeSizeEntries[0][0])
-        if (activeSizeEntries[0][1] > 1) {
-          url.searchParams.set("quantity", activeSizeEntries[0][1].toString())
+      if (profile.hasGarmentSizes) {
+        const currentSizes = sizes || sizeQuantities
+        const activeSizeEntries = Object.entries(currentSizes).filter(([_, q]) => q > 0)
+        if (activeSizeEntries.length === 1) {
+          url.searchParams.set("size", activeSizeEntries[0][0])
+          if (activeSizeEntries[0][1] > 1) {
+            url.searchParams.set("quantity", activeSizeEntries[0][1].toString())
+          } else {
+            url.searchParams.delete("quantity")
+          }
+        } else if (activeSizeEntries.length > 1) {
+          url.searchParams.delete("size")
+          const total = activeSizeEntries.reduce((acc, [_, q]) => acc + q, 0)
+          url.searchParams.set("quantity", total.toString())
+        }
+      } else {
+        url.searchParams.delete("size")
+        const currentDirectQty = directQty !== undefined ? directQty : directQuantity
+        if (currentDirectQty > 1) {
+          url.searchParams.set("quantity", currentDirectQty.toString())
         } else {
           url.searchParams.delete("quantity")
         }
-      } else if (activeSizeEntries.length > 1) {
-        url.searchParams.delete("size")
-        const total = activeSizeEntries.reduce((acc, [_, q]) => acc + q, 0)
-        url.searchParams.set("quantity", total.toString())
       }
 
       window.history.replaceState({}, "", url.toString())
     },
-    [productTitle, customAttributes, sizeQuantities]
+    [productTitle, customAttributes, profile.hasDynamicColors, profile.hasGarmentSizes, sizeQuantities, directQuantity]
   )
 
   const handleQuantityChange = useCallback((sizeId: string, qty: number) => {
@@ -202,10 +240,22 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     })
   }, [selectedColorId, productTitle, syncUrlParams])
 
-  const [selectedViewId, setSelectedViewId] = useState<"front" | "back">(TSHIRT_CONFIG.defaultViewId)
+  const handleDirectQuantityChange = useCallback((qty: number) => {
+    const clamped = Math.max(1, Math.min(500, qty))
+    setDirectQuantity(clamped)
+    syncUrlParams(selectedColorId, productTitle, sizeQuantities, clamped)
+  }, [selectedColorId, productTitle, sizeQuantities, syncUrlParams])
 
-  const currentColor = TSHIRT_CONFIG.colors[selectedColorId] || TSHIRT_CONFIG.colors.black
-  const currentView = currentColor.views[selectedViewId] || currentColor.views.front
+  const [selectedViewId, setSelectedViewId] = useState<"front" | "back">(activeConfig.defaultViewId)
+
+  const currentColor =
+    activeConfig.colors[selectedColorId] ||
+    activeConfig.colors[activeConfig.defaultColorId] ||
+    Object.values(activeConfig.colors)[0]
+  const currentView =
+    currentColor.views[selectedViewId] ||
+    currentColor.views.front ||
+    Object.values(currentColor.views)[0]
 
   const [selectedPositionId, setSelectedPositionId] = useState<string>(currentView.defaultPositionId)
   const currentPosition = currentView.positions[selectedPositionId] || Object.values(currentView.positions)[0]
@@ -223,8 +273,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   // Initial URL synchronization on mount
   useEffect(() => {
-    syncUrlParams(selectedColorId, productTitle, sizeQuantities)
-  }, [selectedColorId, productTitle, syncUrlParams, sizeQuantities])
+    syncUrlParams(selectedColorId, productTitle, sizeQuantities, directQuantity)
+  }, [selectedColorId, productTitle, syncUrlParams, sizeQuantities, directQuantity])
 
   // Initialize Fabric Canvas and restore drafts if available
   useEffect(() => {
@@ -233,29 +283,37 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     setIsLoading(true)
 
     // Check for existing saved draft or URL parameter override
-    const draft = loadDesignDraft(TSHIRT_CONFIG.productId)
+    const draft = loadDesignDraft(activeConfig.productId)
 
     let urlColorId: string | null = null
-    if (typeof window !== "undefined") {
+    if (profile.hasDynamicColors && typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search)
       urlColorId = normalizeColorParam(sp.get("color"))
     }
 
     const initialColorId =
-      urlColorId && TSHIRT_CONFIG.colors[urlColorId]
+      urlColorId && activeConfig.colors[urlColorId]
         ? urlColorId
-        : draft?.colorId && TSHIRT_CONFIG.colors[draft.colorId]
+        : draft?.colorId && activeConfig.colors[draft.colorId]
         ? draft.colorId
-        : TSHIRT_CONFIG.defaultColorId
+        : activeConfig.defaultColorId
 
     // Always default to front view when customizer loads
-    const initialViewId: "front" | "back" = "front"
-    const initialColor = TSHIRT_CONFIG.colors[initialColorId] || TSHIRT_CONFIG.colors.black
-    const initialView = initialColor.views.front
-    const initialPosition = initialView.positions[initialView.defaultPositionId] || Object.values(initialView.positions)[0]
+    const initialViewId: "front" | "back" = activeConfig.defaultViewId || "front"
+    const initialColor =
+      activeConfig.colors[initialColorId] ||
+      activeConfig.colors[activeConfig.defaultColorId] ||
+      Object.values(activeConfig.colors)[0]
+    const initialView =
+      initialColor.views[initialViewId] ||
+      initialColor.views.front ||
+      Object.values(initialColor.views)[0]
+    const initialPosition =
+      initialView.positions[initialView.defaultPositionId] ||
+      Object.values(initialView.positions)[0]
 
     setSelectedColorId(initialColorId)
-    setSelectedViewId("front")
+    setSelectedViewId(initialViewId)
     setSelectedPositionId(initialPosition.id)
 
     const manager = new FabricManager({
@@ -294,7 +352,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       manager.loadFromSerializedState(draft.viewArtworks).then(() => {
         toast.add({
           title: "Draft Restored",
-          description: "Resumed your previous customized t-shirt design session.",
+          description: `Resumed your previous customized ${profile.productType} design session.`,
           type: "info"
         })
       })
@@ -306,13 +364,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       manager.destroy()
       fabricManagerRef.current = null
     }
-  }, [])
+  }, [activeConfig.productId])
 
   // Auto-save draft whenever layers or view change
   const triggerAutoSave = useCallback(() => {
     if (!fabricManagerRef.current) return
     const allArtworks = fabricManagerRef.current.getAllViewArtworks()
-    saveDesignDraft(TSHIRT_CONFIG.productId, {
+    saveDesignDraft(activeConfig.productId, {
       colorId: selectedColorId,
       selectedViewId,
       selectedPositionId,
@@ -324,7 +382,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const handleSelectColor = useCallback(async (colorId: string) => {
     setSelectedColorId(colorId)
     syncUrlParams(colorId, productTitle)
-    const newColor = TSHIRT_CONFIG.colors[colorId]
+    const newColor = activeConfig.colors[colorId]
     if (!newColor) return
 
     const targetView = newColor.views[selectedViewId] || newColor.views.front
@@ -344,7 +402,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         setIsLoading(false)
       }
     }
-  }, [selectedViewId, triggerAutoSave, syncUrlParams, productTitle])
+  }, [selectedViewId, triggerAutoSave, syncUrlParams, productTitle, activeConfig.colors])
 
   // View Angle change (Front <-> Back)
   const handleSelectView = useCallback(async (viewId: "front" | "back") => {
@@ -583,13 +641,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     fabricManagerRef.current?.resetZoom()
     setZoomLevel(1.0)
     setAllUploadedArtworks([])
-    clearDesignDraft(TSHIRT_CONFIG.productId)
+    clearDesignDraft(activeConfig.productId)
     toast.add({
       title: "Design Cleared",
       description: "Reset canvas and cleared design draft.",
       type: "info"
     })
-  }, [])
+  }, [activeConfig.productId])
 
   // Export Mockup Preview
   const handleDownloadMockup = useCallback(() => {
@@ -638,14 +696,25 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const handleAddToCart = useCallback(async () => {
     if (!fabricManagerRef.current) return
 
-    const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
-    if (selectedSizesList.length === 0) {
-      toast.add({
-        title: "No Size Selected",
-        description: "Please select at least 1 item in any size before adding to cart.",
-        type: "warning"
-      })
-      return
+    if (profile.hasGarmentSizes) {
+      const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
+      if (selectedSizesList.length === 0) {
+        toast.add({
+          title: "No Size Selected",
+          description: "Please select at least 1 item in any size before adding to cart.",
+          type: "warning"
+        })
+        return
+      }
+    } else {
+      if (directQuantity < 1) {
+        toast.add({
+          title: "Invalid Quantity",
+          description: "Please select at least 1 piece before adding to cart.",
+          type: "warning"
+        })
+        return
+      }
     }
 
     const totalArtworks = fabricManagerRef.current.getTotalArtworkCount()
@@ -662,39 +731,91 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
     try {
       const exportPkg = await fabricManagerRef.current.exportAllViewsPackage({
-        front: {
+        front: currentColor.views.front ? {
           image: currentColor.views.front.image,
           printPosition: currentColor.views.front.positions[currentColor.views.front.defaultPositionId] || Object.values(currentColor.views.front.positions)[0]
-        },
-        back: {
+        } : undefined,
+        back: currentColor.views.back ? {
           image: currentColor.views.back.image,
           printPosition: currentColor.views.back.positions[currentColor.views.back.defaultPositionId] || Object.values(currentColor.views.back.positions)[0]
-        }
+        } : undefined
       })
 
       const allArtworks = fabricManagerRef.current.getAllViewArtworks()
-      const baseVariantId = product?.variants?.[0]?.id || `mock-variant-${selectedColorId}-tshirt`
+      const baseVariantId = product?.variants?.[0]?.id || `mock-variant-${selectedColorId}-${profile.productType}`
 
-      for (const [sizeId, qty] of selectedSizesList) {
-        const sizeVariantId = `${baseVariantId}-${sizeId}`
+      if (profile.hasGarmentSizes) {
+        const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
+        for (const [sizeId, qty] of selectedSizesList) {
+          const sizeVariantId = `${baseVariantId}-${sizeId}`
+
+          const customizationId = saveCustomizationForCart({
+            productId: product?.id || activeConfig.productId,
+            productName: productTitle || product?.title || activeConfig.name,
+            variantId: sizeVariantId,
+            colorId: selectedColorId,
+            colorName: currentColor.name,
+            size: sizeId,
+            front: exportPkg.front ? {
+              positionId: currentColor.views.front.defaultPositionId,
+              positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Front",
+              previewDataUrl: exportPkg.front.preview,
+              productionDataUrl: exportPkg.front.production,
+              artworks: allArtworks.front || []
+            } : undefined,
+            back: exportPkg.back ? {
+              positionId: currentColor.views.back.defaultPositionId,
+              positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Back",
+              previewDataUrl: exportPkg.back.preview,
+              productionDataUrl: exportPkg.back.production,
+              artworks: allArtworks.back || []
+            } : undefined
+          })
+
+          const detailsList = [
+            ...Object.entries(customAttributes).map(
+              ([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}`
+            ),
+            `Colour: ${currentColor.name}`,
+            `Size: ${sizeId}`,
+            `Qty: ${qty}`,
+            exportPkg.front ? `Front: Customized` : null,
+            exportPkg.back ? `Back: Customized` : null,
+            `ID: ${customizationId}`
+          ].filter(Boolean).join(" | ")
+
+          await addToCart(sizeVariantId, qty, {
+            productName: productTitle || product?.title || activeConfig.name,
+            variantDetails: detailsList
+          })
+        }
+
+        const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
+        toast.add({
+          title: "Added to Cart!",
+          description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
+          type: "success"
+        })
+      } else {
+        // Direct quantity for Mugs, Bottles, Bags
+        const itemVariantId = `${baseVariantId}-qty-${directQuantity}`
 
         const customizationId = saveCustomizationForCart({
-          productId: product?.id || TSHIRT_CONFIG.productId,
-          productName: productTitle || product?.title || TSHIRT_CONFIG.name,
-          variantId: sizeVariantId,
+          productId: product?.id || activeConfig.productId,
+          productName: productTitle || product?.title || activeConfig.name,
+          variantId: itemVariantId,
           colorId: selectedColorId,
           colorName: currentColor.name,
-          size: sizeId,
           front: exportPkg.front ? {
             positionId: currentColor.views.front.defaultPositionId,
-            positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Center Chest",
+            positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Front",
             previewDataUrl: exportPkg.front.preview,
             productionDataUrl: exportPkg.front.production,
             artworks: allArtworks.front || []
           } : undefined,
           back: exportPkg.back ? {
             positionId: currentColor.views.back.defaultPositionId,
-            positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Upper Back",
+            positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Back",
             previewDataUrl: exportPkg.back.preview,
             productionDataUrl: exportPkg.back.production,
             artworks: allArtworks.back || []
@@ -705,26 +826,23 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           ...Object.entries(customAttributes).map(
             ([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}`
           ),
-          `Colour: ${currentColor.name}`,
-          `Size: ${sizeId}`,
-          `Qty: ${qty}`,
-          exportPkg.front ? `Front: ${currentView.name}` : null,
+          `Qty: ${directQuantity}`,
+          exportPkg.front ? `Print: Customized` : null,
           exportPkg.back ? `Back: Customized` : null,
           `ID: ${customizationId}`
         ].filter(Boolean).join(" | ")
 
-        await addToCart(sizeVariantId, qty, {
-          productName: productTitle || product?.title || TSHIRT_CONFIG.name,
+        await addToCart(itemVariantId, directQuantity, {
+          productName: productTitle || product?.title || activeConfig.name,
           variantDetails: detailsList
         })
-      }
 
-      const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
-      toast.add({
-        title: "Added to Cart!",
-        description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
-        type: "success"
-      })
+        toast.add({
+          title: "Added to Cart!",
+          description: `${productTitle || activeConfig.name} • ${directQuantity} piece(s) added to your cart.`,
+          type: "success"
+        })
+      }
     } catch (err: any) {
       console.error("Failed to add customized item to cart:", err)
       toast.add({
@@ -735,7 +853,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     } finally {
       setIsAddingToCart(false)
     }
-  }, [product, productTitle, customAttributes, selectedColorId, currentColor, currentView, sizeQuantities, totalQuantity])
+  }, [product, productTitle, customAttributes, selectedColorId, currentColor, currentView, sizeQuantities, directQuantity, totalQuantity, profile, activeConfig])
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
@@ -749,7 +867,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         {/* 1. Left Sidebar (Visible on Desktop lg+) */}
         <div className="hidden lg:flex lg:col-span-3 xl:col-span-3 h-full min-h-0 flex-col overflow-hidden">
           <CustomizerLeftSidebar
-            colors={TSHIRT_CONFIG.colors}
+            colors={activeConfig.colors}
             selectedColorId={selectedColorId}
             onSelectColor={handleSelectColor}
             selectedViewId={selectedViewId}
@@ -763,6 +881,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             zoomLevel={zoomLevel}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
+            hasDynamicColors={profile.hasDynamicColors}
           />
         </div>
 
@@ -809,50 +928,61 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             sizeQuantities={sizeQuantities}
             onQuantityChange={handleQuantityChange}
             totalQuantity={totalQuantity}
+            hasGarmentSizes={profile.hasGarmentSizes}
+            directQuantity={directQuantity}
+            onDirectQuantityChange={handleDirectQuantityChange}
+            materialSubtitle={
+              profile.productType === "mug"
+                ? "Ceramic 11oz • Glossy"
+                : profile.productType === "bottle"
+                ? "304 Stainless Steel • 750ml"
+                : profile.productType === "bag"
+                ? "Heavy Canvas / Poly"
+                : "Bio-washed 180 GSM"
+            }
           />
         </div>
 
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
         <div className="lg:hidden flex flex-col w-full space-y-3 pb-32 sm:pb-36 pt-1">
           {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
-          <div className="bg-card rounded-2xl border border-border/80  shadow-xs grid grid-cols-4 gap-3">
-            {/* Button 1: Colour Selection Button */}
-            <button
-              type="button"
-              onClick={() => setIsMobileColorSheetOpen(true)}
-              className="flex flex-col items-center justify-center   hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Select garment colour"
-            >
-              {/* Keep color icon as it is */}
-              <div
-                className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
-                style={{ backgroundColor: currentColor.hex }}
+          <div className={`bg-card rounded-2xl border border-border/80 shadow-xs grid ${
+            profile.hasDynamicColors ? "grid-cols-4" : "grid-cols-3"
+          } gap-3`}>
+            {/* Button 1: Colour Selection Button (Only shown if dynamic colors supported) */}
+            {profile.hasDynamicColors && (
+              <button
+                type="button"
+                onClick={() => setIsMobileColorSheetOpen(true)}
+                className="flex flex-col items-center justify-center hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+                title="Select garment colour"
               >
-                <span
-                  className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"
-                    }`}
-                />
-              </div>
-              {/* Just below it add the color label */}
-              <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
-                Color {<ChevronRight className="size-3" />}
-              </span>
-            </button>
+                <div
+                  className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
+                  style={{ backgroundColor: currentColor.hex }}
+                >
+                  <span
+                    className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"}`}
+                  />
+                </div>
+                <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
+                  Color <ChevronRight className="size-3" />
+                </span>
+              </button>
+            )}
 
             {/* Button 2: Print Placement Selection Button */}
             <button
               type="button"
               onClick={() => setIsMobilePlacementSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
               title="Select print placement"
             >
-              {/* Simple icon for selection button */}
               <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                 <Maximize2 className="size-5" />
               </div>
-              {/* Just below it add the placement label */}
-              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
-                {currentPosition.name}{<ChevronRight className="size-3" />}
+              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
+                {currentPosition.name} <ChevronRight className="size-3" />
               </span>
             </button>
 
@@ -860,15 +990,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             <button
               type="button"
               onClick={handleRotateImage}
-              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Select print placement"
+              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Rotate artwork"
             >
-              {/* Simple icon for selection button */}
               <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                 <RotateCcw className="size-5" />
               </div>
-              {/* Just below it add the placement label */}
-              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
+              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
                 Rotate
               </span>
             </button>
@@ -877,19 +1005,16 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             <button
               type="button"
               onClick={handleDownloadMockup}
-              className="flex flex-col items-center justify-center p-3  hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Select print placement"
+              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+              title="Preview and download mockup"
             >
-              {/* Simple icon for selection button */}
               <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                 <Download className="size-5" />
               </div>
-              {/* Just below it add the placement label */}
-              <span className="text-xs text-wrap flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate ">
-               Preview
+              <span className="text-xs text-wrap flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
+                Preview
               </span>
             </button>
-
           </div>
 
           {/* Card B: Upload Design / Artwork Controls */}
@@ -959,14 +1084,22 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             )}
           </div>
 
-          {/* Card C: Size & Quantity Minimal Table */}
+          {/* Card C: Size & Quantity Minimal Table OR Direct Quantity Selector */}
           <div className="bg-card rounded-2xl border border-border/80 p-3.5 shadow-xs">
-            <SizeQuantityTable
-              quantities={sizeQuantities}
-              onQuantityChange={handleQuantityChange}
-              totalQuantity={totalQuantity}
-              unitPrice={unitPrice}
-            />
+            {profile.hasGarmentSizes ? (
+              <SizeQuantityTable
+                quantities={sizeQuantities}
+                onQuantityChange={handleQuantityChange}
+                totalQuantity={totalQuantity}
+                unitPrice={unitPrice}
+              />
+            ) : (
+              <DirectQuantitySelector
+                quantity={directQuantity}
+                onQuantityChange={handleDirectQuantityChange}
+                unitPrice={unitPrice}
+              />
+            )}
           </div>
 
           {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile, direct without bottom sheet) */}
@@ -1007,14 +1140,16 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       {/* 5. MODALS & BOTTOM SHEETS                                                 */}
       {/* ========================================================================= */}
 
-      {/* Mobile Colour Bottom Sheet */}
-      <MobileColorSheet
-        isOpen={isMobileColorSheetOpen}
-        onClose={() => setIsMobileColorSheetOpen(false)}
-        colors={TSHIRT_CONFIG.colors}
-        selectedColorId={selectedColorId}
-        onSelectColor={handleSelectColor}
-      />
+      {/* Mobile Colour Bottom Sheet (Only for profiles with dynamic colors) */}
+      {profile.hasDynamicColors && (
+        <MobileColorSheet
+          isOpen={isMobileColorSheetOpen}
+          onClose={() => setIsMobileColorSheetOpen(false)}
+          colors={activeConfig.colors}
+          selectedColorId={selectedColorId}
+          onSelectColor={handleSelectColor}
+        />
+      )}
 
       {/* Mobile Print Placement Bottom Sheet */}
       <MobilePlacementSheet
@@ -1061,8 +1196,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           }
         }}
       />
-
-
     </div>
   )
 }

@@ -18,6 +18,7 @@ import {
   ChevronDown
 } from "lucide-react"
 import { SizeQuantityTable } from "./SizeQuantityTable"
+import { DirectQuantitySelector } from "./DirectQuantitySelector"
 import type { ArtworkLayerInfo } from "../core/fabric-manager"
 
 export interface CustomizerRightSidebarProps {
@@ -37,7 +38,7 @@ export interface CustomizerRightSidebarProps {
   onSetScale: (scale: number) => void
   onCenterArtwork: () => void
   onFlipH: () => void
-  onFlipV: () => void
+  onFlipV?: () => void
 
   onDownloadMockup: () => void
   onDownloadPrintFile: () => void
@@ -49,6 +50,10 @@ export interface CustomizerRightSidebarProps {
   sizeQuantities: Record<string, number>
   onQuantityChange: (sizeId: string, quantity: number) => void
   totalQuantity: number
+  hasGarmentSizes?: boolean
+  directQuantity?: number
+  onDirectQuantityChange?: (quantity: number) => void
+  materialSubtitle?: string
 }
 
 export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
@@ -73,7 +78,11 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
   unitPrice = 299,
   sizeQuantities,
   onQuantityChange,
-  totalQuantity
+  totalQuantity,
+  hasGarmentSizes = true,
+  directQuantity = 1,
+  onDirectQuantityChange,
+  materialSubtitle
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -205,15 +214,23 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
           </div>
         )}
 
-        {/* 4. Sizes & Quantities Minimal Table */}
+        {/* 4. Sizes & Quantities Minimal Table or Direct Quantity Selector */}
         <div className="pt-1">
           <Separator className="mb-4" />
-          <SizeQuantityTable
-            quantities={sizeQuantities}
-            onQuantityChange={onQuantityChange}
-            totalQuantity={totalQuantity}
-            unitPrice={unitPrice}
-          />
+          {hasGarmentSizes ? (
+            <SizeQuantityTable
+              quantities={sizeQuantities}
+              onQuantityChange={onQuantityChange}
+              totalQuantity={totalQuantity}
+              unitPrice={unitPrice}
+            />
+          ) : (
+            <DirectQuantitySelector
+              quantity={directQuantity}
+              onQuantityChange={onDirectQuantityChange ?? (() => {})}
+              unitPrice={unitPrice}
+            />
+          )}
         </div>
 
         {/* 5. Previews & Downloads */}
@@ -264,7 +281,7 @@ export const CustomizerRightSidebar: React.FC<CustomizerRightSidebarProps> = ({
             )}
           </div>
           <div className="text-[11px] text-muted-foreground text-right">
-            Bio-washed 180 GSM
+            {materialSubtitle || (hasGarmentSizes ? "Bio-washed 180 GSM" : "Premium Custom Print")}
           </div>
         </div>
 

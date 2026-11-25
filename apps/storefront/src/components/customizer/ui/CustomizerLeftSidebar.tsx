@@ -30,6 +30,7 @@ export interface CustomizerLeftSidebarProps {
   zoomLevel?: number
   onZoomIn?: () => void
   onZoomOut?: () => void
+  hasDynamicColors?: boolean
 }
 
 export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
@@ -46,46 +47,50 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
   onClearDesign,
   zoomLevel = 1.0,
   onZoomIn,
-  onZoomOut
+  onZoomOut,
+  hasDynamicColors = true
 }) => {
   return (
     <div className="bg-card rounded-3xl border border-border/80 shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
       {/* Scrollable Setup Controls */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-6 custom-scrollbar">
-        {/* 1. T-Shirt Colour Selector (Bold discs, strictly NO text labels on them) */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-4 flex-wrap pt-1">
-            {Object.values(colors).map((color) => {
-              const isSelected = selectedColorId === color.id
-              return (
-                <button
-                  key={color.id}
-                  type="button"
-                  onClick={() => onSelectColor(color.id)}
-                  title={color.name}
-                  aria-label={color.name}
-                  className={`size-12 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center relative shadow-sm ${
-                    isSelected
-                      ? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-110 border-primary"
-                      : "border-border/80 hover:scale-105 hover:border-foreground/30 opacity-80 hover:opacity-100"
-                  }`}
-                  style={{ backgroundColor: color.hex }}
-                >
-                  {/* Subtle active indicator dot inside swatch */}
-                  {isSelected && (
-                    <span
-                      className={`size-2 rounded-full ${
-                        color.id === "white" ? "bg-black" : "bg-white"
+        {/* 1. Colour Selector (Rendered only for products with dynamic color choices like T-shirts) */}
+        {hasDynamicColors && Object.keys(colors).length > 1 && (
+          <>
+            <div className="space-y-3">
+              <div className="flex items-center gap-4 flex-wrap pt-1">
+                {Object.values(colors).map((color) => {
+                  const isSelected = selectedColorId === color.id
+                  return (
+                    <button
+                      key={color.id}
+                      type="button"
+                      onClick={() => onSelectColor(color.id)}
+                      title={color.name}
+                      aria-label={color.name}
+                      className={`size-12 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center relative shadow-sm ${
+                        isSelected
+                          ? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-110 border-primary"
+                          : "border-border/80 hover:scale-105 hover:border-foreground/30 opacity-80 hover:opacity-100"
                       }`}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <Separator />
+                      style={{ backgroundColor: color.hex }}
+                    >
+                      {/* Subtle active indicator dot inside swatch */}
+                      {isSelected && (
+                        <span
+                          className={`size-2 rounded-full ${
+                            color.id === "white" ? "bg-black" : "bg-white"
+                          }`}
+                        />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
 
         {/* 2. View Angle Switcher (Front View <-> Back View) */}
         <div className="space-y-3">
