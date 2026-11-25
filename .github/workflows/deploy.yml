@@ -112,6 +112,7 @@ jobs:
             pnpm-workspace.yaml \
             .npmrc \
             apps/server/package.json \
+            apps/storefront/package.json \
             apps/server/dist \
             apps/server/static/email/templates
 
@@ -175,11 +176,13 @@ jobs:
             fi
 
             # 3. Synchronize package manifests to target
+            mkdir -p "$TARGET_DIR/apps/server" "$TARGET_DIR/apps/storefront"
             cp "$STAGING_DIR/package.json" "$TARGET_DIR/package.json"
             cp "$STAGING_DIR/pnpm-lock.yaml" "$TARGET_DIR/pnpm-lock.yaml"
             cp "$STAGING_DIR/pnpm-workspace.yaml" "$TARGET_DIR/pnpm-workspace.yaml"
             cp "$STAGING_DIR/.npmrc" "$TARGET_DIR/.npmrc"
             cp "$STAGING_DIR/apps/server/package.json" "$TARGET_DIR/apps/server/package.json"
+            cp "$STAGING_DIR/apps/storefront/package.json" "$TARGET_DIR/apps/storefront/package.json"
 
             # 4. Synchronize email templates (leaves static/assets untouched)
             mkdir -p "$TARGET_DIR/apps/server/static/email/templates"

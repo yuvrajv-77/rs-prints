@@ -9,6 +9,7 @@ import {
     OrderStateTransitionEvent,
     EntityHydrator,
     Injector,
+    RequestContext,
 } from '@vendure/core';
 import {
     EmailPlugin,
@@ -30,7 +31,61 @@ import path from 'path';
 dotenv.config({ path: process.env.ENV_FILE || path.join(__dirname, '../.env.test') });
 dotenv.config();
 
-import { AssetServerPlugin, configureS3AssetStorage } from '@vendure/asset-server-plugin';
+import {
+    AssetServerOptions,
+    AssetServerPlugin,
+    configureS3AssetStorage,
+    HashedAssetNamingStrategy,
+    S3Config,
+} from '@vendure/asset-server-plugin';
+
+const toPosixKey = (key: string) => key.replace(/\\/g, '/').replace(/^\/+/, '');
+
+/**
+ * Ensures asset paths stored in Postgres always use POSIX `/` separators even when uploaded on Windows.
+ */
+class PosixHashedAssetNamingStrategy extends HashedAssetNamingStrategy {
+    generateSourceFileName(ctx: RequestContext, originalFileName: string, conflictFileName?: string): string {
+        return toPosixKey(super.generateSourceFileName(ctx, originalFileName, conflictFileName));
+    }
+    generatePreviewFileName(ctx: RequestContext, originalFileName: string, conflictFileName?: string): string {
+        return toPosixKey(super.generatePreviewFileName(ctx, originalFileName, conflictFileName));
+    }
+}
+
+/**
+ * Wraps Vendure's S3 strategy so object keys never use Windows `\` (from `path.join`) while
+ * keeping the instance an `S3AssetStorageStrategy` for AssetServerPlugin's `instanceof` check.
+ */
+function configurePosixS3AssetStorage(s3Config: S3Config) {
+    const baseFactory = configureS3AssetStorage(s3Config);
+    return (options: AssetServerOptions) => {
+        const strategy = baseFactory(options);
+        const origWriteBuffer = strategy.writeFileFromBuffer.bind(strategy);
+        const origWriteStream = strategy.writeFileFromStream.bind(strategy);
+        const origReadBuffer = strategy.readFileToBuffer.bind(strategy);
+        const origReadStream = strategy.readFileToStream.bind(strategy);
+        const origDelete = strategy.deleteFile.bind(strategy);
+        const origExists = strategy.fileExists.bind(strategy);
+        const origToAbsoluteUrl = strategy.toAbsoluteUrl;
+
+        strategy.writeFileFromBuffer = (fileName, data) => origWriteBuffer(toPosixKey(fileName), data);
+        strategy.writeFileFromStream = (fileName, data) => origWriteStream(toPosixKey(fileName), data);
+        strategy.readFileToBuffer = (id) => origReadBuffer(toPosixKey(id));
+        strategy.readFileToStream = (id) => origReadStream(toPosixKey(id));
+        strategy.deleteFile = (id) => origDelete(toPosixKey(id));
+        strategy.fileExists = (fileName) => origExists(toPosixKey(fileName));
+        (strategy as unknown as { toAbsoluteUrl: typeof origToAbsoluteUrl }).toAbsoluteUrl = (req, id) =>
+            origToAbsoluteUrl(req, id.replace(/\\/g, '/'));
+        (strategy as unknown as { getObjectParams: (id: string) => { Bucket: string; Key: string } }).getObjectParams =
+            (id: string) => ({
+                Bucket: s3Config.bucket,
+                Key: toPosixKey(id),
+            });
+
+        return strategy;
+    };
+}
 
 import { RazorpayPlugin } from './plugins/razorpay/razorpay.plugin';
 import { codPaymentHandler } from './plugins/cod/cod.handler';
@@ -215,8 +270,9 @@ export const config: VendureConfig = {
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),
+            namingStrategy: new PosixHashedAssetNamingStrategy(),
             storageStrategyFactory: process.env.AWS_ACCESS_KEY_ID
-                ? configureS3AssetStorage({
+                ? configurePosixS3AssetStorage({
                     bucket: process.env.AWS_BUCKET_NAME || 'rs-assets',
                     credentials: {
                         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
