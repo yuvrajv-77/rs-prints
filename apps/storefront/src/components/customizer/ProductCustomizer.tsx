@@ -378,31 +378,43 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     })
   }, [selectedColorId, selectedViewId, selectedPositionId])
 
-  // Garment Color change
+  // Garment / Product Color change
   const handleSelectColor = useCallback(async (colorId: string) => {
     setSelectedColorId(colorId)
     syncUrlParams(colorId, productTitle)
     const newColor = activeConfig.colors[colorId]
     if (!newColor) return
 
-    const targetView = newColor.views[selectedViewId] || newColor.views.front
-    if (fabricManagerRef.current) {
-      setIsLoading(true)
-      try {
-        await fabricManagerRef.current.switchColor(targetView.image)
-        toast.add({
-          title: "Colour Updated",
-          description: `Switched garment to ${newColor.name}.`,
-          type: "info"
-        })
-        triggerAutoSave()
-      } catch (err) {
-        console.error("Failed to switch color:", err)
-      } finally {
-        setIsLoading(false)
+    // ONLY T-shirts dynamically swap canvas mockup images (White <-> Black).
+    // Mugs, drinkware, and bags keep their mockup 100% static on canvas.
+    if (profile.productType === "tshirt") {
+      const targetView = newColor.views[selectedViewId] || newColor.views.front
+      if (fabricManagerRef.current && targetView) {
+        setIsLoading(true)
+        try {
+          await fabricManagerRef.current.switchColor(targetView.image)
+          toast.add({
+            title: "Colour Updated",
+            description: `Switched garment to ${newColor.name}.`,
+            type: "info"
+          })
+          triggerAutoSave()
+        } catch (err) {
+          console.error("Failed to switch color:", err)
+        } finally {
+          setIsLoading(false)
+        }
       }
+    } else {
+      // For mugs, drinkware, and bags: purely select the product variant color without altering canvas mockup
+      toast.add({
+        title: "Colour Selected",
+        description: `Selected ${newColor.name} for this item.`,
+        type: "info"
+      })
+      triggerAutoSave()
     }
-  }, [selectedViewId, triggerAutoSave, syncUrlParams, productTitle, activeConfig.colors])
+  }, [profile.productType, selectedViewId, triggerAutoSave, syncUrlParams, productTitle, activeConfig.colors])
 
   // View Angle change (Front <-> Back)
   const handleSelectView = useCallback(async (viewId: "front" | "back") => {

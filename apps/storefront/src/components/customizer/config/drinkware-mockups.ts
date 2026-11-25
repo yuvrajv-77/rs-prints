@@ -59,7 +59,7 @@ export const MUG_CONFIG: ProductCustomizerConfig & { productType: "mug" } = {
         front: {
           id: "front",
           name: "Front View",
-          image: "/mockups/mockup-black-mug-wrap.png",
+          image: "/mockups/mockup-white-mug-wrap.png",
           originalWidth: 1024,
           originalHeight: 523,
           defaultPositionId: "wrap",
