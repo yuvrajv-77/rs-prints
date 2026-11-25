@@ -44,7 +44,7 @@ export default function ProductStickyBar({ product }: ProductStickyBarProps) {
 
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href={`/customize/${product.slug}`}
+            href={`/customize/${product.slug}?fresh=1`}
             className="shrink-0"
           >
             <Button size="sm" className="font-bold text-xs gap-1.5 shadow-sm">

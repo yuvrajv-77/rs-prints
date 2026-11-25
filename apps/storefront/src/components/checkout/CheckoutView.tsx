@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { $cart, fetchActiveOrder, clearCartState, applyCoupon, removeCoupon } from "@/stores/cart";
+import { clearCustomizationsForOrder } from "@/stores/customization";
 import { $currentUser, fetchCurrentUser } from "@/stores/auth";
 import {
   getEligibleShippingMethods,
@@ -384,6 +385,7 @@ export default function CheckoutView() {
           throw new Error(finalOrder.error || "Payment verification failed.");
         }
 
+        clearCustomizationsForOrder(lines);
         clearCartState();
         toast.add({
           title: "Order Placed Successfully!",
@@ -402,6 +404,7 @@ export default function CheckoutView() {
           throw new Error(finalOrder.error || "Failed to confirm Cash on Delivery order.");
         }
 
+        clearCustomizationsForOrder(lines);
         clearCartState();
         toast.add({
           title: "Order Placed Successfully!",

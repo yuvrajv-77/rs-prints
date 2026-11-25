@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getCustomerOrders } from "@/lib/vendure/queries/orders";
+import { getCustomerOrders, resolveOrderLineImageUrl } from "@/lib/vendure/queries/orders";
 import { Package, Truck, CheckCircle2, Clock, ShoppingBag, ExternalLink, ArrowRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +10,30 @@ interface VendureOrderItem {
   id: string;
   quantity: number;
   linePriceWithTax: number;
+  customFields?: {
+    customizationId?: string | null;
+    customizationData?: string | null;
+  } | null;
+  featuredAsset?: {
+    id?: string;
+    preview: string;
+  } | null;
   productVariant: {
     id: string;
     name: string;
     sku: string;
     featuredAsset?: {
+      id?: string;
       preview: string;
+    } | null;
+    product?: {
+      id: string;
+      name: string;
+      slug: string;
+      featuredAsset?: {
+        id?: string;
+        preview: string;
+      } | null;
     } | null;
   };
 }
@@ -238,17 +256,30 @@ export default function OrdersView() {
               <div className="divide-y divide-neutral-100 dark:divide-neutral-800 py-2">
                 {order.lines.map((item) => {
                   const variant = item.productVariant;
-                  const imageUrl = variant.featuredAsset?.preview || "/placeholder-product.png";
+                  const imageUrl = resolveOrderLineImageUrl(item);
 
                   return (
                     <div key={item.id} className="flex items-center justify-between gap-4 py-3.5">
                       <div className="flex items-center gap-3.5">
-                        <div className="size-14 rounded-xl border border-neutral-200/80 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
-                          <img
-                            src={imageUrl}
-                            alt={variant.name}
-                            className="size-full object-cover"
-                          />
+                        <div className="size-14 rounded-xl border border-neutral-200/80 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                          {imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={variant.name}
+                              className="size-full object-cover rounded-lg"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                                if (fallback) fallback.style.display = "flex";
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className="size-full items-center justify-center text-neutral-400"
+                            style={{ display: imageUrl ? "none" : "flex" }}
+                          >
+                            <Package className="size-5" />
+                          </div>
                         </div>
                         <div>
                           <h4 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 line-clamp-1">

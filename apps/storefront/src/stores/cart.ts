@@ -1,5 +1,10 @@
 import { atom, computed } from "nanostores";
-import { getActiveOrder, type ActiveOrder, type ActiveOrderLine } from "@/lib/vendure/queries/orders";
+import {
+  getActiveOrder,
+  type ActiveOrder,
+  type ActiveOrderLine,
+  type OrderLineCustomFields,
+} from "@/lib/vendure/queries/orders";
 import {
   addItemToOrder,
   adjustOrderLine,
@@ -7,9 +12,10 @@ import {
   applyCouponCode,
   removeCouponCode,
 } from "@/lib/vendure/mutations/orders";
+import { hydrateCustomizationsFromOrder } from "@/stores/customization";
 import { toast } from "@/components/ui/toast";
 
-export type { ActiveOrder, ActiveOrderLine };
+export type { ActiveOrder, ActiveOrderLine, OrderLineCustomFields };
 
 export interface CartState {
   order: ActiveOrder | null;
@@ -57,6 +63,9 @@ export async function fetchActiveOrder(): Promise<ActiveOrder | null> {
 
   try {
     const order = await getActiveOrder();
+    if (order?.lines) {
+      hydrateCustomizationsFromOrder(order.lines);
+    }
     $cart.set({
       order: order ?? null,
       loading: false,
@@ -77,7 +86,7 @@ export async function fetchActiveOrder(): Promise<ActiveOrder | null> {
 }
 
 /**
- * Add product variant to active cart.
+ * Add product variant to active cart (optionally with Vendure OrderLine customFields).
  */
 export async function addToCart(
   productVariantId: string,
@@ -85,17 +94,20 @@ export async function addToCart(
   options?: {
     productName?: string;
     variantDetails?: string;
+    suppressToast?: boolean;
+    customFields?: OrderLineCustomFields;
   }
-): Promise<boolean> {
+): Promise<{ success: boolean; order?: ActiveOrder }> {
   $cart.set({
     ...$cart.get(),
     loading: true,
   });
 
   try {
-    const result = await addItemToOrder(productVariantId, quantity);
+    const result = await addItemToOrder(productVariantId, quantity, options?.customFields);
 
     if (result.order) {
+      hydrateCustomizationsFromOrder(result.order.lines);
       $cart.set({
         order: result.order,
         loading: false,
@@ -103,16 +115,18 @@ export async function addToCart(
         error: null,
       });
 
-      const details = options?.productName
-        ? `${options.productName}${options.variantDetails ? ` (${options.variantDetails})` : ""} × ${quantity}`
-        : `${quantity} ${quantity === 1 ? "item" : "items"} added to your cart`;
+      if (!options?.suppressToast) {
+        const details = options?.productName
+          ? `${options.productName}${options.variantDetails ? ` (${options.variantDetails})` : ""} × ${quantity}`
+          : `${quantity} ${quantity === 1 ? "item" : "items"} added to your cart`;
 
-      toast.add({
-        title: "Added to Cart!",
-        description: details,
-        type: "success",
-      });
-      return true;
+        toast.add({
+          title: "Added to Cart!",
+          description: details,
+          type: "success",
+        });
+      }
+      return { success: true, order: result.order };
     } else {
       const errMsg = result.error || "Could not add item to cart.";
       $cart.set({
@@ -120,12 +134,14 @@ export async function addToCart(
         loading: false,
         error: errMsg,
       });
-      toast.add({
-        title: "Cart Error",
-        description: errMsg,
-        type: "error",
-      });
-      return false;
+      if (!options?.suppressToast) {
+        toast.add({
+          title: "Cart Error",
+          description: errMsg,
+          type: "error",
+        });
+      }
+      return { success: false };
     }
   } catch (err: any) {
     console.error("Failed to add item to order:", err);
@@ -135,21 +151,25 @@ export async function addToCart(
       loading: false,
       error: errMsg,
     });
-    toast.add({
-      title: "Error",
-      description: errMsg,
-      type: "error",
-    });
-    return false;
+    if (!options?.suppressToast) {
+      toast.add({
+        title: "Error",
+        description: errMsg,
+        type: "error",
+      });
+    }
+    return { success: false };
   }
 }
 
 /**
- * Adjust order line quantity. If quantity <= 0, automatically removes the line.
+ * Adjust order line quantity (and optionally update OrderLine customFields).
+ * If quantity <= 0, automatically removes the line.
  */
 export async function updateLineQuantity(
   orderLineId: string,
-  quantity: number
+  quantity: number,
+  customFields?: OrderLineCustomFields
 ): Promise<boolean> {
   if (quantity <= 0) {
     return removeLineItem(orderLineId);
@@ -161,9 +181,10 @@ export async function updateLineQuantity(
   });
 
   try {
-    const result = await adjustOrderLine(orderLineId, quantity);
+    const result = await adjustOrderLine(orderLineId, quantity, customFields);
 
     if (result.order) {
+      hydrateCustomizationsFromOrder(result.order.lines);
       $cart.set({
         order: result.order,
         loading: false,

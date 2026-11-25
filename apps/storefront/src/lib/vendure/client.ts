@@ -45,6 +45,10 @@ export function clearAuthToken(): void {
 const endpoint =
   import.meta.env.PUBLIC_VENDURE_API_URL || "http://localhost:3000/shop-api";
 
+export function getVendureApiUrl(): string {
+  return endpoint;
+}
+
 /**
  * Resolves the Vendure backend base origin (e.g. "http://localhost:3000" or "https://api.yourdomain.com").
  */

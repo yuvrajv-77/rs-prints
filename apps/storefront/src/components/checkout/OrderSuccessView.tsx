@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getOrderByCode } from "@/lib/vendure/queries/orders";
+import { getOrderByCode, resolveOrderLineImageUrl } from "@/lib/vendure/queries/orders";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -210,20 +210,29 @@ export default function OrderSuccessView({ orderCode: propCode }: OrderSuccessPr
           <div className="divide-y divide-border/40">
             {lines.map((line: any) => {
               const variant = line.productVariant;
-              const imageUrl =
-                line.featuredAsset?.preview ||
-                variant?.featuredAsset?.preview ||
-                variant?.product?.featuredAsset?.preview ||
-                "/placeholder-product.png";
+              const imageUrl = resolveOrderLineImageUrl(line);
 
               return (
                 <div key={line.id} className="flex items-center gap-4 py-3 first:pt-0">
                   <div className="size-14 rounded-xl border bg-muted/30 overflow-hidden shrink-0 flex items-center justify-center">
-                    <img
-                      src={imageUrl}
-                      alt={variant?.name || "Product"}
-                      className="size-full object-cover"
-                    />
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={variant?.name || "Product"}
+                        className="size-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="size-full items-center justify-center text-muted-foreground"
+                      style={{ display: imageUrl ? "none" : "flex" }}
+                    >
+                      <Package className="size-5" />
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs sm:text-sm font-semibold text-foreground truncate">

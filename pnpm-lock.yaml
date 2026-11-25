@@ -214,6 +214,9 @@ importers:
       razorpay:
         specifier: ^2.9.8
         version: 2.9.8(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+      typeorm:
+        specifier: 0.3.31
+        version: 0.3.31(pg@8.23.0)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@26.6.1)(typescript@5.8.2))
     devDependencies:
       '@vendure/cli':
         specifier: 3.7.3

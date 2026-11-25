@@ -2,6 +2,11 @@ import type { Product } from "@/types/product"
 import { TSHIRT_CONFIG, type ProductCustomizerConfig, type TShirtColorConfig, type MockupViewConfig } from "./tshirt-mockups"
 import { MUG_CONFIG, BOTTLE_CONFIG } from "./drinkware-mockups"
 import { TOTE_BAG_CONFIG, OFFICE_BAG_CONFIG } from "./bag-mockups"
+import {
+  lookupCatalogueProductOptions,
+  CATALOGUE_SINGLE_BASE_ITEMS,
+  type CatalogueProductOptionDef
+} from "./catalogue-options"
 
 export type ResolvedProductType = "tshirt" | "mug" | "bottle" | "bag"
 
@@ -12,34 +17,45 @@ export interface CustomizerProductProfile {
   hasDynamicColors: boolean
   /** T-shirts use garment multi-size matrices (S, M, L, XL, 2XL); Mugs, Bottles & Bags use direct item quantities */
   hasGarmentSizes: boolean
+  /** Human-readable attribute group label: e.g. "Colour", "Neon Colour", "Finish", "Handle Colour", "Body Colour" */
+  attributeName?: string
+  /** Presentation style: "color" (swatches) or "pill" (chip buttons for finishes like Glossy/Matte) */
+  attributeType?: "color" | "finish" | "pill"
 }
 
 /**
  * Heuristic to map human-readable color names to hex codes for UI swatches
  */
-function guessColorHex(name: string): string {
+export function guessColorHex(name: string): string {
   const l = name.toLowerCase().trim()
   if (l.includes("neon pink") || l.includes("hot pink")) return "#FF1493"
   if (l.includes("neon green") || l.includes("lime")) return "#39FF14"
   if (l.includes("neon yellow")) return "#E7FE00"
   if (l.includes("neon orange") || l.includes("orange")) return "#FF5F1F"
   if (l.includes("neon blue") || l.includes("cyan")) return "#00F5FF"
+  if (l.includes("neon red")) return "#FF3366"
+  if (l.includes("gold") || l.includes("golden")) return "#D4AF37"
+  if (l.includes("silver")) return "#C0C0C0"
   if (l.includes("pink")) return "#EC4899"
   if (l.includes("red") || l.includes("crimson")) return "#DC2626"
   if (l.includes("navy")) return "#1E3A8A"
   if (l.includes("royal blue") || l.includes("blue")) return "#2563EB"
+  if (l.includes("dark green")) return "#14532D"
   if (l.includes("green") || l.includes("emerald")) return "#16A34A"
-  if (l.includes("yellow") || l.includes("gold")) return "#FACC15"
+  if (l.includes("yellow")) return "#FACC15"
+  if (l.includes("orange")) return "#EA580C"
   if (l.includes("purple") || l.includes("violet")) return "#8B5CF6"
   if (l.includes("black")) return "#1A1A1A"
   if (l.includes("white")) return "#FFFFFF"
   if (l.includes("grey") || l.includes("gray")) return "#6B7280"
-  if (l.includes("silver")) return "#D1D5DB"
+  if (l.includes("amber") || l.includes("brown")) return "#D97706"
   if (l.includes("natural") || l.includes("canvas")) return "#F5F2EB"
+  if (l.includes("glossy")) return "#0F172A"
+  if (l.includes("matte")) return "#475569"
   return "#94A3B8"
 }
 
-function isLightHex(hex: string): boolean {
+export function isLightHex(hex: string): boolean {
   if (hex.startsWith("#")) {
     const c = hex.slice(1)
     if (c.length === 6) {
@@ -52,29 +68,102 @@ function isLightHex(hex: string): boolean {
   return false
 }
 
+interface ExtractedVariantOptions {
+  colors: Record<string, TShirtColorConfig>
+  attributeName: string
+  attributeType: "color" | "finish" | "pill"
+  hasMultiple: boolean
+  defaultColorId: string
+}
+
 /**
- * Extracts product-specific color options from the product object or URL query params.
- * For mugs, drinkware, and bags, each color points to the SAME static base mockup view.
+ * Extracts product-specific variant options from:
+ * 1. Authoritative Catalogue Registry (Neon Mugs, Finishes, Handle Colours, Body Colours)
+ * 2. Product object (colors / optionGroups from Vendure or mock data)
+ * 3. URL query parameters (?color=..., ?finish=..., ?handle=...)
+ *
+ * For non-apparel (mugs, drinkware, bags), each variant points to the SAME 100% static base mockup view.
  */
-function extractProductColors(
+function extractProductVariantOptions(
   product?: Product,
   searchParams?: URLSearchParams | null,
-  baseViewConfig?: MockupViewConfig
-): Record<string, TShirtColorConfig> | null {
+  baseViewConfig?: MockupViewConfig,
+  fallbackColors: Record<string, TShirtColorConfig> = MUG_CONFIG.colors,
+  fallbackDefaultId: string = "white"
+): ExtractedVariantOptions {
+  const slug = (product?.slug || product?.id || "").toLowerCase().trim()
+
+  // 1. Check if this product is explicitly a single-base product (e.g. Classic White Mug A001)
+  const isExplicitSingle =
+    CATALOGUE_SINGLE_BASE_ITEMS.has(slug) ||
+    Array.from(CATALOGUE_SINGLE_BASE_ITEMS).some((k) => slug.endsWith(`-${k}`))
+
+  if (isExplicitSingle) {
+    return {
+      colors: fallbackColors,
+      attributeName: "Colour",
+      attributeType: "color",
+      hasMultiple: false,
+      defaultColorId: fallbackDefaultId
+    }
+  }
+
+  // 2. Check Catalogue Multi-Variant Map
+  const catDef = lookupCatalogueProductOptions(product, searchParams)
+  if (catDef && catDef.options.length > 0) {
+    const result: Record<string, TShirtColorConfig> = {}
+    for (const opt of catDef.options) {
+      result[opt.id] = {
+        id: opt.id,
+        name: opt.name,
+        hex: opt.hex,
+        isLight: isLightHex(opt.hex),
+        views: baseViewConfig
+          ? {
+              front: {
+                ...baseViewConfig
+              }
+            }
+          : ({} as any)
+      }
+    }
+
+    // Determine default: check URL param ?color= or ?finish= or default to first
+    let defaultId = catDef.options[0].id
+    if (searchParams) {
+      const urlColor = searchParams.get("color")?.toLowerCase() || searchParams.get("finish")?.toLowerCase()
+      if (urlColor) {
+        const found = catDef.options.find(
+          (o) => o.id === urlColor || o.name.toLowerCase().includes(urlColor)
+        )
+        if (found) defaultId = found.id
+      }
+    }
+
+    return {
+      colors: result,
+      attributeName: catDef.attributeName,
+      attributeType: catDef.attributeType,
+      hasMultiple: catDef.options.length > 1,
+      defaultColorId: defaultId
+    }
+  }
+
+  // 3. Fallback to product.colors or product.optionGroups (e.g. Vendure or Mock)
   const colorItems: { name: string; hex?: string }[] = []
 
-  // 1. From product.colors
   if (product?.colors && product.colors.length > 0) {
     for (const c of product.colors) {
       if (c.name) colorItems.push({ name: c.name, hex: c.hex })
     }
   }
 
-  // 2. From product.optionGroups (e.g. "Color" or "Colour")
   if (colorItems.length === 0 && product?.optionGroups) {
-    const colorGroup = product.optionGroups.find(
-      (g) => g.code?.toLowerCase() === "color" || g.name.toLowerCase().includes("color")
-    )
+    const colorGroup = product.optionGroups.find((g) => {
+      const n = (g.name || g.code || "").toLowerCase()
+      return n.includes("color") || n.includes("colour") || n.includes("finish") || n.includes("handle")
+    })
+
     if (colorGroup?.options && colorGroup.options.length > 0) {
       for (const opt of colorGroup.options) {
         colorItems.push({ name: opt.name })
@@ -86,7 +175,7 @@ function extractProductColors(
     }
   }
 
-  // 3. From URL parameters (?colors=Neon+Pink,Neon+Green or ?color=Neon+Pink)
+  // 4. Fallback to URL searchParams if provided
   if (colorItems.length === 0 && searchParams) {
     const colorsParam = searchParams.get("colors")
     if (colorsParam) {
@@ -94,44 +183,55 @@ function extractProductColors(
       for (const p of parts) {
         colorItems.push({ name: p })
       }
-    } else {
-      const singleColor = searchParams.get("color")
-      if (singleColor && singleColor.toLowerCase() !== "white" && singleColor.toLowerCase() !== "black") {
-        colorItems.push({ name: singleColor })
+    }
+  }
+
+  // If found options from product/URL
+  if (colorItems.length > 0) {
+    const result: Record<string, TShirtColorConfig> = {}
+    for (const item of colorItems) {
+      const cleanId = item.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-")
+      const cleanHex = item.hex || guessColorHex(item.name)
+      result[cleanId] = {
+        id: cleanId,
+        name: item.name,
+        hex: cleanHex,
+        isLight: isLightHex(cleanHex),
+        views: baseViewConfig
+          ? {
+              front: {
+                ...baseViewConfig
+              }
+            }
+          : ({} as any)
       }
     }
-  }
 
-  if (colorItems.length === 0) return null
-
-  // Deduplicate and build color dictionary pointing to the static base mockup
-  const result: Record<string, TShirtColorConfig> = {}
-  for (const item of colorItems) {
-    const cleanId = item.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-")
-    const cleanHex = item.hex || guessColorHex(item.name)
-    result[cleanId] = {
-      id: cleanId,
-      name: item.name,
-      hex: cleanHex,
-      isLight: isLightHex(cleanHex),
-      views: baseViewConfig
-        ? {
-            front: {
-              ...baseViewConfig
-            }
-          }
-        : ({} as any)
+    const keys = Object.keys(result)
+    return {
+      colors: result,
+      attributeName: "Colour",
+      attributeType: "color",
+      hasMultiple: keys.length > 1,
+      defaultColorId: keys[0] || fallbackDefaultId
     }
   }
 
-  return Object.keys(result).length > 0 ? result : null
+  // 5. Single base product fallback (NO multiple options)
+  return {
+    colors: fallbackColors,
+    attributeName: "Colour",
+    attributeType: "color",
+    hasMultiple: false,
+    defaultColorId: fallbackDefaultId
+  }
 }
 
 /**
  * Resolves the appropriate product customizer profile based on:
  * 1. Product category or slug
- * 2. Product-scoped color variants
- * 3. URL search parameters (?type=..., ?category=..., ?product=...)
+ * 2. Authoritative Catalogue variant definitions (Neon Mugs, Finishes, Handle Colours, Body Colours)
+ * 3. URL search parameters
  * 4. Fallback to T-shirt profile
  */
 export function resolveCustomizerProfile(
@@ -151,20 +251,25 @@ export function resolveCustomizerProfile(
   // 1. Mugs (Mockup stays 100% static on 7cm x 17.2cm panoramic wrap)
   if (combined.includes("mug")) {
     const baseView = MUG_CONFIG.colors[MUG_CONFIG.defaultColorId]?.views?.front
-    const scopedColors = extractProductColors(product, searchParams, baseView)
-    const effectiveColors = scopedColors || MUG_CONFIG.colors
-    const hasMultiple = Object.keys(effectiveColors).length > 1
-    const defaultColorKey = scopedColors ? Object.keys(scopedColors)[0] : MUG_CONFIG.defaultColorId
+    const extracted = extractProductVariantOptions(
+      product,
+      searchParams,
+      baseView,
+      MUG_CONFIG.colors,
+      MUG_CONFIG.defaultColorId
+    )
 
     return {
       config: {
         ...MUG_CONFIG,
-        defaultColorId: defaultColorKey,
-        colors: effectiveColors
+        defaultColorId: extracted.defaultColorId,
+        colors: extracted.colors
       },
       productType: "mug",
-      hasDynamicColors: hasMultiple,
-      hasGarmentSizes: false
+      hasDynamicColors: extracted.hasMultiple,
+      hasGarmentSizes: false,
+      attributeName: extracted.attributeName,
+      attributeType: extracted.attributeType
     }
   }
 
@@ -175,43 +280,55 @@ export function resolveCustomizerProfile(
     combined.includes("jar") ||
     combined.includes("sipper") ||
     combined.includes("tumbler") ||
-    combined.includes("flask")
+    combined.includes("flask") ||
+    combined.includes("beer glass") ||
+    combined.includes("glass")
   ) {
     const baseView = BOTTLE_CONFIG.colors[BOTTLE_CONFIG.defaultColorId]?.views?.front
-    const scopedColors = extractProductColors(product, searchParams, baseView)
-    const effectiveColors = scopedColors || BOTTLE_CONFIG.colors
-    const hasMultiple = Object.keys(effectiveColors).length > 1
-    const defaultColorKey = scopedColors ? Object.keys(scopedColors)[0] : BOTTLE_CONFIG.defaultColorId
+    const extracted = extractProductVariantOptions(
+      product,
+      searchParams,
+      baseView,
+      BOTTLE_CONFIG.colors,
+      BOTTLE_CONFIG.defaultColorId
+    )
 
     return {
       config: {
         ...BOTTLE_CONFIG,
-        defaultColorId: defaultColorKey,
-        colors: effectiveColors
+        defaultColorId: extracted.defaultColorId,
+        colors: extracted.colors
       },
       productType: "bottle",
-      hasDynamicColors: hasMultiple,
-      hasGarmentSizes: false
+      hasDynamicColors: extracted.hasMultiple,
+      hasGarmentSizes: false,
+      attributeName: extracted.attributeName,
+      attributeType: extracted.attributeType
     }
   }
 
   // 3. Tote Bags (Mockup stays 100% static)
   if (combined.includes("tote")) {
     const baseView = TOTE_BAG_CONFIG.colors[TOTE_BAG_CONFIG.defaultColorId]?.views?.front
-    const scopedColors = extractProductColors(product, searchParams, baseView)
-    const effectiveColors = scopedColors || TOTE_BAG_CONFIG.colors
-    const hasMultiple = Object.keys(effectiveColors).length > 1
-    const defaultColorKey = scopedColors ? Object.keys(scopedColors)[0] : TOTE_BAG_CONFIG.defaultColorId
+    const extracted = extractProductVariantOptions(
+      product,
+      searchParams,
+      baseView,
+      TOTE_BAG_CONFIG.colors,
+      TOTE_BAG_CONFIG.defaultColorId
+    )
 
     return {
       config: {
         ...TOTE_BAG_CONFIG,
-        defaultColorId: defaultColorKey,
-        colors: effectiveColors
+        defaultColorId: extracted.defaultColorId,
+        colors: extracted.colors
       },
       productType: "bag",
-      hasDynamicColors: hasMultiple,
-      hasGarmentSizes: false
+      hasDynamicColors: extracted.hasMultiple,
+      hasGarmentSizes: false,
+      attributeName: extracted.attributeName,
+      attributeType: extracted.attributeType
     }
   }
 
@@ -224,20 +341,25 @@ export function resolveCustomizerProfile(
     combined.includes("backpack")
   ) {
     const baseView = OFFICE_BAG_CONFIG.colors[OFFICE_BAG_CONFIG.defaultColorId]?.views?.front
-    const scopedColors = extractProductColors(product, searchParams, baseView)
-    const effectiveColors = scopedColors || OFFICE_BAG_CONFIG.colors
-    const hasMultiple = Object.keys(effectiveColors).length > 1
-    const defaultColorKey = scopedColors ? Object.keys(scopedColors)[0] : OFFICE_BAG_CONFIG.defaultColorId
+    const extracted = extractProductVariantOptions(
+      product,
+      searchParams,
+      baseView,
+      OFFICE_BAG_CONFIG.colors,
+      OFFICE_BAG_CONFIG.defaultColorId
+    )
 
     return {
       config: {
         ...OFFICE_BAG_CONFIG,
-        defaultColorId: defaultColorKey,
-        colors: effectiveColors
+        defaultColorId: extracted.defaultColorId,
+        colors: extracted.colors
       },
       productType: "bag",
-      hasDynamicColors: hasMultiple,
-      hasGarmentSizes: false
+      hasDynamicColors: extracted.hasMultiple,
+      hasGarmentSizes: false,
+      attributeName: extracted.attributeName,
+      attributeType: extracted.attributeType
     }
   }
 
@@ -246,6 +368,8 @@ export function resolveCustomizerProfile(
     config: TSHIRT_CONFIG,
     productType: "tshirt",
     hasDynamicColors: true,
-    hasGarmentSizes: true
+    hasGarmentSizes: true,
+    attributeName: "Colour",
+    attributeType: "color"
   }
 }

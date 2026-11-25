@@ -327,6 +327,7 @@ export default function ProductConfigurator({ product }: ProductConfiguratorProp
     if (quantity > 1) {
       sp.set("quantity", quantity.toString())
     }
+    sp.set("fresh", "1")
 
     return `/customize/${product.slug}?${sp.toString()}`
   }, [product.title, product.slug, selectedOptions, selectedMaterial, selectedMethod, quantity])

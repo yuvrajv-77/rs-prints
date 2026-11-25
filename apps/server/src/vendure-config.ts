@@ -88,6 +88,7 @@ function configurePosixS3AssetStorage(s3Config: S3Config) {
 }
 
 import { RazorpayPlugin } from './plugins/razorpay/razorpay.plugin';
+import { CustomizationPlugin } from './plugins/customization/customization.plugin';
 import { codPaymentHandler } from './plugins/cod/cod.handler';
 
 
@@ -351,5 +352,6 @@ export const config: VendureConfig = {
         }),
 
         RazorpayPlugin,
+        CustomizationPlugin,
     ],
 };

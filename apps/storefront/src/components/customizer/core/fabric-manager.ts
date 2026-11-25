@@ -19,6 +19,8 @@ export interface SerializedArtwork {
   id: string
   name: string
   dataUrl: string
+  assetId?: string
+  assetUrl?: string
   left: number
   top: number
   scaleX: number
@@ -843,7 +845,9 @@ export class FabricManager {
       return {
         id: data.id || `art-${Date.now()}`,
         name: data.name || "Artwork",
-        dataUrl: data.originalUrl || "",
+        dataUrl: data.originalUrl || data.assetUrl || "",
+        assetId: data.assetId,
+        assetUrl: data.assetUrl,
         left: obj.left || 0,
         top: obj.top || 0,
         scaleX: obj.scaleX || 1,
@@ -856,11 +860,32 @@ export class FabricManager {
     })
   }
 
+  private async resolveImageSourceForCanvas(sourceUrl: string): Promise<string> {
+    if (!sourceUrl || sourceUrl.startsWith("data:")) return sourceUrl
+    try {
+      const res = await fetch(sourceUrl)
+      if (res.ok) {
+        const blob = await res.blob()
+        return await new Promise<string>((resolve) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : sourceUrl)
+          reader.onerror = () => resolve(sourceUrl)
+          reader.readAsDataURL(blob)
+        })
+      }
+    } catch {
+      // Fall back to direct URL loading below
+    }
+    return sourceUrl
+  }
+
   private async restoreArtworkObject(art: SerializedArtwork) {
-    if (!this.canvas || !this.clipRect || !art.dataUrl) return
+    const rawUrl = art.dataUrl || art.assetUrl
+    if (!this.canvas || !this.clipRect || !rawUrl) return
 
     try {
-      const imgObj = await FabricImage.fromURL(art.dataUrl, {
+      const resolvedUrl = await this.resolveImageSourceForCanvas(rawUrl)
+      const imgObj = await FabricImage.fromURL(resolvedUrl, {
         crossOrigin: "anonymous"
       })
 
@@ -886,7 +911,9 @@ export class FabricManager {
         data: {
           id: art.id,
           name: art.name,
-          originalUrl: art.dataUrl
+          originalUrl: resolvedUrl,
+          assetId: art.assetId,
+          assetUrl: art.assetUrl
         }
       })
 
@@ -1280,8 +1307,8 @@ export class FabricManager {
    * Seamlessly export preview mockup and production files for both Front and Back
    */
   public async exportAllViewsPackage(viewsConfig: {
-    front: { image: string; printPosition: PrintPositionConfig }
-    back: { image: string; printPosition: PrintPositionConfig }
+    front?: { image: string; printPosition: PrintPositionConfig }
+    back?: { image: string; printPosition: PrintPositionConfig }
   }): Promise<{
     front?: { preview: string; production: string }
     back?: { preview: string; production: string }
@@ -1305,12 +1332,14 @@ export class FabricManager {
     // 2. Temporarily switch to other view if it has artworks, export, then return
     const otherViewId = originalView === "front" ? "back" : "front"
     const otherArtworks = allArtworks[otherViewId] || []
+    const otherCfg = viewsConfig[otherViewId]
+    const originalCfg = viewsConfig[originalView]
 
-    if (otherArtworks.length > 0 && viewsConfig[otherViewId]) {
+    if (otherArtworks.length > 0 && otherCfg) {
       await this.switchView(
         otherViewId,
-        viewsConfig[otherViewId].image,
-        viewsConfig[otherViewId].printPosition
+        otherCfg.image,
+        otherCfg.printPosition
       )
 
       result[otherViewId] = {
@@ -1319,11 +1348,13 @@ export class FabricManager {
       }
 
       // Switch back to original view
-      await this.switchView(
-        originalView,
-        viewsConfig[originalView].image,
-        viewsConfig[originalView].printPosition
-      )
+      if (originalCfg) {
+        await this.switchView(
+          originalView,
+          originalCfg.image,
+          originalCfg.printPosition
+        )
+      }
     }
 
     return result

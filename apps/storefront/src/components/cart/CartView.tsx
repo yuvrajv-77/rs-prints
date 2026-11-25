@@ -11,7 +11,7 @@ import {
   type ActiveOrderLine,
 } from "@/stores/cart";
 import { $currentUser, fetchCurrentUser } from "@/stores/auth";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -49,10 +49,14 @@ import {
   UserPlus,
   User,
   Sparkles,
-  Eye,
   Download
 } from "lucide-react";
-import { getCustomizationForLine, type CustomizationMetadata } from "@/stores/customization";
+import {
+  $customizations,
+  parseOrderLineCustomization,
+  type CustomizationMetadata,
+} from "@/stores/customization";
+import { formatAssetUrl } from "@/lib/vendure/client";
 import {
   Dialog,
   DialogContent,
@@ -69,10 +73,66 @@ function formatRupees(amountInPaise: number | unknown): string {
   return `₹${rupees.toLocaleString("en-IN")}`;
 }
 
+/**
+ * Build a `/customize` studio URL pre-filled with the cart item's product,
+ * selected variant options, quantity, and any existing customization notes.
+ */
+function buildCartCustomizeUrl(
+  line: ActiveOrderLine,
+  customization: CustomizationMetadata | null
+): string {
+  const variant = line.productVariant;
+  const product = variant.product;
+  const slug = product?.slug || customization?.productSlug;
+  const basePath = slug ? `/customize/${slug}` : "/customize";
+
+  const sp = new URLSearchParams();
+  sp.set("product", customization?.productName || product?.name || variant.name);
+
+  if (customization?.colorId) {
+    sp.set("color", customization.colorId);
+  }
+  if (customization?.size) {
+    sp.set("size", customization.size);
+  }
+
+  for (const opt of variant.options || []) {
+    if (!opt.name) continue;
+    const groupKey = (opt.group?.name || opt.group?.code || "").toLowerCase().trim();
+    if (groupKey.includes("color") || groupKey === "colour") {
+      if (!sp.has("color")) sp.set("color", opt.name.toLowerCase());
+    } else if (groupKey.includes("size")) {
+      if (!sp.has("size")) sp.set("size", opt.name);
+    } else if (groupKey) {
+      const cleanKey = groupKey.replace(/\s+/g, "_");
+      if (!sp.has(cleanKey)) sp.set(cleanKey, opt.name);
+    }
+  }
+
+  if (customization?.customAttributes) {
+    for (const [k, v] of Object.entries(customization.customAttributes)) {
+      if (v && !sp.has(k)) sp.set(k, v);
+    }
+  }
+
+  if (line.quantity > 1) {
+    sp.set("quantity", String(line.quantity));
+  }
+
+  if (customization?.notes) {
+    sp.set("notes", customization.notes);
+  }
+
+  sp.set("orderLineId", line.id);
+
+  return `${basePath}?${sp.toString()}`;
+}
+
 export default function CartView() {
   const cartState = useStore($cart);
   const cartCount = useStore($cartCount);
   const { customer, initialized: authInitialized } = useStore($currentUser);
+  const customizationsMap = useStore($customizations);
 
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null);
   const [activeProofModal, setActiveProofModal] = useState<CustomizationMetadata | null>(null);
@@ -88,6 +148,33 @@ export default function CartView() {
       fetchCurrentUser();
     }
   }, [authInitialized]);
+
+  useEffect(() => {
+    const order = cartState.order;
+    const orderLines = order?.lines ?? [];
+    if (orderLines.length === 0) return;
+
+    const customizedItems = orderLines
+      .map((line) => {
+        const customization = parseOrderLineCustomization(line);
+        if (!customization) return null;
+        return {
+          orderCode: order?.code,
+          orderLineId: line.id,
+          quantity: line.quantity,
+          unitPriceWithTax: line.unitPriceWithTax,
+          linePriceWithTax: line.linePriceWithTax,
+          variant: line.productVariant,
+          customizeUrl: buildCartCustomizeUrl(line, customization),
+          customization,
+        };
+      })
+      .filter(Boolean);
+
+    if (customizedItems.length > 0) {
+      console.log("[RS Prints Cart] Customized Products Data:", customizedItems);
+    }
+  }, [cartState.order, customizationsMap]);
 
   const handleUpdateQty = async (lineId: string, currentQty: number, delta: number) => {
     const newQty = currentQty + delta;
@@ -274,14 +361,19 @@ export default function CartView() {
               const product = variant.product;
               const productUrl = product?.slug ? `/products/${product.slug}` : "/products";
               const isLineUpdating = updatingLineId === line.id;
-              const customization = getCustomizationForLine(line.productVariant.id);
-              const imageUrl =
-                customization?.front?.previewDataUrl ||
-                customization?.back?.previewDataUrl ||
+              const customization = parseOrderLineCustomization(line);
+              const customizeUrl = buildCartCustomizeUrl(line, customization);
+              const rawVendureAsset =
                 line.featuredAsset?.preview ||
                 variant.featuredAsset?.preview ||
                 product?.featuredAsset?.preview ||
-                "/placeholder-product.png";
+                "";
+              const imageUrl =
+                customization?.front?.previewDataUrl ||
+                customization?.front?.previewAssetUrl ||
+                customization?.back?.previewDataUrl ||
+                customization?.back?.previewAssetUrl ||
+                (rawVendureAsset ? formatAssetUrl(rawVendureAsset) : "");
 
               const options = variant.options || [];
 
@@ -298,12 +390,25 @@ export default function CartView() {
                     }`}
                     title={customization ? "Click to view customization proof" : `View ${product?.name || variant.name}`}
                   >
-                    <img
-                      src={imageUrl}
-                      alt={product?.name || variant.name}
-                      className="size-full object-cover object-center"
-                      loading="lazy"
-                    />
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={product?.name || variant.name}
+                        className="size-full object-cover object-center"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="size-full items-center justify-center text-muted-foreground"
+                      style={{ display: imageUrl ? "none" : "flex" }}
+                    >
+                      <Package className="size-6" />
+                    </div>
                     {customization && (
                       <span className="absolute bottom-1 right-1 bg-background/90 backdrop-blur-xs text-[9px] font-bold px-1 py-0.5 rounded border border-border/80 shadow-2xs">
                         Custom
@@ -362,21 +467,17 @@ export default function CartView() {
                         </div>
                       )}
 
-                      {/* Customization Details & Proof Action */}
-                      {customization && (
-                        <div className="mt-2.5 flex items-center gap-2 flex-wrap">
-                          <Badge className="bg-primary/10 text-primary border-primary/30 text-[10px] font-semibold gap-1">
-                            <Sparkles className="size-3" /> Custom Proof Available
-                          </Badge>
-                          <button
-                            type="button"
-                            onClick={() => setActiveProofModal(customization)}
-                            className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
-                          >
-                            <Eye className="size-3" /> View Design Proof
-                          </button>
-                        </div>
-                      )}
+                      {/* Customize Link Button */}
+                      <div className="mt-2.5 flex items-center">
+                        <a
+                          href={customizeUrl}
+                          className={`${buttonVariants({ variant: "link", size: "sm" })} h-auto p-0 text-xs font-semibold gap-1 text-yellow-700 hover:text-yellow-800`}
+                          title={customization ? "Edit custom design in studio" : "Customize this product in studio"}
+                        >
+                          <Sparkles className="size-3.5" />
+                          <span>Customize</span>
+                        </a>
+                      </div>
                     </div>
 
                     {/* Quantity Stepper & Price Row */}
@@ -563,8 +664,13 @@ export default function CartView() {
               <div className="space-y-4 py-2">
                 <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border/60 flex-wrap">
                   <div><strong className="text-foreground">Colour:</strong> {activeProofModal.colorName}</div>
-                  <div><strong className="text-foreground">Size:</strong> {activeProofModal.size}</div>
+                  {activeProofModal.size && (
+                    <div><strong className="text-foreground">Size:</strong> {activeProofModal.size}</div>
+                  )}
                   <div><strong className="text-foreground">Proof ID:</strong> {activeProofModal.id}</div>
+                  {activeProofModal.notes && (
+                    <div className="w-full"><strong className="text-foreground">Notes:</strong> {activeProofModal.notes}</div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -578,13 +684,15 @@ export default function CartView() {
                         alt="Front proof"
                         className="w-full aspect-square object-contain rounded-xl bg-white border"
                       />
-                      <a
-                        href={activeProofModal.front.productionDataUrl}
-                        download={`rs-prints-production-front-${activeProofModal.id}.png`}
-                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
-                      >
-                        <Download className="size-3" /> Download Print File
-                      </a>
+                      {activeProofModal.front.productionDataUrl && (
+                        <a
+                          href={activeProofModal.front.productionDataUrl}
+                          download={`rs-prints-production-front-${activeProofModal.id}.png`}
+                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
+                        >
+                          <Download className="size-3" /> Download Print File
+                        </a>
+                      )}
                     </div>
                   )}
 
@@ -598,13 +706,15 @@ export default function CartView() {
                         alt="Back proof"
                         className="w-full aspect-square object-contain rounded-xl bg-white border"
                       />
-                      <a
-                        href={activeProofModal.back.productionDataUrl}
-                        download={`rs-prints-production-back-${activeProofModal.id}.png`}
-                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
-                      >
-                        <Download className="size-3" /> Download Print File
-                      </a>
+                      {activeProofModal.back.productionDataUrl && (
+                        <a
+                          href={activeProofModal.back.productionDataUrl}
+                          download={`rs-prints-production-back-${activeProofModal.id}.png`}
+                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold mt-1"
+                        >
+                          <Download className="size-3" /> Download Print File
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>

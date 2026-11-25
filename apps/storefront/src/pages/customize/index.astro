@@ -7,10 +7,35 @@
  */
 import Layout from "@/layouts/main.astro"
 import ProductCustomizer from "@/components/customizer/ProductCustomizer"
+import type { Product } from "@/types/product"
+import { getProductBySlug } from "@/lib/vendure/queries/products"
+import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 
 // Cache edge response
 setEdgeCache(Astro.response, CACHE_PRESETS.STATIC_PAGE)
+
+const typeParam = Astro.url.searchParams.get("type")?.toLowerCase() || ""
+const slugParam = Astro.url.searchParams.get("slug") || ""
+const defaultSlug = slugParam
+  ? slugParam
+  : typeParam.includes("mug")
+  ? "rs-ceramic-mugs-a001"
+  : typeParam.includes("bottle")
+  ? "alu-bottle-bb5-bb6"
+  : typeParam.includes("bag") || typeParam.includes("tote")
+  ? "rs-custom-tote-bags-app-tote-blended-plush"
+  : "app-round-tshirt"
+
+let product: Product | undefined = undefined
+try {
+  const vendureProduct = await getProductBySlug(defaultSlug)
+  if (vendureProduct) {
+    product = mapVendureProductToStorefrontProduct(vendureProduct)
+  }
+} catch (err) {
+  console.error(`Error loading default product "${defaultSlug}" for /customize:`, err)
+}
 ---
 
 <Layout
@@ -21,6 +46,6 @@ setEdgeCache(Astro.response, CACHE_PRESETS.STATIC_PAGE)
   noScroll={true}
 >
   <div class="w-full h-full min-h-0 flex flex-col overflow-hidden">
-    <ProductCustomizer client:load />
+    <ProductCustomizer client:load product={product} />
   </div>
 </Layout>

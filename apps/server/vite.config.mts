@@ -1,7 +1,13 @@
 import { vendureDashboardPlugin } from '@vendure/dashboard/vite';
-import { join, resolve } from 'path';
+import { createRequire } from 'module';
+import { dirname, join, resolve } from 'path';
 import { pathToFileURL } from 'url';
 import { defineConfig } from 'vite';
+
+const require = createRequire(import.meta.url);
+const dashboardDir = dirname(require.resolve('@vendure/dashboard/vite'));
+const reactDir = dirname(require.resolve('react/package.json', { paths: [dashboardDir] }));
+const reactDomDir = dirname(require.resolve('react-dom/package.json', { paths: [dashboardDir] }));
 
 export default defineConfig({
     base: '/dashboard',
@@ -64,6 +70,8 @@ export default defineConfig({
             // This allows all plugins to reference a shared set of
             // GraphQL types.
             '@/gql': resolve(__dirname, './src/gql/graphql.ts'),
+            react: reactDir,
+            'react-dom': reactDomDir,
         },
     },
 });

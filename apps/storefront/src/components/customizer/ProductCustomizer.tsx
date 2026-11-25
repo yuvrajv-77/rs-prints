@@ -1,10 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
-import type { Product } from "@/types/product"
-import { addToCart } from "@/stores/cart"
+import type { Product, ProductVariant } from "@/types/product"
+import { addToCart, updateLineQuantity, fetchActiveOrder, $cart } from "@/stores/cart"
+import { getProductBySlug, getProducts } from "@/lib/vendure/queries/products"
+import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
+import { uploadCustomizationArtwork, type UploadedVendureAsset } from "@/lib/vendure/mutations/customization"
 import { toast, Toaster } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import { resolveCustomizerProfile, type CustomizerProductProfile } from "./config/product-registry"
-import { FabricManager, type ArtworkLayerInfo, type UploadedArtworkSummary } from "./core/fabric-manager"
+import {
+  FabricManager,
+  type ArtworkLayerInfo,
+  type SerializedArtwork,
+  type UploadedArtworkSummary
+} from "./core/fabric-manager"
 import { CustomizerLeftSidebar } from "./ui/CustomizerLeftSidebar"
 import { CustomizerRightSidebar } from "./ui/CustomizerRightSidebar"
 import { CustomizerViewport } from "./ui/CustomizerViewport"
@@ -15,9 +24,12 @@ import { MobilePlacementSheet } from "./ui/MobilePlacementSheet"
 import { MobileUploadSheet } from "./ui/MobileUploadSheet"
 import {
   saveCustomizationForCart,
+  linkCustomizationToOrderLine,
+  parseOrderLineCustomization,
   saveDesignDraft,
   loadDesignDraft,
-  clearDesignDraft
+  clearDesignDraft,
+  type ProductDesignDraft
 } from "@/stores/customization"
 import {
   Upload,
@@ -30,6 +42,7 @@ import {
   ChevronDown,
   SlidersHorizontal,
   ChevronRight,
+  FileText,
   X
 } from "lucide-react"
 
@@ -54,14 +67,129 @@ function normalizeSizeParam(param: string | null): string | null {
   return null
 }
 
+/**
+ * Resolves the best matching Vendure ProductVariant for the user's current
+ * customizer selections (color/finish, garment size, and custom attributes).
+ */
+function resolveMatchingVariant(
+  variants: ProductVariant[] | undefined,
+  selection: {
+    colorId: string
+    colorName: string
+    sizeId?: string
+    customAttributes?: Record<string, string>
+  }
+): ProductVariant | null {
+  if (!variants || variants.length === 0) return null
+  if (variants.length === 1) return variants[0]
+
+  const norm = (s: string) => s.toLowerCase().trim()
+  const colorIdNorm = norm(selection.colorId).replace(/-/g, " ")
+  const colorNameNorm = norm(selection.colorName)
+  const sizeNorm = selection.sizeId ? norm(selection.sizeId) : ""
+
+  let bestVariant: ProductVariant = variants[0]
+  let bestScore = -Infinity
+
+  for (const variant of variants) {
+    let score = 0
+    const opts = variant.options || []
+
+    // 1. Match garment size if requested
+    if (sizeNorm) {
+      const sizeOpt = opts.find((o) => {
+        const g = norm(o.group?.name || o.group?.code || "")
+        return g.includes("size")
+      })
+      if (sizeOpt) {
+        const optName = norm(sizeOpt.name)
+        const optCode = norm(sizeOpt.code || "")
+        if (optName === sizeNorm || optCode === sizeNorm) {
+          score += 100
+        } else {
+          score -= 1000
+        }
+      }
+    }
+
+    // 2. Match colour / finish / handle option
+    const colorOpt = opts.find((o) => {
+      const g = norm(o.group?.name || o.group?.code || "")
+      return (
+        g.includes("color") ||
+        g.includes("colour") ||
+        g.includes("finish") ||
+        g.includes("handle") ||
+        g.includes("style")
+      )
+    })
+    if (colorOpt) {
+      const optName = norm(colorOpt.name)
+      const optCode = norm(colorOpt.code || "").replace(/[_-]/g, " ")
+      if (
+        optName === colorNameNorm ||
+        optName === colorIdNorm ||
+        optCode === colorIdNorm ||
+        colorNameNorm.includes(optName) ||
+        optName.includes(colorIdNorm)
+      ) {
+        score += 50
+      } else {
+        score -= 50
+      }
+    } else if (colorIdNorm) {
+      // Fallback: match against any option or variant name
+      const vName = norm(variant.name)
+      if (vName.includes(colorIdNorm) || vName.includes(colorNameNorm)) {
+        score += 20
+      }
+    }
+
+    // 3. Match custom URL attributes (e.g. material=cotton) or prefer Cotton by default
+    const attrEntries = Object.entries(selection.customAttributes || {})
+    for (const [k, v] of attrEntries) {
+      const valNorm = norm(v)
+      const keyNorm = norm(k)
+      const matchedAttr = opts.some((o) => {
+        const g = norm(o.group?.name || o.group?.code || "")
+        const oVal = norm(o.name)
+        return (g.includes(keyNorm) || keyNorm.includes(g)) && oVal === valNorm
+      })
+      if (matchedAttr) score += 30
+    }
+
+    if (!selection.customAttributes?.material) {
+      const hasCotton = opts.some((o) => norm(o.name) === "cotton")
+      if (hasCotton) score += 5
+    }
+
+    // 4. Prefer in-stock variants
+    if (variant.stockLevel && variant.stockLevel !== "OUT_OF_STOCK") {
+      score += 10
+    }
+
+    if (score > bestScore) {
+      bestScore = score
+      bestVariant = variant
+    }
+  }
+
+  return bestVariant
+}
+
 export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const fabricManagerRef = useRef<FabricManager | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+  const [resolvedProduct, setResolvedProduct] = useState<Product | undefined>(product)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showGuides, setShowGuides] = useState<boolean>(true)
+
+  useEffect(() => {
+    setResolvedProduct(product)
+  }, [product])
 
   // Resolve product profile dynamically (T-shirt vs Mug vs Bottle vs Bag)
   const profile: CustomizerProductProfile = useMemo(() => {
@@ -69,10 +197,109 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     if (typeof window !== "undefined") {
       sp = new URLSearchParams(window.location.search)
     }
-    return resolveCustomizerProfile(product, sp)
-  }, [product])
+    return resolveCustomizerProfile(resolvedProduct || product, sp)
+  }, [resolvedProduct, product])
 
   const activeConfig = profile.config
+
+  // Product-specific draft keys so customizations are isolated per product & restored on return
+  const draftPrimaryKey = useMemo(
+    () =>
+      resolvedProduct?.slug ||
+      product?.slug ||
+      resolvedProduct?.id ||
+      product?.id ||
+      activeConfig.productId,
+    [resolvedProduct?.slug, product?.slug, resolvedProduct?.id, product?.id, activeConfig.productId]
+  )
+
+  const draftSecondaryKeys = useMemo(
+    () =>
+      [resolvedProduct?.id, product?.id, activeConfig.productId].filter(
+        (k): k is string => Boolean(k && k !== draftPrimaryKey)
+      ),
+    [resolvedProduct?.id, product?.id, activeConfig.productId, draftPrimaryKey]
+  )
+
+  const editingOrderLineId = useMemo(() => {
+    if (typeof window === "undefined") return null
+    return new URLSearchParams(window.location.search).get("orderLineId")
+  }, [])
+
+  // When arriving from a Product Detail page (?fresh=1 and no orderLineId), start a fresh customization
+  // instead of loading a previous cart item's saved customization.
+  const isFreshStartRef = useRef<boolean>(false)
+  const freshClearedRef = useRef<boolean>(false)
+  if (!freshClearedRef.current && typeof window !== "undefined") {
+    freshClearedRef.current = true
+    const sp = new URLSearchParams(window.location.search)
+    if (sp.get("fresh") === "1" && !sp.get("orderLineId")) {
+      isFreshStartRef.current = true
+      clearDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    }
+  }
+
+  const isRestoringRef = useRef<boolean>(true)
+
+  // Ensure Vendure product with variants is loaded (important for /customize landing or mock fallbacks)
+  const ensureVendureProduct = useCallback(async (): Promise<Product | undefined> => {
+    const existing = resolvedProduct || product
+    if (existing?.variants && existing.variants.length > 0) {
+      return existing
+    }
+
+    const fallbackSlug =
+      existing?.slug ||
+      (profile.productType === "mug"
+        ? "rs-ceramic-mugs-a001"
+        : profile.productType === "bottle"
+        ? "alu-bottle-bb5-bb6"
+        : profile.productType === "bag"
+        ? "rs-custom-tote-bags-app-tote-blended-plush"
+        : "app-round-tshirt")
+
+    try {
+      const vp = await getProductBySlug(fallbackSlug)
+      if (vp && vp.variants && vp.variants.length > 0) {
+        const mapped = mapVendureProductToStorefrontProduct(vp)
+        setResolvedProduct(mapped)
+        return mapped
+      }
+
+      const items = await getProducts()
+      const keyword =
+        profile.productType === "mug"
+          ? "mug"
+          : profile.productType === "bottle"
+          ? "bottle"
+          : profile.productType === "bag"
+          ? "bag"
+          : "tshirt"
+      const match =
+        items.find((it) => it.slug === fallbackSlug) ||
+        items.find((it) => it.slug.toLowerCase().includes(keyword) || it.name.toLowerCase().includes(keyword)) ||
+        items[0]
+
+      if (match?.slug) {
+        const fullVp = await getProductBySlug(match.slug)
+        if (fullVp) {
+          const mapped = mapVendureProductToStorefrontProduct(fullVp)
+          setResolvedProduct(mapped)
+          return mapped
+        }
+      }
+    } catch (err) {
+      console.warn("Could not fetch fallback Vendure product for customizer:", err)
+    }
+
+    return existing
+  }, [resolvedProduct, product, profile.productType])
+
+  useEffect(() => {
+    if (!resolvedProduct?.variants?.length) {
+      void ensureVendureProduct()
+    }
+  }, [resolvedProduct?.variants?.length, ensureVendureProduct])
 
   // Helper to normalize color parameter from URL against active configuration
   const normalizeColorParam = useCallback((param: string | null): string | null => {
@@ -102,33 +329,62 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     const attrs: Record<string, string> = {}
     for (const [key, val] of sp.entries()) {
       const lower = key.toLowerCase()
-      if (!["product", "color", "size", "quantity", "type", "category"].includes(lower) && val) {
+      if (
+        ![
+          "product",
+          "color",
+          "size",
+          "quantity",
+          "type",
+          "category",
+          "notes",
+          "instructions",
+          "description",
+          "orderlineid",
+          "fresh"
+        ].includes(lower) &&
+        val
+      ) {
         attrs[lower] = val
       }
     }
     return attrs
   })
 
-  // Unit price from product prop or default 299
+  // Unit price from resolved product prop or default 299
   const unitPrice = useMemo(() => {
-    if (product?.startingPriceNumber) return Math.round(product.startingPriceNumber)
+    const target = resolvedProduct || product
+    if (target?.startingPriceNumber) return Math.round(target.startingPriceNumber)
     return 299
-  }, [product?.startingPriceNumber])
+  }, [resolvedProduct, product])
 
-  // Determine initial color: URL parameter -> saved draft -> default
+  // Determine initial color: saved product customization (if artworks/notes exist) -> URL parameter -> default
   const [selectedColorId, setSelectedColorId] = useState<string>(() => {
+    const draft = loadDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    const hasSavedWork =
+      Boolean(draft) &&
+      ((draft?.viewArtworks?.front?.length || 0) > 0 ||
+        (draft?.viewArtworks?.back?.length || 0) > 0 ||
+        Boolean(draft?.notes))
+    if (hasSavedWork && draft?.colorId && activeConfig.colors[draft.colorId]) {
+      return draft.colorId
+    }
     if (profile.hasDynamicColors && typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search)
       const c = normalizeColorParam(sp.get("color"))
       if (c && activeConfig.colors[c]) return c
     }
-    const draft = loadDesignDraft(activeConfig.productId)
     if (draft?.colorId && activeConfig.colors[draft.colorId]) return draft.colorId
     return activeConfig.defaultColorId
   })
 
   // Size & Multi-quantity selection state (for apparel)
   const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>(() => {
+    const draft = loadDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    if (draft?.sizeQuantities && Object.values(draft.sizeQuantities).some((q) => q > 0)) {
+      return draft.sizeQuantities
+    }
+
     const defaultSizes: Record<string, number> = {
       S: 0,
       M: 0,
@@ -165,6 +421,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   // Direct quantity state (for mugs, drinkware, and bags)
   const [directQuantity, setDirectQuantity] = useState<number>(() => {
+    const draft = loadDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    if (draft?.directQuantity && draft.directQuantity >= 1) {
+      return Math.min(500, draft.directQuantity)
+    }
     if (typeof window !== "undefined") {
       const sp = new URLSearchParams(window.location.search)
       const rawQty = parseInt(sp.get("quantity") || "", 10)
@@ -186,6 +446,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       if (typeof window === "undefined") return
       const activeTitle = title || productTitle
       const url = new URL(window.location.href)
+      url.searchParams.delete("fresh")
       url.searchParams.set("product", activeTitle)
       if (profile.hasDynamicColors) {
         url.searchParams.set("color", colorId)
@@ -271,19 +532,92 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   const [isMobilePlacementSheetOpen, setIsMobilePlacementSheetOpen] = useState<boolean>(false)
   const [isMobileUploadSheetOpen, setIsMobileUploadSheetOpen] = useState<boolean>(false)
 
+  // Customer description / special printing instructions
+  const [customerNotes, setCustomerNotes] = useState<string>(() => {
+    const draft = loadDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    if (draft?.notes) return draft.notes
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search)
+      const paramNote = sp.get("notes") || sp.get("instructions") || sp.get("description")
+      if (paramNote) return paramNote
+    }
+    return ""
+  })
+
   // Initial URL synchronization on mount
   useEffect(() => {
     syncUrlParams(selectedColorId, productTitle, sizeQuantities, directQuantity)
   }, [selectedColorId, productTitle, syncUrlParams, sizeQuantities, directQuantity])
 
-  // Initialize Fabric Canvas and restore drafts if available
+  // Auto-save helper keyed by specific product
+  const saveCurrentDraft = useCallback(
+    (overrides?: Partial<ProductDesignDraft>) => {
+      if (!fabricManagerRef.current) return
+      const allArtworks = fabricManagerRef.current.getAllViewArtworks()
+      const hasArtworks =
+        (allArtworks.front?.length || 0) > 0 || (allArtworks.back?.length || 0) > 0
+      const activeNotes = overrides?.notes !== undefined ? overrides.notes : customerNotes
+      // Avoid overwriting an existing saved draft with an empty canvas during initial mount
+      if (isRestoringRef.current && !hasArtworks && !activeNotes) return
+
+      saveDesignDraft(
+        draftPrimaryKey,
+        {
+          productId: resolvedProduct?.id || product?.id || activeConfig.productId,
+          productSlug: resolvedProduct?.slug || product?.slug,
+          productName: productTitle || resolvedProduct?.title || product?.title || activeConfig.name,
+          productType: profile.productType,
+          colorId: overrides?.colorId ?? selectedColorId,
+          selectedViewId: overrides?.selectedViewId ?? selectedViewId,
+          selectedPositionId: overrides?.selectedPositionId ?? selectedPositionId,
+          viewArtworks: overrides?.viewArtworks ?? allArtworks,
+          sizeQuantities: profile.hasGarmentSizes ? overrides?.sizeQuantities ?? sizeQuantities : undefined,
+          directQuantity: !profile.hasGarmentSizes ? overrides?.directQuantity ?? directQuantity : undefined,
+          notes: activeNotes,
+          customAttributes: Object.keys(customAttributes).length > 0 ? customAttributes : undefined,
+        },
+        draftSecondaryKeys
+      )
+    },
+    [
+      draftPrimaryKey,
+      draftSecondaryKeys,
+      resolvedProduct,
+      product,
+      productTitle,
+      profile.productType,
+      profile.hasGarmentSizes,
+      activeConfig.productId,
+      activeConfig.name,
+      selectedColorId,
+      selectedViewId,
+      selectedPositionId,
+      sizeQuantities,
+      directQuantity,
+      customerNotes,
+      customAttributes
+    ]
+  )
+
+  const saveCurrentDraftRef = useRef(saveCurrentDraft)
+  useEffect(() => {
+    saveCurrentDraftRef.current = saveCurrentDraft
+  }, [saveCurrentDraft])
+
+  // Initialize Fabric Canvas and restore drafts (from local draft or Vendure ActiveOrder)
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return
 
+    let cancelled = false
+    isRestoringRef.current = true
     setIsLoading(true)
 
-    // Check for existing saved draft or URL parameter override
-    const draft = loadDesignDraft(activeConfig.productId)
+    const draft = loadDesignDraft(draftPrimaryKey, draftSecondaryKeys)
+    const hasSavedDraftWork =
+      Boolean(draft) &&
+      ((draft?.viewArtworks?.front?.length || 0) > 0 ||
+        (draft?.viewArtworks?.back?.length || 0) > 0 ||
+        Boolean(draft?.notes))
 
     let urlColorId: string | null = null
     if (profile.hasDynamicColors && typeof window !== "undefined") {
@@ -292,14 +626,18 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     }
 
     const initialColorId =
-      urlColorId && activeConfig.colors[urlColorId]
+      hasSavedDraftWork && draft?.colorId && activeConfig.colors[draft.colorId]
+        ? draft.colorId
+        : urlColorId && activeConfig.colors[urlColorId]
         ? urlColorId
         : draft?.colorId && activeConfig.colors[draft.colorId]
         ? draft.colorId
         : activeConfig.defaultColorId
 
-    // Always default to front view when customizer loads
-    const initialViewId: "front" | "back" = activeConfig.defaultViewId || "front"
+    const initialViewId: "front" | "back" =
+      draft?.selectedViewId && activeConfig.colors[initialColorId]?.views?.[draft.selectedViewId]
+        ? draft.selectedViewId
+        : activeConfig.defaultViewId || "front"
     const initialColor =
       activeConfig.colors[initialColorId] ||
       activeConfig.colors[activeConfig.defaultColorId] ||
@@ -309,6 +647,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       initialColor.views.front ||
       Object.values(initialColor.views)[0]
     const initialPosition =
+      (draft?.selectedPositionId && initialView.positions[draft.selectedPositionId]) ||
       initialView.positions[initialView.defaultPositionId] ||
       Object.values(initialView.positions)[0]
 
@@ -329,6 +668,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       },
       onLayersChange: (layers) => {
         setArtworkLayers(layers)
+        if (!isRestoringRef.current) {
+          saveCurrentDraftRef.current()
+        }
       },
       onAllArtworksChange: (artworks) => {
         setAllUploadedArtworks(artworks)
@@ -347,36 +689,151 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
     fabricManagerRef.current = manager
 
-    // If draft had artwork objects, restore them
-    if (draft?.viewArtworks) {
-      manager.loadFromSerializedState(draft.viewArtworks).then(() => {
-        toast.add({
-          title: "Draft Restored",
-          description: `Resumed your previous customized ${profile.productType} design session.`,
-          type: "info"
-        })
-      })
+    const applyRestoredArtworks = async (
+      artworks: Record<"front" | "back", SerializedArtwork[]>,
+      restoredColorId?: string,
+      restoredViewId?: "front" | "back",
+      restoredPosId?: string,
+      restoredNotes?: string,
+      restoredSizes?: Record<string, number>,
+      restoredDirectQty?: number
+    ) => {
+      if (cancelled) return
+
+      if (restoredColorId && activeConfig.colors[restoredColorId] && restoredColorId !== initialColorId) {
+        setSelectedColorId(restoredColorId)
+        const targetColor = activeConfig.colors[restoredColorId]
+        const targetView = targetColor.views[restoredViewId || initialViewId] || targetColor.views.front
+        if (profile.productType === "tshirt" && targetView) {
+          await manager.switchColor(targetView.image)
+        }
+      }
+
+      if (restoredViewId && restoredViewId !== initialViewId) {
+        const targetColor = activeConfig.colors[restoredColorId || initialColorId] || initialColor
+        const targetView = targetColor.views[restoredViewId]
+        if (targetView) {
+          const pos =
+            (restoredPosId && targetView.positions[restoredPosId]) ||
+            targetView.positions[targetView.defaultPositionId] ||
+            Object.values(targetView.positions)[0]
+          setSelectedViewId(restoredViewId)
+          setSelectedPositionId(pos.id)
+          await manager.switchView(restoredViewId, targetView.image, pos)
+        }
+      } else if (restoredPosId && initialView.positions[restoredPosId] && restoredPosId !== initialPosition.id) {
+        setSelectedPositionId(restoredPosId)
+        manager.setupPrintableArea(initialView.positions[restoredPosId], false)
+      }
+
+      if (restoredNotes !== undefined) setCustomerNotes(restoredNotes)
+      if (restoredSizes && Object.values(restoredSizes).some((q) => q > 0)) {
+        setSizeQuantities(restoredSizes)
+      }
+      if (restoredDirectQty && restoredDirectQty >= 1) {
+        setDirectQuantity(restoredDirectQty)
+      }
+
+      await manager.loadFromSerializedState(artworks)
+      isRestoringRef.current = false
     }
 
-    setIsLoading(false)
+    const restoreSession = async () => {
+      try {
+        // Skip restoring previous cart customizations when starting fresh from a product detail page
+        if (isFreshStartRef.current && !editingOrderLineId) {
+          return
+        }
+
+        // 1. Check local saved draft for this product
+        if (
+          draft?.viewArtworks &&
+          ((draft.viewArtworks.front?.length || 0) > 0 || (draft.viewArtworks.back?.length || 0) > 0)
+        ) {
+          await applyRestoredArtworks(draft.viewArtworks)
+          if (!cancelled) {
+            toast.add({
+              title: "Customization Restored",
+              description: `Loaded your saved ${profile.productType} design.`,
+              type: "info"
+            })
+          }
+          return
+        }
+
+        // 2. Otherwise hydrate from Vendure activeOrder customFields (persists across browsers/devices)
+        const order = $cart.get().order || (await fetchActiveOrder())
+        const lines = order?.lines || []
+        const matchingLine =
+          (editingOrderLineId && lines.find((l) => l.id === editingOrderLineId)) ||
+          lines.find((l) => {
+            const p = l.productVariant?.product
+            const slugMatch = resolvedProduct?.slug && p?.slug === resolvedProduct.slug
+            const idMatch = resolvedProduct?.id && p?.id === resolvedProduct.id
+            return Boolean((slugMatch || idMatch) && l.customFields?.customizationData)
+          })
+
+        if (matchingLine) {
+          const parsed = parseOrderLineCustomization(matchingLine)
+          if (parsed && (parsed.front?.artworks?.length || parsed.back?.artworks?.length)) {
+            await applyRestoredArtworks(
+              {
+                front: parsed.front?.artworks || [],
+                back: parsed.back?.artworks || [],
+              },
+              parsed.colorId,
+              parsed.selectedViewId,
+              parsed.selectedPositionId || parsed.front?.positionId || parsed.back?.positionId,
+              parsed.notes,
+              parsed.sizeQuantities,
+              parsed.directQuantity ?? matchingLine.quantity
+            )
+            if (!cancelled) {
+              saveCurrentDraftRef.current()
+              toast.add({
+                title: "Customization Loaded from Cart",
+                description: `Restored your saved ${profile.productType} design from Vendure.`,
+                type: "info"
+              })
+            }
+            return
+          }
+        }
+      } finally {
+        isRestoringRef.current = false
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void restoreSession()
 
     return () => {
+      cancelled = true
       manager.destroy()
       fabricManagerRef.current = null
     }
-  }, [activeConfig.productId])
+  }, [activeConfig.productId, draftPrimaryKey])
 
-  // Auto-save draft whenever layers or view change
+  // Auto-save draft whenever layers, view or notes change
   const triggerAutoSave = useCallback(() => {
-    if (!fabricManagerRef.current) return
-    const allArtworks = fabricManagerRef.current.getAllViewArtworks()
-    saveDesignDraft(activeConfig.productId, {
-      colorId: selectedColorId,
-      selectedViewId,
-      selectedPositionId,
-      viewArtworks: allArtworks
-    })
-  }, [selectedColorId, selectedViewId, selectedPositionId])
+    saveCurrentDraft()
+  }, [saveCurrentDraft])
+
+  // Auto-save whenever notes, quantities, color, view, or position change
+  useEffect(() => {
+    if (!fabricManagerRef.current || isRestoringRef.current) return
+    saveCurrentDraft()
+  }, [
+    customerNotes,
+    sizeQuantities,
+    directQuantity,
+    selectedColorId,
+    selectedViewId,
+    selectedPositionId,
+    saveCurrentDraft
+  ])
 
   // Garment / Product Color change
   const handleSelectColor = useCallback(async (colorId: string) => {
@@ -653,13 +1110,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     fabricManagerRef.current?.resetZoom()
     setZoomLevel(1.0)
     setAllUploadedArtworks([])
-    clearDesignDraft(activeConfig.productId)
+    clearDesignDraft(draftPrimaryKey, draftSecondaryKeys)
     toast.add({
       title: "Design Cleared",
       description: "Reset canvas and cleared design draft.",
       type: "info"
     })
-  }, [activeConfig.productId])
+  }, [draftPrimaryKey, draftSecondaryKeys])
 
   // Export Mockup Preview
   const handleDownloadMockup = useCallback(() => {
@@ -740,48 +1197,274 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     }
 
     setIsAddingToCart(true)
+    let isRedirecting = false
 
     try {
+      const activeProduct = await ensureVendureProduct()
+      const variants = activeProduct?.variants || []
+      if (variants.length === 0) {
+        toast.add({
+          title: "Product Unavailable",
+          description: "Could not resolve a purchasable variant for this product. Please try opening Customize from the product page.",
+          type: "error"
+        })
+        return
+      }
+
+      const frontPosId =
+        selectedViewId === "front"
+          ? selectedPositionId
+          : currentColor.views.front?.defaultPositionId
+      const backPosId =
+        selectedViewId === "back"
+          ? selectedPositionId
+          : currentColor.views.back?.defaultPositionId
+
+      const frontPos =
+        currentColor.views.front &&
+        (currentColor.views.front.positions[frontPosId] ||
+          Object.values(currentColor.views.front.positions)[0])
+      const backPos =
+        currentColor.views.back &&
+        (currentColor.views.back.positions[backPosId] ||
+          Object.values(currentColor.views.back.positions)[0])
+
       const exportPkg = await fabricManagerRef.current.exportAllViewsPackage({
-        front: currentColor.views.front ? {
-          image: currentColor.views.front.image,
-          printPosition: currentColor.views.front.positions[currentColor.views.front.defaultPositionId] || Object.values(currentColor.views.front.positions)[0]
-        } : undefined,
-        back: currentColor.views.back ? {
-          image: currentColor.views.back.image,
-          printPosition: currentColor.views.back.positions[currentColor.views.back.defaultPositionId] || Object.values(currentColor.views.back.positions)[0]
-        } : undefined
+        front: currentColor.views.front && frontPos
+          ? { image: currentColor.views.front.image, printPosition: frontPos }
+          : undefined,
+        back: currentColor.views.back && backPos
+          ? { image: currentColor.views.back.image, printPosition: backPos }
+          : undefined
       })
 
       const allArtworks = fabricManagerRef.current.getAllViewArtworks()
-      const baseVariantId = product?.variants?.[0]?.id || `mock-variant-${selectedColorId}-${profile.productType}`
+      const uploadedSummaries = fabricManagerRef.current.getAllUploadedArtworks()
+      const resolvedName = productTitle || activeProduct?.title || activeConfig.name
+      const resolvedSlug = activeProduct?.slug
+      const currentCustomizeUrl =
+        typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}`
+          : resolvedSlug
+          ? `/customize/${resolvedSlug}`
+          : "/customize"
+
+      // Upload raw artwork images, preview mockups, and production PNGs to Vendure Asset storage
+      const uploadCache = new Map<string, UploadedVendureAsset | null>()
+      const uploadOnce = async (
+        dataUrl: string | undefined,
+        fileName: string,
+        tags: string[]
+      ): Promise<UploadedVendureAsset | null> => {
+        if (!dataUrl || !dataUrl.startsWith("data:")) return null
+        if (uploadCache.has(dataUrl)) return uploadCache.get(dataUrl) ?? null
+        const res = await uploadCustomizationArtwork(dataUrl, fileName, tags)
+        uploadCache.set(dataUrl, res)
+        return res
+      }
+
+      const enrichArtworksWithVendureAssets = async (
+        list: SerializedArtwork[],
+        viewLabel: "front" | "back"
+      ): Promise<SerializedArtwork[]> => {
+        const enriched: SerializedArtwork[] = []
+        for (const art of list) {
+          if (art.assetUrl && art.assetId) {
+            enriched.push(art)
+            continue
+          }
+          const uploaded = await uploadOnce(
+            art.dataUrl,
+            `${resolvedSlug || activeConfig.productId}-${viewLabel}-${art.name}`,
+            ["custom-artwork", viewLabel]
+          )
+          enriched.push({
+            ...art,
+            assetId: uploaded?.id || art.assetId,
+            assetUrl: uploaded?.source || art.assetUrl
+          })
+        }
+        return enriched
+      }
+
+      const enrichedFrontArtworks = await enrichArtworksWithVendureAssets(allArtworks.front || [], "front")
+      const enrichedBackArtworks = await enrichArtworksWithVendureAssets(allArtworks.back || [], "back")
+
+      const frontPreviewAsset = exportPkg.front
+        ? await uploadOnce(
+            exportPkg.front.preview,
+            `${resolvedSlug || activeConfig.productId}-front-preview.png`,
+            ["custom-preview", "front"]
+          )
+        : null
+      const frontProdAsset = exportPkg.front
+        ? await uploadOnce(
+            exportPkg.front.production,
+            `${resolvedSlug || activeConfig.productId}-front-print.png`,
+            ["custom-production", "front"]
+          )
+        : null
+
+      const backPreviewAsset = exportPkg.back
+        ? await uploadOnce(
+            exportPkg.back.preview,
+            `${resolvedSlug || activeConfig.productId}-back-preview.png`,
+            ["custom-preview", "back"]
+          )
+        : null
+      const backProdAsset = exportPkg.back
+        ? await uploadOnce(
+            exportPkg.back.production,
+            `${resolvedSlug || activeConfig.productId}-back-print.png`,
+            ["custom-production", "back"]
+          )
+        : null
+
+      const frontViewData = exportPkg.front && frontPos
+        ? {
+            positionId: frontPos.id,
+            positionName: frontPos.name,
+            physicalSizeLabel: frontPos.physicalSizeLabel,
+            previewDataUrl: exportPkg.front.preview,
+            productionDataUrl: exportPkg.front.production,
+            previewAssetId: frontPreviewAsset?.id,
+            previewAssetUrl: frontPreviewAsset?.preview || frontPreviewAsset?.source,
+            productionAssetId: frontProdAsset?.id,
+            productionAssetUrl: frontProdAsset?.source,
+            artworks: enrichedFrontArtworks
+          }
+        : undefined
+
+      const backViewData = exportPkg.back && backPos
+        ? {
+            positionId: backPos.id,
+            positionName: backPos.name,
+            physicalSizeLabel: backPos.physicalSizeLabel,
+            previewDataUrl: exportPkg.back.preview,
+            productionDataUrl: exportPkg.back.production,
+            previewAssetId: backPreviewAsset?.id,
+            previewAssetUrl: backPreviewAsset?.preview || backPreviewAsset?.source,
+            productionAssetId: backProdAsset?.id,
+            productionAssetUrl: backProdAsset?.source,
+            artworks: enrichedBackArtworks
+          }
+        : undefined
+
+      // Persist full product draft (with Vendure asset URLs) so clicking Customize again restores everything
+      saveCurrentDraft({
+        viewArtworks: {
+          front: enrichedFrontArtworks,
+          back: enrichedBackArtworks
+        }
+      })
+
+      // Compact payload stored on Vendure OrderLine.customFields.customizationData
+      const buildOrderLineCustomFields = (
+        customizationId: string,
+        meta: {
+          variantId: string
+          sku?: string
+          size?: string
+          quantity: number
+          unitPrice: number
+        }
+      ) => {
+        const serializeViewForVendure = (view: typeof frontViewData) => {
+          if (!view) return undefined
+          return {
+            positionId: view.positionId,
+            positionName: view.positionName,
+            physicalSizeLabel: view.physicalSizeLabel,
+            previewAssetId: view.previewAssetId,
+            previewAssetUrl: view.previewAssetUrl,
+            productionAssetId: view.productionAssetId,
+            productionAssetUrl: view.productionAssetUrl,
+            // Only keep inline preview if Vendure Asset upload was unavailable
+            previewDataUrl: view.previewAssetUrl ? "" : view.previewDataUrl,
+            productionDataUrl: "",
+            artworks: view.artworks.map((a) => ({
+              ...a,
+              dataUrl: a.assetUrl ? "" : a.dataUrl
+            }))
+          }
+        }
+
+        const payload = {
+          id: customizationId,
+          productId: activeProduct?.id || activeConfig.productId,
+          productSlug: resolvedSlug,
+          productName: resolvedName,
+          productType: profile.productType,
+          variantId: meta.variantId,
+          sku: meta.sku,
+          colorId: selectedColorId,
+          colorName: currentColor.name,
+          size: meta.size,
+          quantity: meta.quantity,
+          sizeQuantities: profile.hasGarmentSizes ? sizeQuantities : undefined,
+          directQuantity: !profile.hasGarmentSizes ? directQuantity : undefined,
+          unitPrice: meta.unitPrice,
+          customAttributes: Object.keys(customAttributes).length > 0 ? customAttributes : undefined,
+          customizeUrl: currentCustomizeUrl,
+          selectedViewId,
+          selectedPositionId,
+          notes: customerNotes.trim() || undefined,
+          front: serializeViewForVendure(frontViewData),
+          back: serializeViewForVendure(backViewData),
+          timestamp: Date.now()
+        }
+
+        return {
+          customizationId,
+          customizationData: JSON.stringify(payload)
+        }
+      }
+
+      const productDetailUrl = resolvedSlug ? `/products/${resolvedSlug}` : "/products"
 
       if (profile.hasGarmentSizes) {
         const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
+        const addedItemsLog: Array<Record<string, any>> = []
+        let allSucceeded = true
+
         for (const [sizeId, qty] of selectedSizesList) {
-          const sizeVariantId = `${baseVariantId}-${sizeId}`
+          const matchedVariant = resolveMatchingVariant(variants, {
+            colorId: selectedColorId,
+            colorName: currentColor.name,
+            sizeId,
+            customAttributes
+          })
+
+          if (!matchedVariant?.id) {
+            allSucceeded = false
+            continue
+          }
+
+          const itemUnitPrice = Math.round(
+            matchedVariant.priceWithTax ?? matchedVariant.price ?? unitPrice
+          )
 
           const customizationId = saveCustomizationForCart({
-            productId: product?.id || activeConfig.productId,
-            productName: productTitle || product?.title || activeConfig.name,
-            variantId: sizeVariantId,
+            orderLineId: editingOrderLineId || undefined,
+            productId: activeProduct?.id || activeConfig.productId,
+            productSlug: resolvedSlug,
+            productName: resolvedName,
+            productType: profile.productType,
+            variantId: matchedVariant.id,
+            sku: matchedVariant.sku,
             colorId: selectedColorId,
             colorName: currentColor.name,
             size: sizeId,
-            front: exportPkg.front ? {
-              positionId: currentColor.views.front.defaultPositionId,
-              positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Front",
-              previewDataUrl: exportPkg.front.preview,
-              productionDataUrl: exportPkg.front.production,
-              artworks: allArtworks.front || []
-            } : undefined,
-            back: exportPkg.back ? {
-              positionId: currentColor.views.back.defaultPositionId,
-              positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Back",
-              previewDataUrl: exportPkg.back.preview,
-              productionDataUrl: exportPkg.back.production,
-              artworks: allArtworks.back || []
-            } : undefined
+            quantity: qty,
+            sizeQuantities,
+            unitPrice: itemUnitPrice,
+            customAttributes: Object.keys(customAttributes).length > 0 ? customAttributes : undefined,
+            customizeUrl: currentCustomizeUrl,
+            selectedViewId,
+            selectedPositionId,
+            notes: customerNotes.trim() || undefined,
+            front: frontViewData,
+            back: backViewData
           })
 
           const detailsList = [
@@ -790,70 +1473,268 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             ),
             `Colour: ${currentColor.name}`,
             `Size: ${sizeId}`,
+            customerNotes.trim() ? `Instructions: ${customerNotes.trim()}` : null,
             `Qty: ${qty}`,
             exportPkg.front ? `Front: Customized` : null,
             exportPkg.back ? `Back: Customized` : null,
             `ID: ${customizationId}`
           ].filter(Boolean).join(" | ")
 
-          await addToCart(sizeVariantId, qty, {
-            productName: productTitle || product?.title || activeConfig.name,
-            variantDetails: detailsList
+          const customFields = buildOrderLineCustomFields(customizationId, {
+            variantId: matchedVariant.id,
+            sku: matchedVariant.sku,
+            size: sizeId,
+            quantity: qty,
+            unitPrice: itemUnitPrice
+          })
+
+          const existingMatchingLine = editingOrderLineId
+            ? $cart
+                .get()
+                .order?.lines?.find(
+                  (l) => l.id === editingOrderLineId && l.productVariant.id === matchedVariant.id
+                )
+            : undefined
+
+          let ok = false
+          let resolvedOrderLineId: string | undefined = existingMatchingLine?.id
+
+          if (existingMatchingLine) {
+            ok = await updateLineQuantity(existingMatchingLine.id, qty, customFields)
+          } else {
+            const addResult = await addToCart(matchedVariant.id, qty, {
+              productName: resolvedName,
+              variantDetails: detailsList,
+              suppressToast: true,
+              customFields
+            })
+            ok = addResult.success
+            const matchingOrderLine = addResult.order?.lines?.find(
+              (l) =>
+                l.customFields?.customizationId === customizationId ||
+                l.productVariant.id === matchedVariant.id
+            )
+            resolvedOrderLineId = matchingOrderLine?.id
+          }
+
+          if (resolvedOrderLineId) {
+            linkCustomizationToOrderLine(customizationId, resolvedOrderLineId)
+          }
+
+          if (!ok) {
+            allSucceeded = false
+          }
+
+          addedItemsLog.push({
+            customizationId,
+            orderLineId: resolvedOrderLineId,
+            addedToCart: ok,
+            size: sizeId,
+            quantity: qty,
+            unitPrice: itemUnitPrice,
+            subtotal: itemUnitPrice * qty,
+            variant: {
+              id: matchedVariant.id,
+              sku: matchedVariant.sku,
+              name: matchedVariant.name,
+              options: matchedVariant.options
+            }
           })
         }
 
-        const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
-        toast.add({
-          title: "Added to Cart!",
-          description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
-          type: "success"
+        console.log("[RS Prints Customizer] Customized Product Data:", {
+          timestamp: new Date().toISOString(),
+          product: {
+            id: activeProduct?.id || activeConfig.productId,
+            slug: resolvedSlug,
+            name: resolvedName,
+            type: profile.productType,
+            category: activeProduct?.category
+          },
+          selection: {
+            colorId: selectedColorId,
+            colorName: currentColor.name,
+            attributeName: profile.attributeName,
+            sizeQuantities,
+            totalQuantity,
+            customAttributes
+          },
+          notes: customerNotes.trim() || null,
+          views: {
+            front: frontViewData,
+            back: backViewData
+          },
+          uploadedArtworks: uploadedSummaries,
+          customizeUrl: currentCustomizeUrl,
+          items: addedItemsLog
         })
+
+        if (allSucceeded && addedItemsLog.length > 0) {
+          isRedirecting = true
+          const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
+          toast.add({
+            title: "Added to Cart!",
+            description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
+            type: "success"
+          })
+          setTimeout(() => {
+            window.location.href = productDetailUrl
+          }, 450)
+        } else {
+          toast.add({
+            title: "Could not add all items to cart",
+            description: "One or more selected variants could not be added. Please check availability and try again.",
+            type: "error"
+          })
+        }
       } else {
         // Direct quantity for Mugs, Bottles, Bags
-        const itemVariantId = `${baseVariantId}-qty-${directQuantity}`
-
-        const customizationId = saveCustomizationForCart({
-          productId: product?.id || activeConfig.productId,
-          productName: productTitle || product?.title || activeConfig.name,
-          variantId: itemVariantId,
+        const matchedVariant = resolveMatchingVariant(variants, {
           colorId: selectedColorId,
           colorName: currentColor.name,
-          front: exportPkg.front ? {
-            positionId: currentColor.views.front.defaultPositionId,
-            positionName: currentColor.views.front.positions[currentColor.views.front.defaultPositionId]?.name || "Front",
-            previewDataUrl: exportPkg.front.preview,
-            productionDataUrl: exportPkg.front.production,
-            artworks: allArtworks.front || []
-          } : undefined,
-          back: exportPkg.back ? {
-            positionId: currentColor.views.back.defaultPositionId,
-            positionName: currentColor.views.back.positions[currentColor.views.back.defaultPositionId]?.name || "Back",
-            previewDataUrl: exportPkg.back.preview,
-            productionDataUrl: exportPkg.back.production,
-            artworks: allArtworks.back || []
-          } : undefined
+          customAttributes
+        })
+
+        if (!matchedVariant?.id) {
+          toast.add({
+            title: "Variant Not Found",
+            description: "Could not find a matching product variant to add to cart.",
+            type: "error"
+          })
+          return
+        }
+
+        const itemUnitPrice = Math.round(
+          matchedVariant.priceWithTax ?? matchedVariant.price ?? unitPrice
+        )
+
+        const customizationId = saveCustomizationForCart({
+          orderLineId: editingOrderLineId || undefined,
+          productId: activeProduct?.id || activeConfig.productId,
+          productSlug: resolvedSlug,
+          productName: resolvedName,
+          productType: profile.productType,
+          variantId: matchedVariant.id,
+          sku: matchedVariant.sku,
+          colorId: selectedColorId,
+          colorName: currentColor.name,
+          quantity: directQuantity,
+          directQuantity,
+          unitPrice: itemUnitPrice,
+          customAttributes: Object.keys(customAttributes).length > 0 ? customAttributes : undefined,
+          customizeUrl: currentCustomizeUrl,
+          selectedViewId,
+          selectedPositionId,
+          notes: customerNotes.trim() || undefined,
+          front: frontViewData,
+          back: backViewData
         })
 
         const detailsList = [
           ...Object.entries(customAttributes).map(
             ([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}`
           ),
+          profile.hasDynamicColors ? `${profile.attributeName || "Option"}: ${currentColor.name}` : null,
+          customerNotes.trim() ? `Instructions: ${customerNotes.trim()}` : null,
           `Qty: ${directQuantity}`,
           exportPkg.front ? `Print: Customized` : null,
           exportPkg.back ? `Back: Customized` : null,
           `ID: ${customizationId}`
         ].filter(Boolean).join(" | ")
 
-        await addToCart(itemVariantId, directQuantity, {
-          productName: productTitle || product?.title || activeConfig.name,
-          variantDetails: detailsList
+        const customFields = buildOrderLineCustomFields(customizationId, {
+          variantId: matchedVariant.id,
+          sku: matchedVariant.sku,
+          quantity: directQuantity,
+          unitPrice: itemUnitPrice
         })
 
-        toast.add({
-          title: "Added to Cart!",
-          description: `${productTitle || activeConfig.name} • ${directQuantity} piece(s) added to your cart.`,
-          type: "success"
+        const existingMatchingLine = editingOrderLineId
+          ? $cart
+              .get()
+              .order?.lines?.find(
+                (l) => l.id === editingOrderLineId && l.productVariant.id === matchedVariant.id
+              )
+          : undefined
+
+        let ok = false
+        let resolvedOrderLineId: string | undefined = existingMatchingLine?.id
+
+        if (existingMatchingLine) {
+          ok = await updateLineQuantity(existingMatchingLine.id, directQuantity, customFields)
+        } else {
+          const addResult = await addToCart(matchedVariant.id, directQuantity, {
+            productName: resolvedName,
+            variantDetails: detailsList,
+            suppressToast: true,
+            customFields
+          })
+          ok = addResult.success
+          const matchingOrderLine = addResult.order?.lines?.find(
+            (l) =>
+              l.customFields?.customizationId === customizationId ||
+              l.productVariant.id === matchedVariant.id
+          )
+          resolvedOrderLineId = matchingOrderLine?.id
+        }
+
+        if (resolvedOrderLineId) {
+          linkCustomizationToOrderLine(customizationId, resolvedOrderLineId)
+        }
+
+        console.log("[RS Prints Customizer] Customized Product Data:", {
+          timestamp: new Date().toISOString(),
+          customizationId,
+          orderLineId: resolvedOrderLineId,
+          addedToCart: ok,
+          product: {
+            id: activeProduct?.id || activeConfig.productId,
+            slug: resolvedSlug,
+            name: resolvedName,
+            type: profile.productType,
+            category: activeProduct?.category
+          },
+          variant: {
+            id: matchedVariant.id,
+            sku: matchedVariant.sku,
+            name: matchedVariant.name,
+            options: matchedVariant.options
+          },
+          selection: {
+            colorId: selectedColorId,
+            colorName: currentColor.name,
+            attributeName: profile.attributeName,
+            quantity: directQuantity,
+            unitPrice: itemUnitPrice,
+            totalPrice: itemUnitPrice * directQuantity,
+            customAttributes
+          },
+          notes: customerNotes.trim() || null,
+          views: {
+            front: frontViewData,
+            back: backViewData
+          },
+          uploadedArtworks: uploadedSummaries,
+          customizeUrl: currentCustomizeUrl
         })
+
+        if (ok) {
+          isRedirecting = true
+          toast.add({
+            title: "Added to Cart!",
+            description: `${resolvedName} • ${directQuantity} piece(s) added to your cart.`,
+            type: "success"
+          })
+          setTimeout(() => {
+            window.location.href = productDetailUrl
+          }, 450)
+        } else {
+          toast.add({
+            title: "Cart Error",
+            description: "Could not add customized item to cart. Please try again.",
+            type: "error"
+          })
+        }
       }
     } catch (err: any) {
       console.error("Failed to add customized item to cart:", err)
@@ -863,9 +1744,28 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         type: "error"
       })
     } finally {
-      setIsAddingToCart(false)
+      if (!isRedirecting) {
+        setIsAddingToCart(false)
+      }
     }
-  }, [product, productTitle, customAttributes, selectedColorId, currentColor, currentView, sizeQuantities, directQuantity, totalQuantity, profile, activeConfig])
+  }, [
+    ensureVendureProduct,
+    saveCurrentDraft,
+    editingOrderLineId,
+    productTitle,
+    customAttributes,
+    selectedColorId,
+    selectedViewId,
+    selectedPositionId,
+    currentColor,
+    sizeQuantities,
+    directQuantity,
+    totalQuantity,
+    unitPrice,
+    customerNotes,
+    profile,
+    activeConfig
+  ])
 
   return (
     <div className="w-full h-full min-h-0 flex flex-col px-2 sm:px-6 py-2 overflow-y-auto lg:overflow-hidden relative">
@@ -894,6 +1794,10 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             hasDynamicColors={profile.hasDynamicColors}
+            attributeName={profile.attributeName}
+            attributeType={profile.attributeType}
+            notes={customerNotes}
+            onNotesChange={setCustomerNotes}
           />
         </div>
 
@@ -981,18 +1885,18 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
                     type="button"
                     onClick={() => setIsMobileColorSheetOpen(true)}
                     className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-                    title="Select colour"
+                    title={`Select ${profile.attributeName || "colour"}`}
                   >
                     <div
                       className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
                       style={{ backgroundColor: currentColor.hex }}
                     >
                       <span
-                        className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"}`}
+                        className={`size-2 rounded-full ${currentColor.isLight ? "bg-black" : "bg-white"}`}
                       />
                     </div>
                     <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
-                      Color <ChevronRight className="size-3" />
+                      {profile.attributeName ? profile.attributeName.split(" ")[0] : "Color"} <ChevronRight className="size-3" />
                     </span>
                   </button>
                 )}
@@ -1132,6 +2036,41 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             )}
           </div>
 
+          {/* Card D: Custom Instructions / Description Input Box (Mobile) */}
+          <div className="bg-card rounded-2xl border border-border/80 p-3.5 shadow-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <FileText className="size-3.5" />
+                <span>Custom Instructions</span>
+              </span>
+              {customerNotes && customerNotes.length > 0 && (
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  {customerNotes.length}/250
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <textarea
+                value={customerNotes}
+                onChange={(e) => setCustomerNotes(e.target.value.slice(0, 250))}
+                placeholder="Add special printing instructions, text to write, or custom requests..."
+                rows={2}
+                className="w-full text-xs p-3 rounded-xl bg-muted/40 border border-border/80 focus:border-primary/80 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all placeholder:text-muted-foreground/60 custom-scrollbar leading-relaxed"
+              />
+              {customerNotes && customerNotes.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCustomerNotes("")}
+                  className="absolute right-2.5 top-2.5 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+                  title="Clear instructions"
+                  aria-label="Clear instructions"
+                >
+                  <X className="size-3" />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* In-Flow Add to Cart Section (NOT fixed to bottom on mobile, direct without bottom sheet) */}
           <div className="bg-card rounded-2xl border border-border/80 p-4 mb-40 shadow-xs flex items-center justify-between gap-4 mt-1">
             <div>
@@ -1178,6 +2117,8 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           colors={activeConfig.colors}
           selectedColorId={selectedColorId}
           onSelectColor={handleSelectColor}
+          attributeName={profile.attributeName}
+          attributeType={profile.attributeType}
         />
       )}
 
@@ -1226,6 +2167,32 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           }
         }}
       />
+
+      {/* Blocking Overlay Loading State while Add to Cart is in progress */}
+      {isAddingToCart && (
+        <div
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 select-none"
+          role="status"
+          aria-live="polite"
+          aria-label="Adding customized product to cart"
+        >
+          <div className="bg-card border border-border/80 shadow-2xl rounded-3xl px-8 py-7 max-w-sm w-full text-center space-y-3">
+            <div className="size-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+              <Spinner className="size-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-foreground">
+                Adding to Cart...
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Uploading your artwork and saving your custom design. Please wait.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Toaster />
     </div>
   )
 }

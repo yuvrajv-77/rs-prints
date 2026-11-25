@@ -11,7 +11,9 @@ import {
   Shirt,
   Maximize2,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
+  FileText,
+  X
 } from "lucide-react"
 import type { PrintPositionConfig, TShirtColorConfig } from "../config/tshirt-mockups"
 
@@ -31,6 +33,10 @@ export interface CustomizerLeftSidebarProps {
   onZoomIn?: () => void
   onZoomOut?: () => void
   hasDynamicColors?: boolean
+  attributeName?: string
+  attributeType?: "color" | "finish" | "pill"
+  notes?: string
+  onNotesChange?: (notes: string) => void
 }
 
 export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
@@ -48,45 +54,86 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
   zoomLevel = 1.0,
   onZoomIn,
   onZoomOut,
-  hasDynamicColors = true
+  hasDynamicColors = true,
+  attributeName = "Colour",
+  attributeType = "color",
+  notes = "",
+  onNotesChange
 }) => {
   return (
     <div className="bg-card rounded-3xl border border-border/80 shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
       {/* Scrollable Setup Controls */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-6 custom-scrollbar">
-        {/* 1. Colour Selector (Rendered only for products with dynamic color choices like T-shirts) */}
+        {/* 1. Dynamic Attribute Selector (Colour, Finish, Handle Colour, Body Colour, etc.) */}
         {hasDynamicColors && Object.keys(colors).length > 1 && (
           <>
             <div className="space-y-3">
-              <div className="flex items-center gap-4 flex-wrap pt-1">
-                {Object.values(colors).map((color) => {
-                  const isSelected = selectedColorId === color.id
-                  return (
-                    <button
-                      key={color.id}
-                      type="button"
-                      onClick={() => onSelectColor(color.id)}
-                      title={color.name}
-                      aria-label={color.name}
-                      className={`size-12 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center relative shadow-sm ${
-                        isSelected
-                          ? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-110 border-primary"
-                          : "border-border/80 hover:scale-105 hover:border-foreground/30 opacity-80 hover:opacity-100"
-                      }`}
-                      style={{ backgroundColor: color.hex }}
-                    >
-                      {/* Subtle active indicator dot inside swatch */}
-                      {isSelected && (
-                        <span
-                          className={`size-2 rounded-full ${
-                            color.id === "white" ? "bg-black" : "bg-white"
-                          }`}
-                        />
-                      )}
-                    </button>
-                  )
-                })}
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Palette className="size-3.5" />
+                  <span>{attributeName}</span>
+                </span>
+                <span className="text-xs font-bold text-foreground truncate max-w-[130px]">
+                  {colors[selectedColorId]?.name}
+                </span>
               </div>
+
+              {attributeType === "pill" ? (
+                /* Pill buttons for Finishes (Glossy vs Matte, Gold vs Silver, etc.) */
+                <div className="grid grid-cols-2 gap-2 p-1 bg-muted/40 rounded-2xl border border-border/60">
+                  {Object.values(colors).map((opt) => {
+                    const isSelected = selectedColorId === opt.id
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => onSelectColor(opt.id)}
+                        className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? "bg-background text-foreground shadow-2xs border border-primary/60 ring-2 ring-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/40"
+                        }`}
+                      >
+                        <span
+                          className="size-2.5 rounded-full border border-border/80"
+                          style={{ backgroundColor: opt.hex }}
+                        />
+                        <span className="truncate">{opt.name}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                /* Swatches for Colors, Neon Colors, Handle Colors, Body Colors */
+                <div className="flex items-center gap-3 flex-wrap pt-1">
+                  {Object.values(colors).map((color) => {
+                    const isSelected = selectedColorId === color.id
+                    return (
+                      <button
+                        key={color.id}
+                        type="button"
+                        onClick={() => onSelectColor(color.id)}
+                        title={color.name}
+                        aria-label={color.name}
+                        className={`size-11 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center relative shadow-sm ${
+                          isSelected
+                            ? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-110 border-primary"
+                            : "border-border/80 hover:scale-105 hover:border-foreground/30 opacity-80 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      >
+                        {isSelected && (
+                          <span
+                            className={`size-2 rounded-full ${
+                              color.isLight ? "bg-black" : "bg-white"
+                            }`}
+                          />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
             <Separator />
           </>
@@ -161,23 +208,18 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
                 </Button>
               </ButtonGroup>
             </div>
-            {Object.keys(availablePositions).length > 1 && <Separator />}
+            <Separator />
           </>
         )}
 
-        {/* 4. Print Position Selector (Only when there are multiple positions; hidden for single-zone mugs & drinkware) */}
+        {/* 4. Placement Zones (Rendered ONLY if multiple print positions exist) */}
         {Object.keys(availablePositions).length > 1 && (
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
-                Print Placement
-              </span>
-              <span className="text-[10px] font-mono text-primary font-bold">
-                {availablePositions[selectedPositionId]?.physicalSizeLabel}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2">
+          <div className="space-y-3">
+            <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Maximize2 className="size-3.5" />
+              <span>Print Placement</span>
+            </span>
+            <div className="grid grid-cols-1 gap-2 pt-1">
               {Object.values(availablePositions).map((pos) => {
                 const isSelected = selectedPositionId === pos.id
                 return (
@@ -185,47 +227,99 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
                     key={pos.id}
                     type="button"
                     onClick={() => onSelectPosition(pos.id)}
-                    className={`px-3.5 py-3 rounded-2xl border text-left text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
+                    className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
-                        : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                        ? "bg-primary/10 border-primary shadow-xs ring-1 ring-primary/40"
+                        : "border-border/70 hover:border-foreground/30 hover:bg-muted/40"
                     }`}
                   >
                     <div>
-                      <div className="font-bold text-foreground">{pos.name}</div>
+                      <div className="font-bold text-xs text-foreground">{pos.name}</div>
                       <div className="text-[10px] text-muted-foreground mt-0.5">
                         {pos.physicalSizeLabel}
                       </div>
                     </div>
-                    <Maximize2 className={`size-3.5 ${isSelected ? "text-primary" : "text-muted-foreground/40"}`} />
+                    {isSelected && (
+                      <span className="size-2 rounded-full bg-primary animate-pulse" />
+                    )}
                   </button>
                 )
               })}
             </div>
           </div>
         )}
+
+        {/* 5. Custom Description / Printing Notes Input Box */}
+        {onNotesChange && (
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <FileText className="size-3.5" />
+                <span>Custom Instructions</span>
+              </span>
+              {notes && notes.length > 0 && (
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  {notes.length}/250
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <textarea
+                value={notes}
+                onChange={(e) => onNotesChange(e.target.value.slice(0, 250))}
+                placeholder="Add instructions (e.g. text to write, custom alignment, or special printing notes)..."
+                rows={3}
+                className="w-full text-xs p-3 rounded-2xl bg-muted/40 border border-border/80 focus:border-primary/80 focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all placeholder:text-muted-foreground/60 custom-scrollbar leading-relaxed"
+              />
+              {notes && notes.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onNotesChange("")}
+                  className="absolute right-2.5 top-2.5 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+                  title="Clear instructions"
+                  aria-label="Clear instructions"
+                >
+                  <X className="size-3" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Pinned Bottom Utility Actions */}
-      <div className="shrink-0 p-3.5 border-t border-border/60 bg-muted/20 flex items-center justify-between gap-2">
-        <button
+      {/* Visual Guides & Canvas Reset Footer */}
+      <div className="p-4 border-t border-border/80 bg-muted/20 space-y-2">
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={onToggleGuides}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1 px-2 rounded-lg hover:bg-muted cursor-pointer"
+          className="w-full justify-between h-9 text-xs rounded-xl cursor-pointer hover:bg-muted"
         >
-          {showGuides ? <EyeOff className="size-3.5 text-primary" /> : <Eye className="size-3.5" />}
-          <span className="text-[11px] font-medium">{showGuides ? "Hide Guide" : "Show Guide"}</span>
-        </button>
+          <span className="flex items-center gap-2">
+            {showGuides ? (
+              <Eye className="size-3.5 text-primary" />
+            ) : (
+              <EyeOff className="size-3.5 text-muted-foreground" />
+            )}
+            <span>Print Area Guides</span>
+          </span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase">
+            {showGuides ? "ON" : "OFF"}
+          </span>
+        </Button>
 
         {onClearDesign && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={onClearDesign}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors py-1 px-2 rounded-lg hover:bg-destructive/10 cursor-pointer"
+            className="w-full justify-start h-8 text-[11px] text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl cursor-pointer transition-colors"
           >
-            <RotateCcw className="size-3.5" />
-            <span className="text-[11px] font-medium">Reset</span>
-          </button>
+            <RotateCcw className="size-3 mr-2" />
+            <span>Reset Active Canvas</span>
+          </Button>
         )}
       </div>
     </div>

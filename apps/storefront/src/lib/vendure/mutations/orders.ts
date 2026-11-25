@@ -1,13 +1,157 @@
 import { vendureClient } from "../client";
 import { graphql } from "../generated/gql";
 import { useFragment } from "../generated/fragment-masking";
-import { ACTIVE_ORDER_FRAGMENT, type ActiveOrder } from "../queries/orders";
+import { ACTIVE_ORDER_FRAGMENT, type ActiveOrder, type OrderLineCustomFields } from "../queries/orders";
 import type { CreateAddressInput, CreateCustomerInput } from "../generated/graphql";
 
 export type OrderActionResult = {
   order?: ActiveOrder;
   error?: string;
 };
+
+const ORDER_FIELDS_WITH_CUSTOM_SELECTION = `
+  id
+  code
+  state
+  active
+  orderPlacedAt
+  totalQuantity
+  subTotal
+  subTotalWithTax
+  total
+  totalWithTax
+  shipping
+  shippingWithTax
+  couponCodes
+  customer {
+    id
+    firstName
+    lastName
+    emailAddress
+    phoneNumber
+  }
+  shippingAddress {
+    fullName
+    company
+    streetLine1
+    streetLine2
+    city
+    province
+    postalCode
+    country
+    countryCode
+    phoneNumber
+  }
+  shippingLines {
+    id
+    priceWithTax
+    shippingMethod {
+      id
+      code
+      name
+      description
+    }
+  }
+  discounts {
+    description
+    amount
+    amountWithTax
+  }
+  lines {
+    id
+    quantity
+    linePrice
+    linePriceWithTax
+    unitPrice
+    unitPriceWithTax
+    discountedUnitPriceWithTax
+    customFields {
+      customizationId
+      customizationData
+    }
+    featuredAsset {
+      id
+      preview
+    }
+    productVariant {
+      id
+      name
+      sku
+      price
+      priceWithTax
+      stockLevel
+      featuredAsset {
+        id
+        preview
+      }
+      product {
+        id
+        name
+        slug
+        featuredAsset {
+          id
+          preview
+        }
+      }
+      options {
+        id
+        code
+        name
+        group {
+          id
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
+const ADD_ITEM_TO_ORDER_WITH_CUSTOM_FIELDS = `
+  mutation AddItemToOrderWithCustomFields(
+    $productVariantId: ID!
+    $quantity: Int!
+    $customFields: OrderLineCustomFieldsInput
+  ) {
+    addItemToOrder(
+      productVariantId: $productVariantId
+      quantity: $quantity
+      customFields: $customFields
+    ) {
+      ... on Order {
+        ${ORDER_FIELDS_WITH_CUSTOM_SELECTION}
+      }
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`;
+
+const ADJUST_ORDER_LINE_WITH_CUSTOM_FIELDS = `
+  mutation AdjustOrderLineWithCustomFields(
+    $orderLineId: ID!
+    $quantity: Int!
+    $customFields: OrderLineCustomFieldsInput
+  ) {
+    adjustOrderLine(
+      orderLineId: $orderLineId
+      quantity: $quantity
+      customFields: $customFields
+    ) {
+      ... on Order {
+        ${ORDER_FIELDS_WITH_CUSTOM_SELECTION}
+      }
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`;
+
+let orderLineCustomFieldsMutationSupported: boolean | null = null;
 
 export const ADD_ITEM_TO_ORDER = graphql(`
   mutation AddItemToOrder($productVariantId: ID!, $quantity: Int!) {
@@ -23,7 +167,33 @@ export const ADD_ITEM_TO_ORDER = graphql(`
   }
 `);
 
-export async function addItemToOrder(productVariantId: string, quantity: number): Promise<OrderActionResult> {
+export async function addItemToOrder(
+  productVariantId: string,
+  quantity: number,
+  customFields?: OrderLineCustomFields
+): Promise<OrderActionResult> {
+  if (customFields && orderLineCustomFieldsMutationSupported !== false) {
+    try {
+      const result = await vendureClient.request<{ addItemToOrder: any }>(
+        ADD_ITEM_TO_ORDER_WITH_CUSTOM_FIELDS,
+        { productVariantId, quantity, customFields }
+      );
+      orderLineCustomFieldsMutationSupported = true;
+      const res = result.addItemToOrder;
+      if ("lines" in res || !("errorCode" in res)) {
+        return { order: res as ActiveOrder };
+      }
+      return { error: ("message" in res && res.message) ? res.message : "Failed to add item to cart" };
+    } catch (err: any) {
+      const msg = String(err?.message || "");
+      if (msg.includes("OrderLineCustomFieldsInput") || msg.includes("customFields")) {
+        orderLineCustomFieldsMutationSupported = false;
+      } else {
+        throw err;
+      }
+    }
+  }
+
   const result = await vendureClient.request(ADD_ITEM_TO_ORDER, {
     productVariantId,
     quantity,
@@ -50,7 +220,33 @@ export const ADJUST_ORDER_LINE = graphql(`
   }
 `);
 
-export async function adjustOrderLine(orderLineId: string, quantity: number): Promise<OrderActionResult> {
+export async function adjustOrderLine(
+  orderLineId: string,
+  quantity: number,
+  customFields?: OrderLineCustomFields
+): Promise<OrderActionResult> {
+  if (customFields && orderLineCustomFieldsMutationSupported !== false) {
+    try {
+      const result = await vendureClient.request<{ adjustOrderLine: any }>(
+        ADJUST_ORDER_LINE_WITH_CUSTOM_FIELDS,
+        { orderLineId, quantity, customFields }
+      );
+      orderLineCustomFieldsMutationSupported = true;
+      const res = result.adjustOrderLine;
+      if ("lines" in res || !("errorCode" in res)) {
+        return { order: res as ActiveOrder };
+      }
+      return { error: ("message" in res && res.message) ? res.message : "Failed to adjust item quantity" };
+    } catch (err: any) {
+      const msg = String(err?.message || "");
+      if (msg.includes("OrderLineCustomFieldsInput") || msg.includes("customFields")) {
+        orderLineCustomFieldsMutationSupported = false;
+      } else {
+        throw err;
+      }
+    }
+  }
+
   const result = await vendureClient.request(ADJUST_ORDER_LINE, {
     orderLineId,
     quantity,

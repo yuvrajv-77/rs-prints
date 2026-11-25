@@ -426,7 +426,32 @@ export const products: Product[] = [
       "Catalogue reference: #A004C",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Red Handle",
+                "hex": "#DC2626"
+        },
+        {
+                "name": "Pink Handle",
+                "hex": "#EC4899"
+        },
+        {
+                "name": "Orange Handle",
+                "hex": "#EA580C"
+        },
+        {
+                "name": "Green Handle",
+                "hex": "#16A34A"
+        },
+        {
+                "name": "Yellow Handle",
+                "hex": "#FACC15"
+        },
+        {
+                "name": "Blue Handle",
+                "hex": "#2563EB"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -437,7 +462,19 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8 cm x 9.5 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Handle Colour",
+                "values": [
+                        "Red Handle",
+                        "Pink Handle",
+                        "Orange Handle",
+                        "Green Handle",
+                        "Yellow Handle",
+                        "Blue Handle"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -529,7 +566,44 @@ export const products: Product[] = [
       "Catalogue reference: #A006",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Red",
+                "hex": "#DC2626"
+        },
+        {
+                "name": "Green",
+                "hex": "#16A34A"
+        },
+        {
+                "name": "Blue",
+                "hex": "#2563EB"
+        },
+        {
+                "name": "Dark Green",
+                "hex": "#14532D"
+        },
+        {
+                "name": "Pink",
+                "hex": "#EC4899"
+        },
+        {
+                "name": "Black",
+                "hex": "#1A1A1A"
+        },
+        {
+                "name": "Yellow",
+                "hex": "#FACC15"
+        },
+        {
+                "name": "Orange",
+                "hex": "#EA580C"
+        },
+        {
+                "name": "Light Blue",
+                "hex": "#38BDF8"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -540,7 +614,22 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.2 cm x 9.5 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Rim & Inner Colour",
+                "values": [
+                        "Red",
+                        "Green",
+                        "Blue",
+                        "Dark Green",
+                        "Pink",
+                        "Black",
+                        "Yellow",
+                        "Orange",
+                        "Light Blue"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -632,7 +721,32 @@ export const products: Product[] = [
       "Catalogue reference: #A007",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Neon Pink",
+                "hex": "#FF1493"
+        },
+        {
+                "name": "Neon Green",
+                "hex": "#39FF14"
+        },
+        {
+                "name": "Neon Orange",
+                "hex": "#FF5F1F"
+        },
+        {
+                "name": "Neon Yellow",
+                "hex": "#E7FE00"
+        },
+        {
+                "name": "Neon Blue",
+                "hex": "#00F5FF"
+        },
+        {
+                "name": "Neon Red",
+                "hex": "#FF3366"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -643,7 +757,19 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.2 cm x 9.5 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Neon Colour",
+                "values": [
+                        "Neon Pink",
+                        "Neon Green",
+                        "Neon Orange",
+                        "Neon Yellow",
+                        "Neon Blue",
+                        "Neon Red"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -735,7 +861,16 @@ export const products: Product[] = [
       "Catalogue reference: #A008",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Gold",
+                "hex": "#D4AF37"
+        },
+        {
+                "name": "Silver",
+                "hex": "#C0C0C0"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -746,7 +881,15 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.2 cm x 9.5 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Metallic Finish",
+                "values": [
+                        "Gold",
+                        "Silver"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -941,7 +1084,20 @@ export const products: Product[] = [
       "Catalogue reference: #A112",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Silver Plated",
+                "hex": "#C0C0C0"
+        },
+        {
+                "name": "Gold Plated",
+                "hex": "#D4AF37"
+        },
+        {
+                "name": "Pink Plated",
+                "hex": "#F472B6"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -952,7 +1108,16 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.3 cm x 9.7 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Plated Finish",
+                "values": [
+                        "Silver Plated",
+                        "Gold Plated",
+                        "Pink Plated"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -1250,7 +1415,16 @@ export const products: Product[] = [
       "Catalogue reference: #A012",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Glossy",
+                "hex": "#0F172A"
+        },
+        {
+                "name": "Matte",
+                "hex": "#475569"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -1261,7 +1435,15 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.3 cm x 9.5 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Finish",
+                "values": [
+                        "Glossy",
+                        "Matte"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",
@@ -1760,7 +1942,36 @@ export const products: Product[] = [
       "Catalogue reference: #A005",
       "Suitable for gifting, events and personal use"
     ],
-    "colors": [],
+    "colors": [
+        {
+                "name": "Black Handle",
+                "hex": "#1A1A1A"
+        },
+        {
+                "name": "Pink Handle",
+                "hex": "#EC4899"
+        },
+        {
+                "name": "Yellow Handle",
+                "hex": "#FACC15"
+        },
+        {
+                "name": "Red Handle",
+                "hex": "#DC2626"
+        },
+        {
+                "name": "Green Handle",
+                "hex": "#16A34A"
+        },
+        {
+                "name": "Light Blue Handle",
+                "hex": "#38BDF8"
+        },
+        {
+                "name": "Blue Handle",
+                "hex": "#2563EB"
+        }
+],
     "materials": [
       "Catalogue material/specification"
     ],
@@ -1771,7 +1982,20 @@ export const products: Product[] = [
       "11 oz / 325 ml",
       "8.2 cm x 9.6 cm"
     ],
-    "optionGroups": [],
+    "optionGroups": [
+        {
+                "name": "Handle Colour",
+                "values": [
+                        "Black Handle",
+                        "Pink Handle",
+                        "Yellow Handle",
+                        "Red Handle",
+                        "Green Handle",
+                        "Light Blue Handle",
+                        "Blue Handle"
+                ]
+        }
+],
     "highlights": [
       {
         "title": "Personalized",

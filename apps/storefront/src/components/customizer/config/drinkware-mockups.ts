@@ -50,22 +50,6 @@ export const MUG_CONFIG: ProductCustomizerConfig & { productType: "mug" } = {
           positions: MUG_POSITIONS
         }
       }
-    },
-    black: {
-      id: "black",
-      name: "Matte Black",
-      hex: "#1A1A1A",
-      views: {
-        front: {
-          id: "front",
-          name: "Front View",
-          image: "/mockups/mockup-white-mug-wrap.png",
-          originalWidth: 1024,
-          originalHeight: 523,
-          defaultPositionId: "wrap",
-          positions: MUG_POSITIONS
-        }
-      }
     }
   }
 }
@@ -103,22 +87,6 @@ export const BOTTLE_CONFIG: ProductCustomizerConfig & { productType: "bottle" } 
       name: "Powder White",
       hex: "#FFFFFF",
       isLight: true,
-      views: {
-        front: {
-          id: "front",
-          name: "Front View",
-          image: "/mockups/White Stainless Bottle with Black Loop Cap.png",
-          originalWidth: 1024,
-          originalHeight: 1536,
-          defaultPositionId: "print_area",
-          positions: BOTTLE_POSITIONS
-        }
-      }
-    },
-    black: {
-      id: "black",
-      name: "Matte Black",
-      hex: "#1F2937",
       views: {
         front: {
           id: "front",

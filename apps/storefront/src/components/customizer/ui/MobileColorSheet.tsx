@@ -8,6 +8,8 @@ export interface MobileColorSheetProps {
   colors: Record<string, TShirtColorConfig>
   selectedColorId: string
   onSelectColor: (colorId: string) => void
+  attributeName?: string
+  attributeType?: "color" | "finish" | "pill"
 }
 
 export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
@@ -15,7 +17,9 @@ export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
   onClose,
   colors,
   selectedColorId,
-  onSelectColor
+  onSelectColor,
+  attributeName = "Colour",
+  attributeType = "color"
 }) => {
   if (!isOpen) return null
 
@@ -36,8 +40,10 @@ export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
               <Palette className="size-4" />
             </div>
             <div>
-              <h3 className="font-black text-sm text-foreground">Select Garment Colour</h3>
-              <p className="text-[11px] text-muted-foreground">Pick a colour for your custom t-shirt</p>
+              <h3 className="font-black text-sm text-foreground">Select {attributeName}</h3>
+              <p className="text-[11px] text-muted-foreground">
+                Choose {attributeName.toLowerCase()} for your custom product
+              </p>
             </div>
           </div>
           <button
@@ -50,7 +56,7 @@ export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
           </button>
         </div>
 
-        {/* Available Colours List */}
+        {/* Available Options List */}
         <div className="p-4 pb-14 sm:pb-10 space-y-2.5 overflow-y-auto custom-scrollbar">
           {Object.values(colors).map((color) => {
             const isSelected = selectedColorId === color.id
@@ -78,14 +84,18 @@ export const MobileColorSheet: React.FC<MobileColorSheetProps> = ({
                     {isSelected && (
                       <span
                         className={`size-2 rounded-full ${
-                          color.id === "white" ? "bg-black" : "bg-white"
+                          color.isLight ? "bg-black" : "bg-white"
                         }`}
                       />
                     )}
                   </span>
                   <div>
                     <div className="text-xs font-bold text-foreground">{color.name}</div>
-                    <div className="text-[10px] text-muted-foreground">100% Bio-Washed Cotton</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {attributeType === "finish" || attributeType === "pill"
+                        ? "Special Finish Option"
+                        : "Customizer Variant"}
+                    </div>
                   </div>
                 </div>
 
