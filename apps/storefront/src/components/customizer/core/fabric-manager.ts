@@ -263,7 +263,7 @@ export class FabricManager {
 
     const hasArtwork = this.getArtworkObjects().length > 0
 
-    // 3. Create printable region visual guide rectangle
+    // 3. Create printable region visual guide rectangle (green dashed outline matching test photo)
     this.guideRect = new Rect({
       left: absLeft,
       top: absTop,
@@ -271,10 +271,10 @@ export class FabricManager {
       height: absHeight,
       originX: "left",
       originY: "top",
-      fill: hasArtwork ? "transparent" : "rgba(37, 99, 235, 0.05)",
-      stroke: "rgba(37, 99, 235, 0.8)",
+      fill: hasArtwork ? "transparent" : "rgba(22, 163, 74, 0.04)",
+      stroke: "#16a34a",
       strokeWidth: 2,
-      strokeDashArray: [6, 6],
+      strokeDashArray: [6, 4],
       selectable: false,
       evented: !hasArtwork,
       hoverCursor: !hasArtwork ? "pointer" : "default",
@@ -284,9 +284,9 @@ export class FabricManager {
     })
 
     // 4. Create placeholder text
-    const fontSize = Math.max(12, Math.min(Math.round(absWidth * 0.065), 18))
+    const fontSize = Math.max(12, Math.min(Math.round(absWidth * 0.045), 18))
     this.placeholderText = new FabricText(
-      `+ Upload Photo\n(${this.printPosition.name})`,
+      `+ Upload Design\n(${this.printPosition.physicalSizeLabel})`,
       {
         left: absLeft + absWidth / 2,
         top: absTop + absHeight / 2,
@@ -295,7 +295,7 @@ export class FabricManager {
         fontSize: fontSize,
         fontFamily: "sans-serif",
         fontWeight: "bold",
-        fill: "#2563EB",
+        fill: "#15803d",
         textAlign: "center",
         selectable: false,
         evented: !hasArtwork,
@@ -390,7 +390,7 @@ export class FabricManager {
     }
     if (this.guideRect) {
       this.guideRect.set({
-        fill: hasArtwork ? "transparent" : "rgba(37, 99, 235, 0.05)",
+        fill: hasArtwork ? "transparent" : "rgba(22, 163, 74, 0.04)",
         evented: !hasArtwork,
         hoverCursor: !hasArtwork ? "pointer" : "default"
       })

@@ -36,10 +36,11 @@ export function resolveCustomizerProfile(
 
   // 1. Mugs
   if (combined.includes("mug")) {
+    const hasColors = Object.keys(MUG_CONFIG.colors).length > 1 || Boolean(product?.colors && product.colors.length > 1)
     return {
       config: MUG_CONFIG,
       productType: "mug",
-      hasDynamicColors: false,
+      hasDynamicColors: hasColors,
       hasGarmentSizes: false
     }
   }
@@ -53,10 +54,11 @@ export function resolveCustomizerProfile(
     combined.includes("tumbler") ||
     combined.includes("flask")
   ) {
+    const hasColors = Object.keys(BOTTLE_CONFIG.colors).length > 1 || Boolean(product?.colors && product.colors.length > 1)
     return {
       config: BOTTLE_CONFIG,
       productType: "bottle",
-      hasDynamicColors: false,
+      hasDynamicColors: hasColors,
       hasGarmentSizes: false
     }
   }

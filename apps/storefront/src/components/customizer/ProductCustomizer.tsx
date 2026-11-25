@@ -890,7 +890,11 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           <CustomizerViewport
             containerRef={containerRef}
             canvasRef={canvasRef}
-            selectedPositionName={`${currentView.name} • ${currentPosition.name}`}
+            selectedPositionName={
+              Object.keys(currentView.positions).length > 1
+                ? `${currentView.name} • ${currentPosition.name}`
+                : `${currentPosition.name} (${currentPosition.physicalSizeLabel})`
+            }
             showGuides={showGuides}
             onToggleGuides={handleToggleGuides}
             isLoading={isLoading}
@@ -899,6 +903,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             zoomLevel={zoomLevel}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
+            hasBackView={Boolean(currentColor.views?.back)}
           />
         </div>
 
@@ -933,7 +938,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             onDirectQuantityChange={handleDirectQuantityChange}
             materialSubtitle={
               profile.productType === "mug"
-                ? "Ceramic 11oz • Glossy"
+                ? "Ceramic 11oz • 7 cm × 17.2 cm"
                 : profile.productType === "bottle"
                 ? "304 Stainless Steel • 750ml"
                 : profile.productType === "bag"
@@ -946,76 +951,89 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         {/* 4. Mobile Column Controls (Visible on Mobile below lg) */}
         <div className="lg:hidden flex flex-col w-full space-y-3 pb-32 sm:pb-36 pt-1">
           {/* Mobile Selection Tabs: Colour & Print Placement Buttons side-by-side */}
-          <div className={`bg-card rounded-2xl border border-border/80 shadow-xs grid ${
-            profile.hasDynamicColors ? "grid-cols-4" : "grid-cols-3"
-          } gap-3`}>
-            {/* Button 1: Colour Selection Button (Only shown if dynamic colors supported) */}
-            {profile.hasDynamicColors && (
-              <button
-                type="button"
-                onClick={() => setIsMobileColorSheetOpen(true)}
-                className="flex flex-col items-center justify-center hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-                title="Select garment colour"
-              >
-                <div
-                  className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
-                  style={{ backgroundColor: currentColor.hex }}
+          {(() => {
+            const hasMultiplePositions = Object.keys(currentView.positions).length > 1
+            const hasColorSelection = profile.hasDynamicColors && Object.keys(activeConfig.colors).length > 1
+            const colsClass =
+              hasColorSelection && hasMultiplePositions
+                ? "grid-cols-4"
+                : hasColorSelection || hasMultiplePositions
+                ? "grid-cols-3"
+                : "grid-cols-2"
+
+            return (
+              <div className={`bg-card rounded-2xl border border-border/80 shadow-xs grid ${colsClass} gap-3`}>
+                {/* Button 1: Colour Selection Button (Only shown if dynamic colors supported) */}
+                {hasColorSelection && (
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileColorSheetOpen(true)}
+                    className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+                    title="Select colour"
+                  >
+                    <div
+                      className="size-11 rounded-2xl border-2 border-primary ring-2 ring-primary/30 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105 relative"
+                      style={{ backgroundColor: currentColor.hex }}
+                    >
+                      <span
+                        className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"}`}
+                      />
+                    </div>
+                    <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
+                      Color <ChevronRight className="size-3" />
+                    </span>
+                  </button>
+                )}
+
+                {/* Button 2: Print Placement Selection Button (Only when multiple positions exist) */}
+                {hasMultiplePositions && (
+                  <button
+                    type="button"
+                    onClick={() => setIsMobilePlacementSheetOpen(true)}
+                    className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+                    title="Select print placement"
+                  >
+                    <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                      <Maximize2 className="size-5" />
+                    </div>
+                    <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
+                      {currentPosition.name} <ChevronRight className="size-3" />
+                    </span>
+                  </button>
+                )}
+
+                {/* Button 3: Rotate Placement Selection Button */}
+                <button
+                  type="button"
+                  onClick={handleRotateImage}
+                  className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+                  title="Rotate artwork"
                 >
-                  <span
-                    className={`size-2 rounded-full ${currentColor.id === "white" ? "bg-black" : "bg-white"}`}
-                  />
-                </div>
-                <span className="text-xs flex items-center gap-1 font-bold text-foreground mt-2 truncate max-w-full">
-                  Color <ChevronRight className="size-3" />
-                </span>
-              </button>
-            )}
+                  <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                    <RotateCcw className="size-5" />
+                  </div>
+                  <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
+                    Rotate
+                  </span>
+                </button>
 
-            {/* Button 2: Print Placement Selection Button */}
-            <button
-              type="button"
-              onClick={() => setIsMobilePlacementSheetOpen(true)}
-              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Select print placement"
-            >
-              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-                <Maximize2 className="size-5" />
+                {/* Button 4: Download Placement Selection Button */}
+                <button
+                  type="button"
+                  onClick={handleDownloadMockup}
+                  className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
+                  title="Preview and download mockup"
+                >
+                  <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
+                    <Download className="size-5" />
+                  </div>
+                  <span className="text-xs text-wrap flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
+                    Preview
+                  </span>
+                </button>
               </div>
-              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
-                {currentPosition.name} <ChevronRight className="size-3" />
-              </span>
-            </button>
-
-            {/* Button 3: Rotate Placement Selection Button */}
-            <button
-              type="button"
-              onClick={handleRotateImage}
-              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Rotate artwork"
-            >
-              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-                <RotateCcw className="size-5" />
-              </div>
-              <span className="text-xs line-clamp-2 flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
-                Rotate
-              </span>
-            </button>
-
-            {/* Button 4: Download Placement Selection Button */}
-            <button
-              type="button"
-              onClick={handleDownloadMockup}
-              className="flex flex-col items-center justify-center p-3 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer group bg-muted/10"
-              title="Preview and download mockup"
-            >
-              <div className="size-11 rounded-2xl border border-border/80 bg-muted/60 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
-                <Download className="size-5" />
-              </div>
-              <span className="text-xs text-wrap flex justify-center items-center gap-1 font-bold text-foreground mt-2 truncate">
-                Preview
-              </span>
-            </button>
-          </div>
+            )
+          })()}
 
           {/* Card B: Upload Design / Artwork Controls */}
           <div className="bg-card rounded-2xl border border-border/80 p-3 shadow-xs">

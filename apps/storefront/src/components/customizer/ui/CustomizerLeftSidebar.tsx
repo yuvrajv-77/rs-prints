@@ -92,37 +92,40 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
           </>
         )}
 
-        {/* 2. View Angle Switcher (Front View <-> Back View) */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/60 rounded-2xl border border-border/60">
-            <button
-              type="button"
-              onClick={() => onSelectView("front")}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                selectedViewId === "front"
-                  ? "bg-background text-foreground shadow-2xs border border-border/80"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Shirt className="size-3.5" />
-              <span>Front</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectView("back")}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                selectedViewId === "back"
-                  ? "bg-background text-foreground shadow-2xs border border-border/80"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Shirt className="size-3.5 rotate-180" />
-              <span>Back</span>
-            </button>
-          </div>
-        </div>
-
-        <Separator />
+        {/* 2. View Angle Switcher (Front View <-> Back View, shown only if back view is present) */}
+        {Boolean(colors[selectedColorId]?.views?.back) && (
+          <>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 p-1.5 bg-muted/60 rounded-2xl border border-border/60">
+                <button
+                  type="button"
+                  onClick={() => onSelectView("front")}
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    selectedViewId === "front"
+                      ? "bg-background text-foreground shadow-2xs border border-border/80"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Shirt className="size-3.5" />
+                  <span>Front</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSelectView("back")}
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    selectedViewId === "back"
+                      ? "bg-background text-foreground shadow-2xs border border-border/80"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Shirt className="size-3.5 rotate-180" />
+                  <span>Back</span>
+                </button>
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
 
         {/* 3. Zoom Controls (Shadcn ButtonGroup with icons only) */}
         {onZoomIn && onZoomOut && (
@@ -158,47 +161,49 @@ export const CustomizerLeftSidebar: React.FC<CustomizerLeftSidebarProps> = ({
                 </Button>
               </ButtonGroup>
             </div>
-            <Separator />
+            {Object.keys(availablePositions).length > 1 && <Separator />}
           </>
         )}
 
-        {/* 4. Print Position Selector */}
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
-              Print Placement
-            </span>
-            <span className="text-[10px] font-mono text-primary font-bold">
-              {availablePositions[selectedPositionId]?.physicalSizeLabel}
-            </span>
-          </div>
+        {/* 4. Print Position Selector (Only when there are multiple positions; hidden for single-zone mugs & drinkware) */}
+        {Object.keys(availablePositions).length > 1 && (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">
+                Print Placement
+              </span>
+              <span className="text-[10px] font-mono text-primary font-bold">
+                {availablePositions[selectedPositionId]?.physicalSizeLabel}
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 gap-2">
-            {Object.values(availablePositions).map((pos) => {
-              const isSelected = selectedPositionId === pos.id
-              return (
-                <button
-                  key={pos.id}
-                  type="button"
-                  onClick={() => onSelectPosition(pos.id)}
-                  className={`px-3.5 py-3 rounded-2xl border text-left text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
-                    isSelected
-                      ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
-                      : "border-border/80 hover:bg-muted/40 text-muted-foreground"
-                  }`}
-                >
-                  <div>
-                    <div className="font-bold text-foreground">{pos.name}</div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">
-                      {pos.physicalSizeLabel}
+            <div className="grid grid-cols-1 gap-2">
+              {Object.values(availablePositions).map((pos) => {
+                const isSelected = selectedPositionId === pos.id
+                return (
+                  <button
+                    key={pos.id}
+                    type="button"
+                    onClick={() => onSelectPosition(pos.id)}
+                    className={`px-3.5 py-3 rounded-2xl border text-left text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
+                      isSelected
+                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-2xs"
+                        : "border-border/80 hover:bg-muted/40 text-muted-foreground"
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold text-foreground">{pos.name}</div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        {pos.physicalSizeLabel}
+                      </div>
                     </div>
-                  </div>
-                  <Maximize2 className={`size-3.5 ${isSelected ? "text-primary" : "text-muted-foreground/40"}`} />
-                </button>
-              )
-            })}
+                    <Maximize2 className={`size-3.5 ${isSelected ? "text-primary" : "text-muted-foreground/40"}`} />
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Pinned Bottom Utility Actions */}

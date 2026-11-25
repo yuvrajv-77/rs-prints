@@ -15,6 +15,7 @@ export interface CustomizerViewportProps {
   zoomLevel?: number
   onZoomIn?: () => void
   onZoomOut?: () => void
+  hasBackView?: boolean
 }
 
 export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
@@ -28,7 +29,8 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
   onSelectView,
   zoomLevel = 1.0,
   onZoomIn,
-  onZoomOut
+  onZoomOut,
+  hasBackView = true
 }) => {
   return (
     <div className="w-full h-full min-h-0 flex flex-col items-center justify-between relative overflow-hidden">
@@ -98,8 +100,8 @@ export const CustomizerViewport: React.FC<CustomizerViewportProps> = ({
         </div>
       )}
 
-      {/* Front / Back selector in mockup box below mockup - only on mobile screens */}
-      {selectedViewId && onSelectView && (
+      {/* Front / Back selector in mockup box below mockup - only on mobile screens when product has multiple views */}
+      {hasBackView && selectedViewId && onSelectView && (
         <div className="lg:hidden mt-2 shrink-0 flex items-center justify-center z-10">
           <div className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-md p-1 rounded-full border border-border shadow-xs">
             <button
