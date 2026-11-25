@@ -148,7 +148,7 @@ export function mapVendureProductToStorefrontProduct(vp: any): Product {
   // D. Fallback placeholder if no images exist on Vendure
   if (imageList.length === 0) {
     imageList.push({
-      url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
+      url: "/image-not-available.svg",
       alt: vp.name,
       isPrimary: true,
     });

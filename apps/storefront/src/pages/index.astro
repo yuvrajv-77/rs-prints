@@ -7,6 +7,7 @@ import CustomerFavoritesCarousel from "@/components/product/CustomerFavoritesCar
 import ProductCarousel from "@/components/product/ProductCarousel"
 import { getProductBySlug } from "@/data/products"
 import { getCollectionProducts, getFeaturedProducts } from "@/lib/vendure/queries/products"
+import { getAllCategories } from "@/lib/catalog"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 import brandConfig from "@/data/brandConfig.json"
 
@@ -90,20 +91,27 @@ const defaultFeaturedItems = [
   { slug: "blended-plush-tote-bag-a090", categorySlug: "tote-bag" },
 ]
 
-// 1. Fetch Customer Favorites from Vendure collection (falls back to top Vendure products or curated bestsellers if empty/offline)
-let featuredProducts = await getCollectionProducts(
-  [
-    "customers-favourite",
-    "customers-favourites",
-    "customer-favourites",
-    "customer-favourite",
-    "customers-favorites",
-    "customers-favorite",
-    "customer-favorites",
-    "customer-favorite",
-  ],
-  10
-)
+// Fetch Customer Favorites, Gift Items, and live public Categories concurrently
+let [featuredProducts, giftProducts, catalogCategories] = await Promise.all([
+  getCollectionProducts(
+    [
+      "customers-favourite",
+      "customers-favourites",
+      "customer-favourites",
+      "customer-favourite",
+      "customers-favorites",
+      "customers-favorite",
+      "customer-favorites",
+      "customer-favorite",
+    ],
+    10
+  ),
+  getCollectionProducts(
+    ["gifts-accessories", "gift-items", "gift-item", "gifts", "mdf-products"],
+    10
+  ),
+  getAllCategories().catch(() => []),
+])
 
 if (featuredProducts.length === 0) {
   featuredProducts = await getFeaturedProducts(10)
@@ -132,12 +140,6 @@ const defaultGiftSlugs = [
   { slug: "rectangular-mdf-keychain-a044", categorySlug: "mdf-products" },
 ]
 
-// 2. Fetch Gift Items from Vendure collection (falls back to local curated gifts if empty/offline)
-let giftProducts = await getCollectionProducts(
-  ["gifts-accessories", "gift-items", "gift-item", "gifts", "mdf-products"],
-  10
-)
-
 if (giftProducts.length === 0) {
   giftProducts = defaultGiftSlugs
     .map((item) => {
@@ -146,6 +148,15 @@ if (giftProducts.length === 0) {
     })
     .filter((x): x is { product: any; categorySlug: string } => Boolean(x))
 }
+
+const homeCategories = catalogCategories
+  .filter((c) => c.id !== "other-products")
+  .map((c) => ({
+    id: c.id,
+    title: c.title,
+    href: `/categories/${c.id}`,
+    image: c.image,
+  }))
 ---
 
 <Layout
@@ -162,7 +173,10 @@ if (giftProducts.length === 0) {
 
     <!-- 2. Shop by Category Carousel (Immediately Below Hero) -->
     <div class="-mt-2 sm:-mt-4">
-      <CategoryCarousel client:load />
+      <CategoryCarousel
+        categories={homeCategories.length > 0 ? homeCategories : undefined}
+        client:load
+      />
     </div>
 
     <!-- 4. Customer Favorites / Featured Best Sellers Carousel -->

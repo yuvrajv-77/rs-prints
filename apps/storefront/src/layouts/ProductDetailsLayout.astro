@@ -94,17 +94,17 @@ const schemaMarkup = [
     <Breadcrumb className="mb-6">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          <BreadcrumbLink href="/" data-astro-prefetch="hover">Home</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href="/categories">Categories</BreadcrumbLink>
+          <BreadcrumbLink href="/categories" data-astro-prefetch="hover">Categories</BreadcrumbLink>
         </BreadcrumbItem>
         {parentCollection && (
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/categories/${parentCollection.slug}`}>
+              <BreadcrumbLink href={`/categories/${parentCollection.slug}`} data-astro-prefetch="hover">
                 {parentCollection.name}
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -114,7 +114,10 @@ const schemaMarkup = [
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={parentCollection ? `/categories/${parentCollection.slug}/${subcollection.slug}` : `/categories/${subcollection.slug}`}>
+              <BreadcrumbLink
+                href={parentCollection ? `/categories/${parentCollection.slug}/${subcollection.slug}` : `/categories/${subcollection.slug}`}
+                data-astro-prefetch="hover"
+              >
                 {subcollection.name}
               </BreadcrumbLink>
             </BreadcrumbItem>

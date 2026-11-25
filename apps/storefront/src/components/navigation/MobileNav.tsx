@@ -29,6 +29,7 @@ import {
 import BrandLogo from "@/components/BrandLogo"
 import {
   NAVIGATION_CATEGORIES,
+  filterNavigationCategories,
   type NavigationCategory,
 } from "./navigationData"
 import {
@@ -39,8 +40,16 @@ import {
 } from "../ui/input-group"
 import { isAccountSectionEnabled } from "@/config/account"
 
-export default function MobileNav() {
+interface MobileNavProps {
+  activeCollectionSlugs?: string[] | null
+}
+
+export default function MobileNav({ activeCollectionSlugs }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const categories = React.useMemo(
+    () => filterNavigationCategories(NAVIGATION_CATEGORIES, activeCollectionSlugs),
+    [activeCollectionSlugs]
+  )
   const [activeCategory, setActiveCategory] = useState<NavigationCategory | null>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -153,11 +162,12 @@ export default function MobileNav() {
                         href="/account/orders"
                         className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
-                        My Projects
+                        Order History
                       </a>
 
                       <a
                         href="/contact"
+                        data-astro-prefetch="hover"
                         className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
                         Help is here
@@ -186,13 +196,14 @@ export default function MobileNav() {
 
                     {/* Main Categories Navigation List */}
                     <div className="px-2 space-y-1">
-                      {NAVIGATION_CATEGORIES.map((category) => (
+                      {categories.map((category) => (
                         <div
                           key={category.id}
                           className="flex items-center justify-between rounded-lg hover:bg-muted/70 transition-colors pr-1 group"
                         >
                           <a
                             href={category.href}
+                            data-astro-prefetch="hover"
                             onClick={() => setIsOpen(false)}
                             className="flex-1 px-3 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors text-left"
                           >
@@ -220,6 +231,7 @@ export default function MobileNav() {
                       </div>
                       <a
                         href="/about"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -227,6 +239,7 @@ export default function MobileNav() {
                       </a>
                       <a
                         href="/contact"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -234,6 +247,7 @@ export default function MobileNav() {
                       </a>
                       <a
                         href="/bulk-order"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-foreground/85 hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -244,6 +258,7 @@ export default function MobileNav() {
                       </a>
                       <a
                         href="/terms-and-conditions"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -251,6 +266,7 @@ export default function MobileNav() {
                       </a>
                       <a
                         href="/shipping-and-refund-policy"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -258,6 +274,7 @@ export default function MobileNav() {
                       </a>
                       <a
                         href="/privacy-policy"
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                       >
@@ -285,6 +302,7 @@ export default function MobileNav() {
                     <div className="flex items-center gap-1">
                       <a
                         href={activeCategory.href}
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="text-xs font-semibold text-primary hover:underline px-2 py-1"
                       >
@@ -326,6 +344,7 @@ export default function MobileNav() {
                                 <li key={idx}>
                                   <a
                                     href={item.href}
+                                    data-astro-prefetch="hover"
                                     onClick={() => setIsOpen(false)}
                                     className="flex items-center justify-between pl-7 pr-4 py-2 text-sm text-foreground/85 hover:text-foreground hover:bg-muted/50 transition-colors"
                                   >
@@ -341,6 +360,7 @@ export default function MobileNav() {
                               <li className="pt-1 pb-1 pl-7 pr-4">
                                 <a
                                   href={subcat.href}
+                                  data-astro-prefetch="hover"
                                   onClick={() => setIsOpen(false)}
                                   className="text-xs font-semibold text-primary hover:underline"
                                 >
@@ -357,6 +377,7 @@ export default function MobileNav() {
                     <div className="pt-4 px-4 pb-6 border-t border-border/30 mt-4">
                       <a
                         href={activeCategory.href}
+                        data-astro-prefetch="hover"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center justify-between text-sm font-semibold text-primary hover:underline py-2"
                       >

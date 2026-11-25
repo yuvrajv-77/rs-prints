@@ -169,6 +169,7 @@ export default function HeroBannerSlider({
             >
               <a
                 href={slide.href}
+                data-astro-prefetch="hover"
                 className={`relative block aspect-[2170/724] w-full overflow-hidden select-none ${
                   slide.bgClass || "bg-card"
                 }`}

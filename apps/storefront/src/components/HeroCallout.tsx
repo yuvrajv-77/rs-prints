@@ -24,16 +24,18 @@ export default function HeroCallout() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto z-10">
                 <a
                     href="/contact"
+                    data-astro-prefetch="hover"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:brightness-105 active:scale-[0.98] transition-all"
                 >
                     Start Custom Order
                     <ArrowUpRight className="size-4" />
                 </a>
                 <a
-                    href="/reviews"
+                    href="/categories"
+                    data-astro-prefetch="hover"
                     className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border border-border bg-background hover:bg-muted/70 text-foreground text-sm font-medium transition-all"
                 >
-                    Customer Reviews
+                    Explore Categories
                 </a>
             </div>
         </div>

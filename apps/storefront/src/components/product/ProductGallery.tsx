@@ -75,13 +75,21 @@ export default function ProductGallery({
             alt={currentImage?.alt || "Product image"}
             className="w-full h-full object-cover object-center transition-transform duration-300"
             loading="eager"
+            onError={(e) => {
+              const target = e.currentTarget
+              if (!target.src.endsWith("/image-not-available.svg")) {
+                target.onerror = null
+                target.src = "/image-not-available.svg"
+              }
+            }}
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-muted/40 text-muted-foreground p-6 text-center">
-            <span className="text-4xl mb-2">🎁</span>
-            <p className="text-xs font-medium text-foreground/80">Custom Personalized Merchandise</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">High-definition print sample</p>
-          </div>
+          <img
+            src="/image-not-available.svg"
+            alt={currentImage?.alt || "Image Not Available"}
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+          />
         )}
       </div>
 

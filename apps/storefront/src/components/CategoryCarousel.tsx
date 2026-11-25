@@ -43,13 +43,13 @@ export const HOME_CATEGORIES: CategoryCardItem[] = [
   {
     id: "home-living",
     title: "Home & Living",
-    href: "/categories/pillows-cushions",
+    href: "/categories/home-living",
     image: "/categories/home-living.jpg",
   },
   {
     id: "gifts-accessories",
     title: "Gifts & Accessories",
-    href: "/categories/mdf-gifts",
+    href: "/categories/gifts-accessories",
     image: "/categories/gifts-accessories.jpg",
   },
 ]
@@ -85,6 +85,7 @@ export default function CategoryCarousel({
             {viewAllHref && (
               <a
                 href={viewAllHref}
+                data-astro-prefetch="hover"
                 className="hidden sm:inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-primary hover:underline mr-1 transition-colors"
               >
                 View all
@@ -105,6 +106,7 @@ export default function CategoryCarousel({
             >
               <a
                 href={category.href}
+                data-astro-prefetch="hover"
                 className="group block text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
               >
                 {/* Thumbnail Card */}

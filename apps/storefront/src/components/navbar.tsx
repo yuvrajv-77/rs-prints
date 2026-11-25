@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react"
 import { cn } from "cn"
 import {
   NAVIGATION_CATEGORIES,
+  filterNavigationCategories,
   type NavigationCategory,
   type NavigationSubcategory,
 } from "./navigation/navigationData"
@@ -40,9 +41,17 @@ const CATEGORY_SPOTLIGHTS: Record<
   },
 }
 
-export default function Navbar() {
+interface NavbarProps {
+  activeCollectionSlugs?: string[] | null
+}
+
+export default function Navbar({ activeCollectionSlugs }: NavbarProps) {
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const categories = React.useMemo(
+    () => filterNavigationCategories(NAVIGATION_CATEGORIES, activeCollectionSlugs),
+    [activeCollectionSlugs]
+  )
 
   const handleMouseEnter = (categoryId: string) => {
     if (timeoutRef.current) {
@@ -66,7 +75,7 @@ export default function Navbar() {
     }
   }, [])
 
-  const activeCategory = NAVIGATION_CATEGORIES.find(
+  const activeCategory = categories.find(
     (c) => c.id === activeCategoryId
   )
   const isHelpActive = activeCategoryId === "help"
@@ -80,6 +89,7 @@ export default function Navbar() {
         {/* Subcategory Heading */}
         <a
           href={subcat.href}
+          data-astro-prefetch="hover"
           onClick={() => setActiveCategoryId(null)}
           className="text-[15px] font-bold text-foreground hover:text-primary transition-colors block mb-3 tracking-tight truncate"
           title={subcat.title}
@@ -93,6 +103,7 @@ export default function Navbar() {
             <li key={idx}>
               <a
                 href={item.href}
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug truncate"
                 title={item.title}
@@ -107,6 +118,7 @@ export default function Navbar() {
         <div className="mt-3 pt-1">
           <a
             href={subcat.href}
+            data-astro-prefetch="hover"
             onClick={() => setActiveCategoryId(null)}
             className="text-[13px] font-semibold text-primary hover:underline inline-flex items-center gap-1"
           >
@@ -134,6 +146,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/about"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -143,6 +156,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/contact"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -152,6 +166,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/bulk-order"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -170,6 +185,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/terms-and-conditions"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -179,6 +195,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/shipping-and-refund-policy"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -188,6 +205,7 @@ export default function Navbar() {
             <li>
               <a
                 href="/privacy-policy"
+                data-astro-prefetch="hover"
                 onClick={() => setActiveCategoryId(null)}
                 className="text-[14px] text-foreground/75 hover:text-foreground hover:underline transition-colors block leading-snug"
               >
@@ -283,6 +301,7 @@ export default function Navbar() {
         {spotlight && (
           <a
             href={category.href}
+            data-astro-prefetch="hover"
             onClick={() => setActiveCategoryId(null)}
             className="group/card w-80 shrink-0 rounded-2xl bg-muted/40 border border-border/60 p-4 flex flex-col justify-between hover:border-primary/40 hover:bg-muted/60 transition-all overflow-hidden"
           >
@@ -324,7 +343,7 @@ export default function Navbar() {
     <div className="flex items-center h-20" onMouseLeave={handleMouseLeave}>
       {/* Top Navigation Links Bar */}
       <nav className="flex items-center gap-1 xl:gap-2 h-full">
-        {NAVIGATION_CATEGORIES.map((category) => {
+        {categories.map((category) => {
           const isActive = activeCategoryId === category.id
 
           return (
@@ -335,6 +354,7 @@ export default function Navbar() {
             >
               <a
                 href={category.href}
+                data-astro-prefetch="hover"
                 className={cn(
                   "relative flex items-center px-3.5 py-2 text-[15px] transition-colors cursor-pointer select-none",
                   isActive
@@ -360,6 +380,7 @@ export default function Navbar() {
         >
           <a
             href="/contact"
+            data-astro-prefetch="hover"
             className={cn(
               "relative flex items-center px-3.5 py-2 text-[15px] transition-colors cursor-pointer select-none",
               isHelpActive
@@ -407,6 +428,7 @@ export default function Navbar() {
                   <>
                     <a
                       href="/contact"
+                      data-astro-prefetch="hover"
                       onClick={() => setActiveCategoryId(null)}
                       className="text-[15px] font-bold text-foreground hover:text-primary hover:underline flex items-center gap-2 group"
                     >
@@ -427,6 +449,7 @@ export default function Navbar() {
                   <>
                     <a
                       href={activeCategory.href}
+                      data-astro-prefetch="hover"
                       onClick={() => setActiveCategoryId(null)}
                       className="text-[15px] font-bold text-foreground hover:text-primary hover:underline flex items-center gap-2 group"
                     >

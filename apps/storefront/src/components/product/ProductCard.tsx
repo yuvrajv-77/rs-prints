@@ -59,6 +59,7 @@ export default function ProductCard({
   return (
     <a
       href={`/products/${product.slug}`}
+      data-astro-prefetch="hover"
       data-product-slug={product.slug}
       data-category-slug={categorySlug}
       data-subcategory={categorySlug}

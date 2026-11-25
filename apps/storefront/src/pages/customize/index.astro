@@ -12,8 +12,8 @@ import { getProductBySlug } from "@/lib/vendure/queries/products"
 import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
 import { setEdgeCache, CACHE_PRESETS } from "@/lib/cache"
 
-// Cache edge response
-setEdgeCache(Astro.response, CACHE_PRESETS.STATIC_PAGE)
+// Edge Caching
+setEdgeCache(Astro.response, CACHE_PRESETS.PRODUCT_DETAIL)
 
 const typeParam = Astro.url.searchParams.get("type")?.toLowerCase() || ""
 const slugParam = Astro.url.searchParams.get("slug") || ""

@@ -25,7 +25,7 @@ export default function Footer() {
                     
                     {/* Brand & Mission Statement */}
                     <div className="max-w-md space-y-3">
-                        <a href="/" className="inline-flex items-center gap-2.5 sm:gap-3 group select-none">
+                        <a href="/" data-astro-prefetch="hover" className="inline-flex items-center gap-2.5 sm:gap-3 group select-none">
                             <img
                                 src="/favicon.png"
                                 alt="RS Prints Logo"
@@ -92,36 +92,35 @@ export default function Footer() {
                     <div className="flex flex-wrap items-start sm:items-center gap-x-6 sm:gap-x-7 gap-y-3 text-sm font-medium">
                         <a 
                             href="/about" 
+                            data-astro-prefetch="hover"
                             className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
                         >
                             About Us
                         </a>
                         <a 
-                            href="/reviews" 
-                            className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
-                        >
-                            Happy Customers
-                        </a>
-                        <a 
                             href="/privacy-policy" 
+                            data-astro-prefetch="hover"
                             className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
                         >
                             Privacy Policy
                         </a>
                         <a 
                             href="/terms-and-conditions" 
+                            data-astro-prefetch="hover"
                             className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
                         >
                             Terms & Conditions
                         </a>
                         <a 
                             href="/shipping-and-refund-policy" 
+                            data-astro-prefetch="hover"
                             className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
                         >
                             Shipping & Returns
                         </a>
                         <a 
                             href="/contact" 
+                            data-astro-prefetch="hover"
                             className="inline-flex items-center gap-1 text-primary font-semibold hover:underline underline-offset-4"
                         >
                             Contact Desk

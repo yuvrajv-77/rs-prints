@@ -21,6 +21,42 @@ export interface NavigationCategory {
   subcategories: NavigationSubcategory[]
 }
 
+function slugMatchesActiveSet(slug: string, activeSet: Set<string>): boolean {
+  const clean = slug.toLowerCase().trim()
+  if (activeSet.has(clean)) return true
+  if (clean.endsWith("s") && activeSet.has(clean.slice(0, -1))) return true
+  if (!clean.endsWith("s") && activeSet.has(`${clean}s`)) return true
+  return false
+}
+
+/**
+ * Filters static navigation categories & subcategories against active public
+ * Vendure collection slugs so collections marked Private in Admin are hidden.
+ * When `activeSlugs` is null/empty (e.g. backend offline), returns the full list.
+ */
+export function filterNavigationCategories(
+  categories: NavigationCategory[],
+  activeSlugs?: string[] | null
+): NavigationCategory[] {
+  if (!activeSlugs || activeSlugs.length === 0) {
+    return categories
+  }
+
+  const activeSet = new Set(activeSlugs.map((s) => s.toLowerCase().trim()))
+
+  return categories
+    .filter((cat) => slugMatchesActiveSet(cat.id, activeSet))
+    .map((cat) => {
+      const visibleSubs = cat.subcategories.filter((sub) =>
+        slugMatchesActiveSet(sub.id, activeSet)
+      )
+      return {
+        ...cat,
+        subcategories: visibleSubs.length > 0 ? visibleSubs : cat.subcategories,
+      }
+    })
+}
+
 export const NAVIGATION_CATEGORIES: NavigationCategory[] = [
   {
     "id": "mugs",

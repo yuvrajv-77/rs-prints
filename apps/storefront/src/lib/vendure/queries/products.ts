@@ -111,10 +111,63 @@ export async function getProducts() {
   return data.products.items;
 }
 
-/** Fetches full product entity by its slug for detail page rendering */
+const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
+const MAX_PRODUCT_CACHE_ENTRIES = 250;
+const MAX_COLLECTION_CACHE_ENTRIES = 120;
+
+interface TimedCacheEntry<T> {
+  data: T;
+  expiresAt: number;
+}
+
+function setBoundedCache<T>(
+  cache: Map<string, TimedCacheEntry<T>>,
+  key: string,
+  data: T,
+  ttlMs: number,
+  maxEntries: number
+): void {
+  if (cache.has(key)) {
+    cache.delete(key);
+  } else if (cache.size >= maxEntries) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) {
+      cache.delete(oldestKey);
+    }
+  }
+  cache.set(key, { data, expiresAt: Date.now() + ttlMs });
+}
+
+const productCache = new Map<string, TimedCacheEntry<any>>();
+const productPending = new Map<string, Promise<any>>();
+
+/** Fetches full product entity by its slug for detail page rendering (cached 5 min + deduplicated) */
 export async function getProductBySlug(slug: string) {
-  const data = await vendureClient.request(GET_PRODUCT_BY_SLUG, { slug });
-  return data.product;
+  const key = slug?.trim();
+  if (!key) return null;
+
+  const cached = productCache.get(key);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.data;
+  }
+
+  const inFlight = productPending.get(key);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = (async () => {
+    const data = await vendureClient.request(GET_PRODUCT_BY_SLUG, { slug: key });
+    if (data.product) {
+      setBoundedCache(productCache, key, data.product, DEFAULT_CACHE_TTL_MS, MAX_PRODUCT_CACHE_ENTRIES);
+    }
+    return data.product;
+  })().finally(() => {
+    productPending.delete(key);
+  });
+
+  productPending.set(key, request);
+  return request;
 }
 
 /**
@@ -244,13 +297,14 @@ export const GET_COLLECTION_PRODUCTS_SEARCH_QUERY = `
   }
 `;
 
-// In-memory cache for collection carousel queries (5 minutes TTL)
-const collectionCache = new Map<string, { data: Array<{ product: any; categorySlug: string }>; expiresAt: number }>();
-const COLLECTION_CACHE_TTL_MS = 5 * 60 * 1000;
+// In-memory cache & in-flight deduplication for collection carousel queries (5 minutes TTL)
+const collectionCache = new Map<string, TimedCacheEntry<Array<{ product: any; categorySlug: string }>>>();
+const collectionPending = new Map<string, Promise<Array<{ product: any; categorySlug: string }>>>();
+const COLLECTION_CACHE_TTL_MS = DEFAULT_CACHE_TTL_MS;
 
 /**
  * Fetches products in a specific collection by slug (or list of candidate slugs).
- * Caches the result in memory for 5 minutes to prevent redundant database traffic.
+ * Caches the result in memory for 5 minutes and deduplicates concurrent requests.
  */
 export async function getCollectionProducts(
   slugOrSlugs: string | string[],
@@ -261,6 +315,7 @@ export async function getCollectionProducts(
   const expandedSlugs = new Set<string>();
   for (const s of rawSlugs) {
     const trimmed = s.toLowerCase().trim();
+    if (!trimmed) continue;
     expandedSlugs.add(trimmed);
     if (trimmed.startsWith("customer-")) {
       expandedSlugs.add(trimmed.replace(/^customer-/, "customers-"));
@@ -281,8 +336,9 @@ export async function getCollectionProducts(
     }
   }
   const slugs = Array.from(expandedSlugs);
-  const primarySlug = slugs[0];
-  const cacheKey = `${primarySlug}:${take}`;
+  if (slugs.length === 0) return [];
+
+  const cacheKey = `${slugs.join(",")}:${take}`;
   const now = Date.now();
 
   const cached = collectionCache.get(cacheKey);
@@ -290,190 +346,202 @@ export async function getCollectionProducts(
     return cached.data;
   }
 
-  const { mapVendureProductToStorefrontProduct } = await import("../mappers");
-  const { getProductBySlug } = await import("@/data/products");
+  const inFlight = collectionPending.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
 
-  // 1. Tier 1: Direct Collection API (exact same product model and images as category pages)
-  for (const slug of slugs) {
-    try {
-      const colData = await vendureClient.request<{
-        collection?: {
-          id: string;
-          name: string;
-          slug: string;
-          productVariants?: {
-            items: Array<{
-              product?: any;
-            }>;
+  const request = (async () => {
+    const { mapVendureProductToStorefrontProduct } = await import("../mappers");
+    const { getProductBySlug: getMockProductBySlug } = await import("@/data/products");
+
+    // 1. Tier 1: Direct Collection API (exact same product model and images as category pages)
+    for (const slug of slugs) {
+      try {
+        const colData = await vendureClient.request<{
+          collection?: {
+            id: string;
+            name: string;
+            slug: string;
+            productVariants?: {
+              items: Array<{
+                product?: any;
+              }>;
+            };
           };
-        };
-      }>(GET_COLLECTION_PRODUCTS_DETAILED_QUERY, { slug });
+        }>(GET_COLLECTION_PRODUCTS_DETAILED_QUERY, { slug });
 
-      const rawVariants = colData.collection?.productVariants?.items || [];
-      if (rawVariants.length > 0) {
-        const seenIds = new Set<string>();
-        const uniqueProducts: any[] = [];
-        for (const v of rawVariants) {
-          if (v.product && !seenIds.has(String(v.product.id))) {
-            seenIds.add(String(v.product.id));
-            uniqueProducts.push(v.product);
+        const rawVariants = colData.collection?.productVariants?.items || [];
+        if (rawVariants.length > 0) {
+          const seenIds = new Set<string>();
+          const uniqueProducts: any[] = [];
+          for (const v of rawVariants) {
+            if (v.product && !seenIds.has(String(v.product.id))) {
+              seenIds.add(String(v.product.id));
+              uniqueProducts.push(v.product);
+            }
+          }
+
+          if (uniqueProducts.length > 0) {
+            const mapped = uniqueProducts.map((p) => {
+              const storefrontProd = mapVendureProductToStorefrontProduct(p);
+              const catSlug = resolveItemCategorySlug(p.slug, storefrontProd.category || p.collections?.[0]?.slug);
+              return {
+                product: storefrontProd,
+                categorySlug: catSlug,
+              };
+            });
+
+            // Prioritize products with uploaded images so cards show real photos first
+            mapped.sort((a, b) => {
+              const aHas = (a.product.images?.length > 0 && Boolean(a.product.images[0]?.url)) ? 1 : 0;
+              const bHas = (b.product.images?.length > 0 && Boolean(b.product.images[0]?.url)) ? 1 : 0;
+              return bHas - aHas;
+            });
+
+            const sliced = mapped.slice(0, take);
+            setBoundedCache(collectionCache, cacheKey, sliced, COLLECTION_CACHE_TTL_MS, MAX_COLLECTION_CACHE_ENTRIES);
+            return sliced;
           }
         }
+      } catch {
+        // Continue to next candidate slug or Tier 2 Search API
+      }
+    }
 
-        if (uniqueProducts.length > 0) {
-          const mapped = uniqueProducts.map((p) => {
-            const storefrontProd = mapVendureProductToStorefrontProduct(p);
-            const catSlug = resolveItemCategorySlug(p.slug, storefrontProd.category || p.collections?.[0]?.slug);
+    // 2. Tier 2: Search API fallback
+    for (const slug of slugs) {
+      try {
+        const data = await vendureClient.request<{
+          search?: {
+            totalItems: number;
+            items: Array<{
+              productId: string;
+              slug: string;
+              productName: string;
+              description: string;
+              productAsset?: { id: string; preview: string } | null;
+              productVariantAsset?: { id: string; preview: string } | null;
+              priceWithTax: { value?: number; min?: number; max?: number };
+            }>;
+          };
+        }>(GET_COLLECTION_PRODUCTS_SEARCH_QUERY, { collectionSlug: slug, take });
+
+        const searchItems = data.search?.items || [];
+        if (searchItems.length > 0) {
+          const mappedItems = searchItems.map((item) => {
+            const pricePaise = item.priceWithTax?.value ?? item.priceWithTax?.min ?? 19900;
+            const priceNumber = Math.round(pricePaise / 100);
+            const rawPreview = item.productAsset?.preview || item.productVariantAsset?.preview || "";
+            const previewUrl = formatAssetUrl(rawPreview);
+
+            // Check if local catalogue has rich details for this slug
+            const localMock = getMockProductBySlug(item.slug);
+            const itemCategorySlug = resolveItemCategorySlug(item.slug, localMock?.category);
+
+            let product: any;
+            if (localMock) {
+              product = {
+                ...localMock,
+                title: item.productName || localMock.title,
+                startingPrice: `₹${priceNumber}`,
+                startingPriceNumber: priceNumber,
+                featuredAsset: previewUrl
+                  ? { id: item.productAsset?.id || item.productVariantAsset?.id, preview: previewUrl }
+                  : localMock.featuredAsset,
+                images: previewUrl
+                  ? [{ url: previewUrl, alt: item.productName, isPrimary: true }, ...(localMock.images || [])]
+                  : localMock.images,
+              };
+            } else {
+              product = {
+                id: String(item.productId),
+                slug: item.slug,
+                category: itemCategorySlug,
+                title: item.productName,
+                tagline: item.description
+                  ? item.description.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 100)
+                  : "Custom printed personalized merchandise.",
+                description: item.description || "",
+                startingPrice: `₹${priceNumber}`,
+                startingPriceNumber: priceNumber,
+                minOrder: "1 Piece",
+                rating: 4.9,
+                reviewCount: 36,
+                images: previewUrl ? [{ url: previewUrl, alt: item.productName, isPrimary: true }] : [],
+                featuredAsset: previewUrl
+                  ? { id: item.productAsset?.id || item.productVariantAsset?.id, preview: previewUrl }
+                  : undefined,
+                highlights: [],
+                faqs: [],
+              };
+            }
+
             return {
-              product: storefrontProd,
-              categorySlug: catSlug,
+              product,
+              categorySlug: itemCategorySlug,
             };
           });
 
-          // Prioritize products with uploaded images so cards show real photos first
-          mapped.sort((a, b) => {
+          // Prioritize products with images
+          mappedItems.sort((a, b) => {
             const aHas = (a.product.images?.length > 0 && Boolean(a.product.images[0]?.url)) ? 1 : 0;
             const bHas = (b.product.images?.length > 0 && Boolean(b.product.images[0]?.url)) ? 1 : 0;
             return bHas - aHas;
           });
 
-          const sliced = mapped.slice(0, take);
-          collectionCache.set(cacheKey, { data: sliced, expiresAt: now + COLLECTION_CACHE_TTL_MS });
+          const sliced = mappedItems.slice(0, take);
+          setBoundedCache(collectionCache, cacheKey, sliced, COLLECTION_CACHE_TTL_MS, MAX_COLLECTION_CACHE_ENTRIES);
           return sliced;
         }
+      } catch (err) {
+        console.warn(`[Vendure] Search query failed for collection slug "${slug}":`, err);
       }
-    } catch {
-      // Continue to next candidate slug or Tier 2 Search API
     }
-  }
 
-  // 2. Tier 2: Search API fallback
-  for (const slug of slugs) {
+    // 3. Tier 3: Secondary fallback: check products list matching collection slug
     try {
       const data = await vendureClient.request<{
-        search?: {
-          totalItems: number;
+        products: {
           items: Array<{
-            productId: string;
+            id: string;
+            name: string;
             slug: string;
-            productName: string;
             description: string;
-            productAsset?: { id: string; preview: string } | null;
-            productVariantAsset?: { id: string; preview: string } | null;
-            priceWithTax: { value?: number; min?: number; max?: number };
+            featuredAsset: { id: string; preview: string } | null;
+            variants: Array<{ id: string; name: string; price: number; priceWithTax: number }>;
+            collections: Array<{ id: string; slug: string }>;
           }>;
         };
-      }>(GET_COLLECTION_PRODUCTS_SEARCH_QUERY, { collectionSlug: slug, take });
+      }>(GET_FEATURED_PRODUCTS_QUERY, { take: 40 });
 
-      const searchItems = data.search?.items || [];
-      if (searchItems.length > 0) {
-        const mappedItems = searchItems.map((item) => {
-          const pricePaise = item.priceWithTax?.value ?? item.priceWithTax?.min ?? 19900;
-          const priceNumber = Math.round(pricePaise / 100);
-          const rawPreview = item.productAsset?.preview || item.productVariantAsset?.preview || "";
-          const previewUrl = formatAssetUrl(rawPreview);
+      const matching = (data.products?.items || []).filter((p) =>
+        p.collections?.some((c) => slugs.includes(c.slug.toLowerCase()))
+      );
 
-          // Check if local catalogue has rich details for this slug
-          const localMock = getProductBySlug(item.slug);
-          const itemCategorySlug = resolveItemCategorySlug(item.slug, localMock?.category);
-
-          let product: any;
-          if (localMock) {
-            product = {
-              ...localMock,
-              title: item.productName || localMock.title,
-              startingPrice: `₹${priceNumber}`,
-              startingPriceNumber: priceNumber,
-              featuredAsset: previewUrl
-                ? { id: item.productAsset?.id || item.productVariantAsset?.id, preview: previewUrl }
-                : localMock.featuredAsset,
-              images: previewUrl
-                ? [{ url: previewUrl, alt: item.productName, isPrimary: true }, ...(localMock.images || [])]
-                : localMock.images,
-            };
-          } else {
-            product = {
-              id: String(item.productId),
-              slug: item.slug,
-              category: itemCategorySlug,
-              title: item.productName,
-              tagline: item.description
-                ? item.description.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 100)
-                : "Custom printed personalized merchandise.",
-              description: item.description || "",
-              startingPrice: `₹${priceNumber}`,
-              startingPriceNumber: priceNumber,
-              minOrder: "1 Piece",
-              rating: 4.9,
-              reviewCount: 36,
-              images: previewUrl ? [{ url: previewUrl, alt: item.productName, isPrimary: true }] : [],
-              featuredAsset: previewUrl
-                ? { id: item.productAsset?.id || item.productVariantAsset?.id, preview: previewUrl }
-                : undefined,
-              highlights: [],
-              faqs: [],
-            };
-          }
-
+      if (matching.length > 0) {
+        const mapped = matching.slice(0, take).map((p) => {
+          const localMock = getMockProductBySlug(p.slug);
+          const itemCategorySlug = resolveItemCategorySlug(p.slug, localMock?.category);
           return {
-            product,
+            product: mapVendureProductToStorefrontProduct(p),
             categorySlug: itemCategorySlug,
           };
         });
-
-        // Prioritize products with images
-        mappedItems.sort((a, b) => {
-          const aHas = (a.product.images?.length > 0 && Boolean(a.product.images[0]?.url)) ? 1 : 0;
-          const bHas = (b.product.images?.length > 0 && Boolean(b.product.images[0]?.url)) ? 1 : 0;
-          return bHas - aHas;
-        });
-
-        const sliced = mappedItems.slice(0, take);
-        collectionCache.set(cacheKey, { data: sliced, expiresAt: now + COLLECTION_CACHE_TTL_MS });
-        return sliced;
+        setBoundedCache(collectionCache, cacheKey, mapped, COLLECTION_CACHE_TTL_MS, MAX_COLLECTION_CACHE_ENTRIES);
+        return mapped;
       }
-    } catch (err) {
-      console.warn(`[Vendure] Search query failed for collection slug "${slug}":`, err);
+    } catch {
+      // Silent catch, fall back to empty
     }
-  }
 
-  // 3. Tier 3: Secondary fallback: check products list matching collection slug
-  try {
-    const data = await vendureClient.request<{
-      products: {
-        items: Array<{
-          id: string;
-          name: string;
-          slug: string;
-          description: string;
-          featuredAsset: { id: string; preview: string } | null;
-          variants: Array<{ id: string; name: string; price: number; priceWithTax: number }>;
-          collections: Array<{ id: string; slug: string }>;
-        }>;
-      };
-    }>(GET_FEATURED_PRODUCTS_QUERY, { take: 40 });
+    return [];
+  })().finally(() => {
+    collectionPending.delete(cacheKey);
+  });
 
-    const matching = (data.products?.items || []).filter((p) =>
-      p.collections?.some((c) => slugs.includes(c.slug.toLowerCase()))
-    );
-
-    if (matching.length > 0) {
-      const mapped = matching.slice(0, take).map((p) => {
-        const localMock = getProductBySlug(p.slug);
-        const itemCategorySlug = resolveItemCategorySlug(p.slug, localMock?.category);
-        return {
-          product: mapVendureProductToStorefrontProduct(p),
-          categorySlug: itemCategorySlug,
-        };
-      });
-      collectionCache.set(cacheKey, { data: mapped, expiresAt: now + COLLECTION_CACHE_TTL_MS });
-      return mapped;
-    }
-  } catch {
-    // Silent catch, fall back to empty
-  }
-
-  return [];
+  collectionPending.set(cacheKey, request);
+  return request;
 }
 
 /**
@@ -508,6 +576,9 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
   }
 `;
 
+const featuredFallbackCache = new Map<number, TimedCacheEntry<Array<{ product: any; categorySlug: string }>>>();
+const featuredFallbackPending = new Map<number, Promise<Array<{ product: any; categorySlug: string }>>>();
+
 export async function getFeaturedProducts(take = 8) {
   // Alias to customer-favorites collection
   const collectionItems = await getCollectionProducts(
@@ -528,30 +599,51 @@ export async function getFeaturedProducts(take = 8) {
     return collectionItems;
   }
 
-  try {
-    const data = await vendureClient.request<{
-      products: {
-        items: Array<{
-          id: string;
-          name: string;
-          slug: string;
-          description: string;
-          featuredAsset: { id: string; preview: string } | null;
-          variants: Array<{ id: string; name: string; price: number; priceWithTax: number }>;
-          collections: Array<{ id: string; slug: string }>;
-        }>;
-      };
-    }>(GET_FEATURED_PRODUCTS_QUERY, { take });
-
-    const { mapVendureProductToStorefrontProduct } = await import("../mappers");
-    return (data.products?.items || []).map((p) => ({
-      product: mapVendureProductToStorefrontProduct(p),
-      categorySlug: p.collections?.[0]?.slug || "products",
-    }));
-  } catch (error) {
-    console.warn("Could not fetch featured products from Vendure:", error);
-    return [];
+  const cached = featuredFallbackCache.get(take);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.data;
   }
+
+  const inFlight = featuredFallbackPending.get(take);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = (async () => {
+    try {
+      const data = await vendureClient.request<{
+        products: {
+          items: Array<{
+            id: string;
+            name: string;
+            slug: string;
+            description: string;
+            featuredAsset: { id: string; preview: string } | null;
+            variants: Array<{ id: string; name: string; price: number; priceWithTax: number }>;
+            collections: Array<{ id: string; slug: string }>;
+          }>;
+        };
+      }>(GET_FEATURED_PRODUCTS_QUERY, { take });
+
+      const { mapVendureProductToStorefrontProduct } = await import("../mappers");
+      const mapped = (data.products?.items || []).map((p) => ({
+        product: mapVendureProductToStorefrontProduct(p),
+        categorySlug: p.collections?.[0]?.slug || "products",
+      }));
+      if (mapped.length > 0) {
+        featuredFallbackCache.set(take, { data: mapped, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS });
+      }
+      return mapped;
+    } catch (error) {
+      console.warn("Could not fetch featured products from Vendure:", error);
+      return [];
+    }
+  })().finally(() => {
+    featuredFallbackPending.delete(take);
+  });
+
+  featuredFallbackPending.set(take, request);
+  return request;
 }
 
 /**
@@ -642,95 +734,198 @@ export const GET_VENDURE_CATALOGUE = graphql(`
   }
 `);
 
+export interface VendureGroupedCatalogueResult {
+  groupedSections: Array<{
+    id: string;
+    title: string;
+    description: string;
+    totalCount: number;
+    products: any[];
+    subcategories: Array<{
+      id: string;
+      title: string;
+      description: string;
+      products: any[];
+    }>;
+  }>;
+  facets: any[];
+  totalProducts: number;
+}
+
+let catalogueCache: TimedCacheEntry<VendureGroupedCatalogueResult> | null = null;
+let cataloguePending: Promise<VendureGroupedCatalogueResult> | null = null;
+
 /**
  * Groups all products into hierarchical categories & subcategories based on Vendure collections.
- * 
+ * Cached for 5 minutes with in-flight deduplication to avoid repeated full-catalog scans.
+ *
  * Logic:
  * 1. Identifies top-level parent collections (those attached to __root_collection__ or id=1).
  * 2. Groups child subcollections under their respective parent.
  * 3. Associates products matching each collection's id or slug.
  * 4. Catches unassigned products and places them under an "Other Products" fallback section.
  */
-export async function getVendureGroupedSections() {
-  const data = await vendureClient.request(GET_VENDURE_CATALOGUE);
-  const allCollections = data.collections.items;
-  const allProducts = data.products.items;
-  const allFacets = data.facets.items;
+export async function getVendureGroupedSections(): Promise<VendureGroupedCatalogueResult> {
+  if (catalogueCache && Date.now() < catalogueCache.expiresAt) {
+    return catalogueCache.data;
+  }
 
-  const { mapVendureProductToStorefrontProduct } = await import("../mappers");
+  if (cataloguePending) {
+    return cataloguePending;
+  }
 
-  // Top-level collections are those whose parent is __root_collection__ (or id === '1')
-  const topLevel = allCollections.filter(
-    (c) => !c.parent || c.parent.name === "__root_collection__" || c.parent.id === "1"
-  );
+  cataloguePending = (async (): Promise<VendureGroupedCatalogueResult> => {
+    const data = await vendureClient.request(GET_VENDURE_CATALOGUE);
+    const allCollections = data.collections.items;
+    const allProducts = data.products.items;
+    const allFacets = data.facets.items;
 
-  const sections = topLevel.map((parentCol) => {
-    // Child subcollections for this parent
-    const children = allCollections.filter(
-      (c) => c.parent && String(c.parent.id) === String(parentCol.id)
+    const { mapVendureProductToStorefrontProduct } = await import("../mappers");
+
+    // Top-level collections are those whose parent is __root_collection__ (or id === '1')
+    const topLevel = allCollections.filter(
+      (c) => !c.parent || c.parent.name === "__root_collection__" || c.parent.id === "1"
     );
 
-    const subcategoryDefs =
-      children.length > 0
-        ? children
-        : [parentCol];
-
-    const subcategories = subcategoryDefs.map((sub) => {
-      const matchingProducts = allProducts.filter((p) =>
-        p.collections.some(
-          (c) => String(c.id) === String(sub.id) || c.slug === sub.slug
-        )
+    const sections = topLevel.map((parentCol) => {
+      // Child subcollections for this parent
+      const children = allCollections.filter(
+        (c) => c.parent && String(c.parent.id) === String(parentCol.id)
       );
 
+      const subcategoryDefs =
+        children.length > 0
+          ? children
+          : [parentCol];
+
+      const subcategories = subcategoryDefs.map((sub) => {
+        const matchingProducts = allProducts.filter((p) =>
+          p.collections.some(
+            (c) => String(c.id) === String(sub.id) || c.slug === sub.slug
+          )
+        );
+
+        return {
+          id: sub.slug,
+          title: sub.name,
+          description: sub.description || `${sub.name} printing collection.`,
+          products: matchingProducts.map(mapVendureProductToStorefrontProduct),
+        };
+      });
+
+      const parentProducts = subcategories.flatMap((s) => s.products);
+
       return {
-        id: sub.slug,
-        title: sub.name,
-        description: sub.description || `${sub.name} printing collection.`,
-        products: matchingProducts.map(mapVendureProductToStorefrontProduct),
+        id: parentCol.slug,
+        title: parentCol.name,
+        description: parentCol.description || `Explore our custom ${parentCol.name.toLowerCase()} range.`,
+        totalCount: parentProducts.length,
+        products: parentProducts,
+        subcategories,
       };
     });
 
-    const parentProducts = subcategories.flatMap((s) => s.products);
+    // Handle any products not assigned to top-level collections
+    const assignedProductIds = new Set(
+      sections.flatMap((s) => s.products.map((p) => p.id))
+    );
+    const unassigned = allProducts
+      .filter((p) => !assignedProductIds.has(p.id))
+      .map(mapVendureProductToStorefrontProduct);
 
-    return {
-      id: parentCol.slug,
-      title: parentCol.name,
-      description: parentCol.description || `Explore our custom ${parentCol.name.toLowerCase()} range.`,
-      totalCount: parentProducts.length,
-      products: parentProducts,
-      subcategories,
+    if (unassigned.length > 0) {
+      sections.push({
+        id: "other-products",
+        title: "Other Products",
+        description: "Additional custom printed products available in our shop.",
+        totalCount: unassigned.length,
+        products: unassigned,
+        subcategories: [
+          {
+            id: "general",
+            title: "All Products",
+            description: "Assorted merchandise and custom items.",
+            products: unassigned,
+          },
+        ],
+      });
+    }
+
+    const result: VendureGroupedCatalogueResult = {
+      groupedSections: sections,
+      facets: allFacets,
+      totalProducts: allProducts.length,
     };
+
+    if (allCollections.length > 0) {
+      collectionSlugsCache = {
+        data: allCollections.map((c) => c.slug.toLowerCase()),
+        expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS,
+      };
+    }
+
+    if (sections.length > 0 || allProducts.length > 0) {
+      catalogueCache = { data: result, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS };
+    }
+
+    return result;
+  })().finally(() => {
+    cataloguePending = null;
   });
 
-  // Handle any products not assigned to top-level collections
-  const assignedProductIds = new Set(
-    sections.flatMap((s) => s.products.map((p) => p.id))
-  );
-  const unassigned = allProducts
-    .filter((p) => !assignedProductIds.has(p.id))
-    .map(mapVendureProductToStorefrontProduct);
+  return cataloguePending;
+}
 
-  if (unassigned.length > 0) {
-    sections.push({
-      id: "other-products",
-      title: "Other Products",
-      description: "Additional custom printed products available in our shop.",
-      totalCount: unassigned.length,
-      products: unassigned,
-      subcategories: [
-        {
-          id: "general",
-          title: "All Products",
-          description: "Assorted merchandise and custom items.",
-          products: unassigned,
-        },
-      ],
-    });
+const GET_PUBLIC_COLLECTION_SLUGS_QUERY = `
+  query GetPublicCollectionSlugs {
+    collections(options: { take: 100 }) {
+      items {
+        slug
+      }
+    }
+  }
+`;
+
+let collectionSlugsCache: TimedCacheEntry<string[]> | null = null;
+let collectionSlugsPending: Promise<string[] | null> | null = null;
+
+/**
+ * Fetches all public (non-private) collection slugs from Vendure (cached 5 min + deduplicated).
+ * Returns null if Vendure is unreachable so navigation menus can fall back safely.
+ */
+export async function getPublicCollectionSlugs(): Promise<string[] | null> {
+  if (collectionSlugsCache && Date.now() < collectionSlugsCache.expiresAt) {
+    return collectionSlugsCache.data;
   }
 
-  return {
-    groupedSections: sections,
-    facets: allFacets,
-    totalProducts: allProducts.length,
-  };
+  if (collectionSlugsPending) {
+    return collectionSlugsPending;
+  }
+
+  collectionSlugsPending = (async (): Promise<string[] | null> => {
+    try {
+      const data = await vendureClient.request<{
+        collections?: { items?: Array<{ slug: string }> };
+      }>(GET_PUBLIC_COLLECTION_SLUGS_QUERY);
+
+      const slugs = (data.collections?.items || [])
+        .map((c) => c.slug?.toLowerCase().trim())
+        .filter((s): s is string => Boolean(s));
+
+      if (slugs.length > 0) {
+        collectionSlugsCache = {
+          data: slugs,
+          expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS,
+        };
+      }
+
+      return slugs;
+    } catch {
+      return null;
+    }
+  })().finally(() => {
+    collectionSlugsPending = null;
+  });
+
+  return collectionSlugsPending;
 }

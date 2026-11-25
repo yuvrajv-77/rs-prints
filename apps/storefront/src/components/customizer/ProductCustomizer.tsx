@@ -4,7 +4,6 @@ import { addToCart, updateLineQuantity, fetchActiveOrder, $cart } from "@/stores
 import { getProductBySlug, getProducts } from "@/lib/vendure/queries/products"
 import { mapVendureProductToStorefrontProduct } from "@/lib/vendure/mappers"
 import { uploadCustomizationArtwork, type UploadedVendureAsset } from "@/lib/vendure/mutations/customization"
-import { toast, Toaster } from "@/components/ui/toast"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { resolveCustomizerProfile, type CustomizerProductProfile } from "./config/product-registry"
@@ -679,11 +678,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         fileInputRef.current?.click()
       },
       onError: (msg) => {
-        toast.add({
-          title: "Editor Error",
-          description: msg,
-          type: "error"
-        })
+        console.error("[RS Prints Customizer] Editor error:", msg)
       }
     })
 
@@ -751,13 +746,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           ((draft.viewArtworks.front?.length || 0) > 0 || (draft.viewArtworks.back?.length || 0) > 0)
         ) {
           await applyRestoredArtworks(draft.viewArtworks)
-          if (!cancelled) {
-            toast.add({
-              title: "Customization Restored",
-              description: `Loaded your saved ${profile.productType} design.`,
-              type: "info"
-            })
-          }
           return
         }
 
@@ -790,11 +778,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
             )
             if (!cancelled) {
               saveCurrentDraftRef.current()
-              toast.add({
-                title: "Customization Loaded from Cart",
-                description: `Restored your saved ${profile.productType} design from Vendure.`,
-                type: "info"
-              })
             }
             return
           }
@@ -850,11 +833,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         setIsLoading(true)
         try {
           await fabricManagerRef.current.switchColor(targetView.image)
-          toast.add({
-            title: "Colour Updated",
-            description: `Switched garment to ${newColor.name}.`,
-            type: "info"
-          })
           triggerAutoSave()
         } catch (err) {
           console.error("Failed to switch color:", err)
@@ -864,11 +842,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       }
     } else {
       // For mugs, drinkware, and bags: purely select the product variant color without altering canvas mockup
-      toast.add({
-        title: "Colour Selected",
-        description: `Selected ${newColor.name} for this item.`,
-        type: "info"
-      })
       triggerAutoSave()
     }
   }, [profile.productType, selectedViewId, triggerAutoSave, syncUrlParams, productTitle, activeConfig.colors])
@@ -886,19 +859,9 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       setIsLoading(true)
       try {
         await fabricManagerRef.current.switchView(viewId, targetView.image, defaultPos)
-        toast.add({
-          title: `Switched to ${targetView.name}`,
-          description: "Artwork for each view is automatically preserved.",
-          type: "info"
-        })
         triggerAutoSave()
       } catch (err) {
         console.error("Failed to switch view:", err)
-        toast.add({
-          title: "View Switch Failed",
-          description: "Could not switch garment view angle.",
-          type: "error"
-        })
       } finally {
         setIsLoading(false)
       }
@@ -911,11 +874,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     const newPos = currentView.positions[positionId]
     if (newPos && fabricManagerRef.current) {
       fabricManagerRef.current.setupPrintableArea(newPos, true)
-      toast.add({
-        title: "Print Position Changed",
-        description: `Now editing ${newPos.name} (${newPos.physicalSizeLabel}).`,
-        type: "info"
-      })
       triggerAutoSave()
     }
   }, [currentView, triggerAutoSave])
@@ -923,30 +881,14 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
   // Upload artwork image
   const handleUploadImage = useCallback((file: File) => {
     if (fabricManagerRef.current && fabricManagerRef.current.getTotalArtworkCount() >= 2) {
-      toast.add({
-        title: "Maximum Images Reached",
-        description: "You can upload a maximum of 2 designs only. Please delete an image first.",
-        type: "warning"
-      })
       return
     }
 
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      toast.add({
-        title: "Unsupported File Format",
-        description: "Please upload a PNG, JPEG, or WEBP image file.",
-        type: "error"
-      })
       return
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
-      toast.add({
-        title: "File Too Large",
-        description: `Your file is ${sizeMB}MB. The maximum allowed upload size is 25MB.`,
-        type: "error"
-      })
       return
     }
 
@@ -958,28 +900,14 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       const testImg = new Image()
       testImg.onload = () => {
         if (testImg.naturalWidth < 50 || testImg.naturalHeight < 50) {
-          toast.add({
-            title: "Low Resolution Warning",
-            description: "Image dimensions are too small (<50px) for high quality printing.",
-            type: "warning"
-          })
           return
         }
 
         fabricManagerRef.current?.addArtworkImage(dataUrl, file.name)
-        toast.add({
-          title: "Artwork Added!",
-          description: `Loaded ${file.name}. Drag or resize inside the printable area.`,
-          type: "success"
-        })
         triggerAutoSave()
       }
       testImg.onerror = () => {
-        toast.add({
-          title: "Invalid Image",
-          description: "Could not decode the uploaded image file.",
-          type: "error"
-        })
+        console.error("Could not decode the uploaded image file.")
       }
       testImg.src = dataUrl
     }
@@ -988,11 +916,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   const handleTriggerUpload = useCallback(() => {
     if (allUploadedArtworks.length >= 2 || (fabricManagerRef.current && fabricManagerRef.current.getTotalArtworkCount() >= 2)) {
-      toast.add({
-        title: "Maximum Images Reached",
-        description: "You can upload a maximum of 2 designs only. Please delete an image first.",
-        type: "warning"
-      })
       return
     }
     fileInputRef.current?.click()
@@ -1076,11 +999,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
   const handleRemoveLayer = useCallback((layerId: string) => {
     fabricManagerRef.current?.removeArtwork(layerId)
-    toast.add({
-      title: "Layer Removed",
-      description: "Artwork layer deleted from canvas.",
-      type: "info"
-    })
     triggerAutoSave()
   }, [triggerAutoSave])
 
@@ -1111,11 +1029,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     setZoomLevel(1.0)
     setAllUploadedArtworks([])
     clearDesignDraft(draftPrimaryKey, draftSecondaryKeys)
-    toast.add({
-      title: "Design Cleared",
-      description: "Reset canvas and cleared design draft.",
-      type: "info"
-    })
   }, [draftPrimaryKey, draftSecondaryKeys])
 
   // Export Mockup Preview
@@ -1128,24 +1041,13 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     link.download = `rs-prints-${selectedColorId}-${selectedViewId}-mockup.png`
     link.href = dataUrl
     link.click()
-
-    toast.add({
-      title: "Mockup Preview Saved",
-      description: `${currentView.name} mockup proof downloaded as PNG.`,
-      type: "success"
-    })
-  }, [selectedColorId, selectedViewId, currentView])
+  }, [selectedColorId, selectedViewId])
 
   // Export Production Artwork (Transparent 300 DPI)
   const handleDownloadPrintFile = useCallback(() => {
     if (!fabricManagerRef.current) return
     const dataUrl = fabricManagerRef.current.exportProductionArtwork()
     if (!dataUrl) {
-      toast.add({
-        title: "No Artwork to Export",
-        description: `Please upload artwork on ${currentView.name} before downloading print files.`,
-        type: "warning"
-      })
       return
     }
 
@@ -1153,13 +1055,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     link.download = `rs-prints-print-ready-${selectedViewId}-${currentPosition.id}.png`
     link.href = dataUrl
     link.click()
-
-    toast.add({
-      title: "Production Print File Ready",
-      description: "Transparent, 300-DPI high-res file saved (no shirt background).",
-      type: "success"
-    })
-  }, [currentView, selectedViewId, currentPosition])
+  }, [selectedViewId, currentPosition])
 
   // Add to Cart workflow
   const handleAddToCart = useCallback(async () => {
@@ -1168,31 +1064,16 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
     if (profile.hasGarmentSizes) {
       const selectedSizesList = Object.entries(sizeQuantities).filter(([_, qty]) => qty > 0)
       if (selectedSizesList.length === 0) {
-        toast.add({
-          title: "No Size Selected",
-          description: "Please select at least 1 item in any size before adding to cart.",
-          type: "warning"
-        })
         return
       }
     } else {
       if (directQuantity < 1) {
-        toast.add({
-          title: "Invalid Quantity",
-          description: "Please select at least 1 piece before adding to cart.",
-          type: "warning"
-        })
         return
       }
     }
 
     const totalArtworks = fabricManagerRef.current.getTotalArtworkCount()
     if (totalArtworks === 0) {
-      toast.add({
-        title: "No Artwork Uploaded",
-        description: "Please upload at least one image before adding to cart.",
-        type: "warning"
-      })
       return
     }
 
@@ -1203,11 +1084,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
       const activeProduct = await ensureVendureProduct()
       const variants = activeProduct?.variants || []
       if (variants.length === 0) {
-        toast.add({
-          title: "Product Unavailable",
-          description: "Could not resolve a purchasable variant for this product. Please try opening Customize from the product page.",
-          type: "error"
-        })
+        console.error("Could not resolve a purchasable variant for this product.")
         return
       }
 
@@ -1571,21 +1448,11 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
         if (allSucceeded && addedItemsLog.length > 0) {
           isRedirecting = true
-          const sizeSummary = selectedSizesList.map(([s, q]) => `${s}: ${q}`).join(", ")
-          toast.add({
-            title: "Added to Cart!",
-            description: `${currentColor.name} • ${totalQuantity} piece(s) (${sizeSummary}) added to your cart.`,
-            type: "success"
-          })
           setTimeout(() => {
             window.location.href = productDetailUrl
           }, 450)
         } else {
-          toast.add({
-            title: "Could not add all items to cart",
-            description: "One or more selected variants could not be added. Please check availability and try again.",
-            type: "error"
-          })
+          console.error("One or more selected variants could not be added to cart.")
         }
       } else {
         // Direct quantity for Mugs, Bottles, Bags
@@ -1596,11 +1463,7 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
         })
 
         if (!matchedVariant?.id) {
-          toast.add({
-            title: "Variant Not Found",
-            description: "Could not find a matching product variant to add to cart.",
-            type: "error"
-          })
+          console.error("Could not find a matching product variant to add to cart.")
           return
         }
 
@@ -1720,29 +1583,15 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
 
         if (ok) {
           isRedirecting = true
-          toast.add({
-            title: "Added to Cart!",
-            description: `${resolvedName} • ${directQuantity} piece(s) added to your cart.`,
-            type: "success"
-          })
           setTimeout(() => {
             window.location.href = productDetailUrl
           }, 450)
         } else {
-          toast.add({
-            title: "Cart Error",
-            description: "Could not add customized item to cart. Please try again.",
-            type: "error"
-          })
+          console.error("Could not add customized item to cart.")
         }
       }
     } catch (err: any) {
       console.error("Failed to add customized item to cart:", err)
-      toast.add({
-        title: "Could not add to cart",
-        description: err?.message || "Please check connection.",
-        type: "error"
-      })
     } finally {
       if (!isRedirecting) {
         setIsAddingToCart(false)
@@ -2191,8 +2040,6 @@ export default function ProductCustomizer({ product }: ProductCustomizerProps) {
           </div>
         </div>
       )}
-
-      <Toaster />
     </div>
   )
 }

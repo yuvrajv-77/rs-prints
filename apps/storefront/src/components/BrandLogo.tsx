@@ -6,7 +6,7 @@ interface BrandLogoProps {
 
 function BrandLogo({ className = '' }: BrandLogoProps) {
   return (
-    <a href="/" className={`flex items-center gap-2 sm:gap-2.5 group select-none ${className}`}>
+    <a href="/" data-astro-prefetch="hover" className={`flex items-center gap-2 sm:gap-2.5 group select-none ${className}`}>
       <img
         src="/favicon.png"
         alt="RS Prints Logo"

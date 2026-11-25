@@ -11,6 +11,9 @@ export default defineConfig({
   site: "https://rs-prints.y74125.workers.dev/",
   output: "server",
   adapter: cloudflare(),
+  prefetch: {
+    defaultStrategy: "hover",
+  },
   vite: {
     plugins: [tailwindcss()],
   },

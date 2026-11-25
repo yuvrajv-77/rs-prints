@@ -6,6 +6,7 @@ import BrandLogo from "@/components/BrandLogo"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import UserNav from "@/components/UserNav"
+import { getPublicCollectionSlugs } from "@/lib/vendure/queries/products"
 
 interface Props {
   title?: string
@@ -48,6 +49,7 @@ const {
 // Build absolute canonical URL
 const siteUrl = "https://rsprints.in"
 const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
+const activeCollectionSlugs = await getPublicCollectionSlugs()
 ---
 
 <!doctype html>
@@ -98,13 +100,13 @@ const finalCanonical = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl
       <!-- Desktop Navigation Bar (hidden on mobile) -->
       <div class="container mx-auto hidden md:flex h-20 items-center justify-between px-4">
         <BrandLogo />
-        <Navbar client:load />
+        <Navbar client:load activeCollectionSlugs={activeCollectionSlugs} />
         <UserNav client:load />
       </div>
 
       <!-- Mobile Navigation Bar (visible only on mobile) -->
       <div class="block md:hidden">
-        <MobileNav client:load />
+        <MobileNav client:load activeCollectionSlugs={activeCollectionSlugs} />
       </div>
     </header>
 
